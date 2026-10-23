@@ -49,7 +49,7 @@ Parsing resolves each entry to a fully qualified key. If a key appears more than
 
 Each set value starts as text. Its form determines how common string decoding works. A declared type expression controls conversion for that occurrence. Without a declaration, a consumer can request conversion when it retrieves the value. A request that conflicts with a declaration, or a failed requested conversion, produces a type expression mismatch. An unset value remains marked unset; when string retrieval is allowed, it is equivalent to an empty string.
 
-This specification defines file properties, key and heading syntax, values, common string decoding, and the conversion and retrieval procedure. Standard type names, concrete conversion rules, some type-expression details, future file properties, version policies and a dedicated file extension remain undecided; section 12 lists them. The Go implementation is a sample parser and consumer with an illustrative type profile. See [the Go sample guide](../implementations/go/README.md) for its behavior and provisional choices.
+This specification defines file properties, key and heading syntax, values, common string decoding, and the conversion and retrieval procedure. Standard type names, concrete conversion rules, some type-expression details, future file properties, version policies and a dedicated file extension remain undecided; see [Undecided matters](open-issues.md). [Type profiles and candidate types](type-profile.md) records the candidate catalogue and established byte representation. The Go implementation is a sample parser and consumer with an illustrative type profile. See [the Go sample guide](../implementations/go/README.md) for its behaviour and provisional choices.
 
 ### 1.1 File property declarations
 
@@ -937,24 +937,7 @@ Syntax errors include line numbers, keys and causes as required, but do not incl
 
 ## 12. Undecided matters
 
-This document does not settle the following matters.
-
-| Item | Undecided details |
-|-------------|--------------------------------------------------------------------|
-| Future versions, properties and file extension | Future version numbering and compatibility policy, additional properties and dedicated file extension. The mandatory declaration region, blank separator and exact current declaration `@dotReg 1` are established in section 1.1 |
-| Type names | Standard permitted type names, aliases and case sensitivity |
-| Remaining details of type expression grammar | Empty type expressions and the concrete grammar for quotes and escapes within type expressions. The prohibition on internal whitespace, and the decision not to prohibit symbols and nested parentheses for compound types outright, are established. The type conversion layer defines the meaning and validity of each type expression |
-| Remaining whitespace rules for type annotations | Alignment tabs between the key and the type expression, or between the closing parenthesis and the colon |
-| Future escape extensions | Whether to add forms beyond the basic notation, `\u{H...}` and `\uXXXX` defined in section 3.4. The Unicode scalar value range, surrogate pairs in the four-digit form, rejection of invalid notation and absence of replacement are established |
-| Unicode character classification | The concrete classification of whitespace and control characters in unquoted key elements. The absence of Unicode normalisation, and the principle that quoted key elements allow any valid UTF-8 string, are established |
-| Remaining details of value quoting | Categories and notification points for decoding errors. First-character selection between wholly quoted and literal single-line values, preservation of later literal quotes and backslashes, triple-quoted markers and margins, literal pipe detection, form-specific whitespace and escape handling, and explicit empty block state are established in sections 8.2–8.4 |
-| Type-specific decoders | Concrete meaning and conversion for numbers, booleans, lists and other types. Common string decoding, empty-header detection including pipe blocks, explicit empty block values and the equivalence of unset to an empty string when string retrieval is permitted are established |
-| Type-specific interpretation of unset | Treatment in non-string types and the relationship to required fields and defaults |
-| Type expression identity | Matching of type aliases, alternative spellings, compound types and similar expressions |
-| Failure of conversion to a declared type | Error categories and notification points when conversion to the specified type expression is impossible. No fallback to another type expression or a string is permitted |
-| Relationship to schemas | Connecting configuration schemas to declarations and retrieval requests, and handling unknown type names |
-| APIs and value retention | Output representation and canonical notation for key paths that preserve element boundaries; output representation for type expressions; single, collection and indexed retrieval APIs, including aggregate handling of mixed declared types; retention of conversion results at retrieval; schema API; profile selection method. Preserving all source-ordered occurrences without overwriting is established |
-| Formatter | Whether one will be provided and its formatting policy |
+The [undecided-matters register](open-issues.md) lists the remaining decisions and links to the rules already established here. [Type profiles and candidate types](type-profile.md) contains the candidate catalogue and the established Base64 representation for `bytes`. Candidate names do not establish standard valid types or Go sample capabilities.
 
 ## 13. Conformance checking
 

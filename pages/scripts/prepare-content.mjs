@@ -77,6 +77,8 @@ export async function prepareContent() {
     '',
     '**Experimental types.** The `string`, `int` and `bool` annotations belong to the Go sample’s demo profile. Standard type names and conversion rules remain undecided.',
     '',
+    'See [type profiles and candidate types](../type-profile/) for type-specific representations and candidates, and [undecided matters](../open-issues/) for the remaining decisions.',
+    '',
     '[Download sample.txt](../examples/sample.txt) · [Run the Go sample](../implementations/go/)',
     '',
     '```text',

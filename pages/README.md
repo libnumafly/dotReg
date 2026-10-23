@@ -38,6 +38,8 @@ The site imports these repository files rather than maintaining separate copies:
 | `../docs/README.md` | `documentation/` |
 | `../docs/getting-started.md` | `getting-started/` |
 | `../docs/config-format.md` | `specification/` |
+| `../docs/type-profile.md` | `type-profile/` |
+| `../docs/open-issues.md` | `open-issues/` |
 | `../docs/conformance.md` | `conformance/` |
 | `../implementations/go/README.md` | `implementations/go/` |
 | `../implementations/go/PERFORMANCE.md` | `implementations/go/performance/` |

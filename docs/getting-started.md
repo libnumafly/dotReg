@@ -2,7 +2,7 @@
 
 dotReg uses `key: value` lines. Dots separate key elements. Headings group related keys, and explicit blocks hold multiline values.
 
-This guide introduces the notation. The [reference specification](config-format.md) defines every rule, and [section 12](config-format.md#12-undecided-matters) lists the parts still open.
+This guide introduces the notation. The [reference specification](config-format.md) defines the core rules, and [undecided matters](open-issues.md) lists the parts still open.
 
 ## Contents
 
@@ -147,7 +147,7 @@ Values are decoded as strings first. A declaration converts that occurrence to i
 | `A.Label:42` | `int` | Try converting the string when read; failure is a type mismatch |
 | `A.Label:42` | `string` | Return the string |
 
-Each occurrence has its own annotation. The names and behavior of standard types are still undecided; `int` and `string` here illustrate the rules and the Go sample's experimental profile. See [type annotation rules](config-format.md#6-type-annotations) and [the Go guide](../implementations/go/README.md#type-conversion-and-the-callers-configuration-schema).
+Each occurrence has its own annotation. The names and behaviour of standard types are still undecided; `int` and `string` here illustrate the rules and the Go sample's experimental profile. See [type annotation rules](config-format.md#6-type-annotations), [type profiles and candidate types](type-profile.md) and [the Go guide](../implementations/go/README.md#type-conversion-and-the-callers-configuration-schema).
 
 ## Try the Go sample
 

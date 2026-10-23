@@ -29,8 +29,10 @@ export default defineConfig({
         ] },
         { label: 'The notation', items: [
           { label: 'Specification', slug: 'specification' },
+          { label: 'Type profiles and candidate types', slug: 'type-profile' },
           { label: 'Conformance checklist', slug: 'conformance' },
           { label: 'Example configuration', slug: 'examples' },
+          { label: 'Undecided matters', slug: 'open-issues' },
         ] },
         { label: 'Implementations', items: [
           { label: 'Go sample', slug: 'implementations/go' },

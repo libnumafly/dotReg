@@ -30,7 +30,19 @@ export const pages = [
     source: 'docs/config-format.md',
     slug: 'specification',
     title: 'Configuration file format',
-    description: 'The dotReg reference specification, including established rules and undecided matters.',
+    description: 'The dotReg core specification for syntax, string decoding and processing responsibilities.',
+  },
+  {
+    source: 'docs/type-profile.md',
+    slug: 'type-profile',
+    title: 'Type profiles and candidate types',
+    description: 'Established type-specific representations, candidate names and illustrative values.',
+  },
+  {
+    source: 'docs/open-issues.md',
+    slug: 'open-issues',
+    title: 'Undecided matters',
+    description: 'Open questions about the notation, type system, APIs and future properties.',
   },
   {
     source: 'docs/conformance.md',

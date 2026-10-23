@@ -49,6 +49,6 @@ The closing triple quotes set the indentation margin to remove. In a pipe block,
 
 Website development and GitHub Pages setup: [Starlight website guide](pages/README.md).
 
-**In development.** The specification distinguishes agreed rules from [open questions](docs/config-format.md#12-undecided-matters).
+**In development.** The specification defines the core rules. [Type profiles and candidate types](docs/type-profile.md) records type-specific representations and candidate names; [undecided matters](docs/open-issues.md) lists the questions still open.
 
 The specification, examples and sample implementation are available under the [MIT License](LICENSE).

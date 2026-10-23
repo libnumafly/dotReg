@@ -10,22 +10,23 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 |---|---|
 | [Getting started](getting-started.md) | Learn the required file declaration, value lines, repeated values, headings, strings and unset values through small examples |
 | [Configuration file format](config-format.md) | Consult the reference specification for syntax, processing stages and application responsibilities |
+| [Type profiles and candidate types](type-profile.md) | Look up established type-specific representations and distinguish them from candidate type names and examples |
 | [Conformance checklist](conformance.md) | Check an implementation's parser against the established format rules |
-| [Undecided matters](config-format.md#12-undecided-matters) | Check which parts of the format remain open |
+| [Undecided matters](open-issues.md) | Check which parts of the format remain open |
 | [Example configuration](../examples/sample.txt) | Explore repeated values, quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
 | [Go sample guide](../implementations/go/README.md) | Run the optional parser and CLI, use its API, or inspect its supported scope and provisional choices |
 
 ## Project status
 
-**The notation is still being developed.** The specification distinguishes established rules from undecided matters; it is the reference for the format. The getting started guide introduces those rules without replacing them.
+**The notation is still being developed.** The core specification defines the established format rules, the type-profile document records type-specific representations and candidates, and the open-issues document lists undecided matters. The getting started guide introduces the core rules without replacing them.
 
-The current format version is declared by the mandatory `@dotReg 1` property region and blank separator. Future version policy, additional properties, a dedicated file extension and standard type names remain undecided. See [file properties](config-format.md#11-file-property-declarations) and [section 12 of the specification](config-format.md#12-undecided-matters).
+The current format version is declared by the mandatory `@dotReg 1` property region and blank separator. Future version policy, additional properties, a dedicated file extension and standard type names remain undecided. See [file properties](config-format.md#11-file-property-declarations) and [undecided matters](open-issues.md).
 
 The Go implementation is a sample for trying the notation. Its public API and experimental type profile are provisional. In particular, the `string`, `int` and `bool` annotations in the example configuration do not establish standard type names or conversion rules.
 
 ## How the documents fit together
 
-The [specification](config-format.md) defines the notation and separates syntax processing, common string decoding, type conversion and application-specific validation. The [Go guide](../implementations/go/README.md) describes one implementation of those stages and the temporary choices it makes where the format remains open.
+The [core specification](config-format.md) defines the notation and separates syntax processing, common string decoding, type conversion and application-specific validation. [Type profiles and candidate types](type-profile.md) supplements it with type-specific representations and clearly labelled candidates. [Undecided matters](open-issues.md) records the remaining questions; it does not add format rules. The [Go guide](../implementations/go/README.md) describes one implementation of those stages and the temporary choices it makes where the format remains open.
 
 For a first read, follow [Getting started](getting-started.md). For a particular rule, use the specification sections below. Implementers can also check their parser against the [conformance checklist](conformance.md):
 
