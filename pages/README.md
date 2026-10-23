@@ -83,8 +83,9 @@ and add its sidebar entry in `astro.config.mjs`.
    reports the public URL in the `github-pages` environment.
 
 `.github/workflows/docs.yml` builds pull requests without deploying them. Pushes
-to `main` and manual runs build and publish `pages/dist/`. The Go implementation
-keeps its existing CI workflow. Dependencies are pinned in `package-lock.json`,
+to `main` and manual runs build and publish `pages/dist/`. The [Go workflow](../.github/workflows/ci.yml)
+checks the existing Go implementation; the [parser samples workflow](../.github/workflows/parsers.yml)
+checks all eight language entries. Dependencies are pinned in `package-lock.json`,
 and Dependabot checks the website's npm dependencies weekly.
 
 The site is configured with `site: https://libnumafly.github.io` and

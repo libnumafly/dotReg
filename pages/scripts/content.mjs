@@ -18,7 +18,7 @@ export const pages = [
     source: 'docs/README.md',
     slug: 'documentation',
     title: 'Documentation',
-    description: 'Find the guides, reference specification and sample implementation.',
+    description: 'Find the guides, reference specification and sample parsers.',
   },
   {
     source: 'docs/getting-started.md',

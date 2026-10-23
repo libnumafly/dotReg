@@ -14,7 +14,7 @@ This guide introduces the notation. The [reference specification](config-format.
 - [Write multiline strings](#write-multiline-strings)
 - [Distinguish unset from empty](#distinguish-unset-from-empty)
 - [Add types when a consumer supports them](#add-types-when-a-consumer-supports-them)
-- [Try the Go sample](#try-the-go-sample)
+- [Try the sample parsers](#try-the-sample-parsers)
 
 ## Start with file properties
 
@@ -149,9 +149,13 @@ Values are decoded as strings first. A declaration converts that occurrence to i
 
 Each occurrence has its own annotation. The names and behaviour of standard types are still undecided; `int` and `string` here illustrate the rules and the Go sample's experimental profile. See [type annotation rules](config-format.md#6-type-annotations), [type profiles and candidate types](type-profile.md) and [the Go guide](../implementations/go/README.md#type-conversion-and-the-callers-configuration-schema).
 
-## Try the Go sample
+<a id="try-the-go-sample"></a>
 
-With Go 1.22 or later, run these commands from the repository root:
+## Try the sample parsers
+
+Choose Go, Python, JavaScript, TypeScript, Java, C#, Rust or C++ in the [sample parser set](../implementations/README.md). Each language guide explains how to run its CLI and use its library API.
+
+For example, with Go 1.22 or later, run these commands from the repository root:
 
 ```sh
 cd implementations/go
