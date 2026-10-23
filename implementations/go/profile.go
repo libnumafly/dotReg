@@ -46,12 +46,14 @@ func DemoProfile() Profile {
 	}
 }
 
-// Config contains decoded values with their original unset state and optional
-// declared type. It is immutable after Build; custom converted values are owned
-// by the application and should themselves be treated as immutable.
+// Config retains every occurrence in source order for each key, including equal
+// values, with its unset state and optional declared type. It is immutable after
+// Build; custom converted values are owned by the application and should
+// themselves be treated as immutable.
 type Config struct {
 	profile Profile
 	values  map[string]setting
+	more    map[string][]setting
 }
 
 type setting struct {
@@ -63,8 +65,10 @@ type setting struct {
 }
 
 // Build decodes all value entries, applying only their explicitly declared
-// types. Untyped values stay strings until Get requests a conversion. Heading
-// entries do not create settings. Failure returns no partial Config.
+// types. Untyped values stay strings until retrieval requests a conversion.
+// Repeated keys append independent occurrences without deduplication or
+// overwriting. Heading entries do not create settings. Failure returns no
+// partial Config.
 func Build(entries []Entry, profile Profile) (*Config, error) {
 	if _, exists := profile.Types[profile.StringType]; profile.StringType == "" || exists {
 		return nil, problem(0, ErrInput)
@@ -85,9 +89,6 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 			return nil, problem(entry.Line, ErrInput)
 		}
 		key := pathID(entry.Path)
-		if _, exists := cfg.values[key]; exists {
-			return nil, problem(entry.Line, ErrDuplicate)
-		}
 		text, err := DecodeString(entry)
 		if err != nil {
 			return nil, err
@@ -99,20 +100,71 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 				return nil, problem(entry.Line, ErrTypeConversion)
 			}
 		}
-		cfg.values[key] = item
+		if _, exists := cfg.values[key]; exists {
+			if cfg.more == nil {
+				cfg.more = make(map[string][]setting)
+			}
+			cfg.more[key] = append(cfg.more[key], item)
+		} else {
+			cfg.values[key] = item
+		}
 	}
 	return cfg, nil
 }
 
-// Get requests a particular profile type. A declared type must match want
-// before any conversion or unset-to-empty interpretation. Undeclared values
-// are converted on demand; failed conversions are type mismatches. Successful
-// on-demand conversions are not cached or assigned as a declared type.
+// Get requests a particular profile type for a key with exactly one occurrence.
+// Multiple occurrences return ErrMultipleValues at the second header, before
+// any retrieval conversion. Use GetAll to retrieve repeated values.
 func (cfg *Config) Get(path []string, want string) (any, error) {
-	item, ok := cfg.lookup(path)
+	first, more, ok := cfg.lookup(path)
 	if !ok {
 		return nil, problem(0, ErrMissing)
 	}
+	if len(more) > 0 {
+		return nil, problem(more[0].line, ErrMultipleValues)
+	}
+	return cfg.get(first, want)
+}
+
+// GetAll retrieves every occurrence in source order. Each declaration must
+// match want; untyped occurrences convert on demand without caching. A failure
+// reports that occurrence's header and returns no partial values.
+func (cfg *Config) GetAll(path []string, want string) ([]any, error) {
+	first, more, ok := cfg.lookup(path)
+	if !ok {
+		return nil, problem(0, ErrMissing)
+	}
+	values := make([]any, 1+len(more))
+	for i := range values {
+		item := first
+		if i > 0 {
+			item = more[i-1]
+		}
+		value, err := cfg.get(item, want)
+		if err != nil {
+			return nil, err
+		}
+		values[i] = value
+	}
+	return values, nil
+}
+
+// GetAt retrieves one zero-based occurrence using that occurrence's declaration
+// and conversion rules. Missing keys and out-of-range indices return ErrMissing.
+func (cfg *Config) GetAt(path []string, index int, want string) (any, error) {
+	first, more, ok := cfg.lookup(path)
+	if !ok || index < 0 || index > len(more) {
+		return nil, problem(0, ErrMissing)
+	}
+	if index == 0 {
+		return cfg.get(first, want)
+	}
+	return cfg.get(more[index-1], want)
+}
+
+// A declaration is checked before conversion or unset-to-empty interpretation.
+// Retrieval conversion never changes the stored string or declaration.
+func (cfg *Config) get(item setting, want string) (any, error) {
 	if item.hasType {
 		if item.typeName != want {
 			return nil, problem(item.line, ErrTypeMismatch)
@@ -126,22 +178,41 @@ func (cfg *Config) Get(path []string, want string) (any, error) {
 	return value, nil
 }
 
-// IsUnset distinguishes a missing value from an explicitly quoted empty string.
-// It reports the state only and does not request or convert a type.
+// IsUnset reports the state for a key with exactly one occurrence. It does not
+// request or convert a type. Repeated keys return ErrMultipleValues.
 func (cfg *Config) IsUnset(path []string) (bool, error) {
-	item, ok := cfg.lookup(path)
+	first, more, ok := cfg.lookup(path)
 	if !ok {
 		return false, problem(0, ErrMissing)
 	}
-	return item.text.Unset, nil
+	if len(more) > 0 {
+		return false, problem(more[0].line, ErrMultipleValues)
+	}
+	return first.text.Unset, nil
 }
 
-func (cfg *Config) lookup(path []string) (setting, bool) {
-	if cfg == nil || len(path) == 0 {
-		return setting{}, false
+// IsUnsetAll returns each occurrence's original unset state in source order.
+// The returned slice is independent of the Config and of other calls.
+func (cfg *Config) IsUnsetAll(path []string) ([]bool, error) {
+	first, more, ok := cfg.lookup(path)
+	if !ok {
+		return nil, problem(0, ErrMissing)
 	}
-	item, ok := cfg.values[pathID(path)]
-	return item, ok
+	states := make([]bool, 1+len(more))
+	states[0] = first.text.Unset
+	for i, item := range more {
+		states[i+1] = item.text.Unset
+	}
+	return states, nil
+}
+
+func (cfg *Config) lookup(path []string) (setting, []setting, bool) {
+	if cfg == nil || len(path) == 0 {
+		return setting{}, nil, false
+	}
+	key := pathID(path)
+	first, ok := cfg.values[key]
+	return first, cfg.more[key], ok
 }
 
 func (cfg *Config) convert(text Text, want string) (any, error) {

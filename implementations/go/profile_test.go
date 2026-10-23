@@ -2,6 +2,7 @@ package dotreg
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -378,11 +379,257 @@ func TestConfigPreservesElementBoundariesAndEmptyNames(t *testing.T) {
 		_, err = cfg.IsUnset(path)
 		assertValueCode(t, err, ErrMissing)
 	}
-	_, err = Build([]Entry{
-		{Kind: Value, Path: []string{"A.B"}, Raw: "first"},
-		{Kind: Value, Path: []string{"A.B"}, Raw: "second"},
+	cfg, err = Build([]Entry{
+		{Line: 1, Kind: Value, Path: []string{"A.B"}, Raw: "first"},
+		{Line: 4, Kind: Value, Path: []string{"A.B"}, Raw: "second"},
 	}, DemoProfile())
-	assertValueCode(t, err, ErrDuplicate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	values, err := cfg.GetAll([]string{"A.B"}, "string")
+	if err != nil || !reflect.DeepEqual(values, []any{"first", "second"}) {
+		t.Errorf("repeated one-element key = %#v, %v", values, err)
+	}
+	_, err = cfg.Get([]string{"A.B"}, "string")
+	assertProfileErrorLine(t, err, ErrMultipleValues, 4)
+}
+
+func assertProfileErrorLine(t *testing.T, err error, code Code, line int) {
+	t.Helper()
+	assertValueCode(t, err, code)
+	var diagnostic *Error
+	if !errors.As(err, &diagnostic) || diagnostic.Line != line {
+		t.Errorf("error = %v, want header line %d", err, line)
+	}
+}
+
+func TestRepeatedSettingsPreserveOrderEqualValuesAndUnsetStates(t *testing.T) {
+	cfg, err := Build([]Entry{
+		{Line: 1, Kind: Heading, Path: []string{"A"}},
+		{Line: 2, Kind: Value, Path: []string{"A"}, Unset: true},
+		{Line: 4, Kind: Value, Path: []string{"B"}, Raw: "unrelated"},
+		{Line: 5, Kind: Value, Path: []string{"A"}, Raw: "\"\""},
+		{Line: 8, Kind: Value, Path: []string{"A"}, Form: PipeBlock},
+		{Line: 10, Kind: Value, Path: []string{"A"}, Raw: "same"},
+		{Line: 11, Kind: Value, Path: []string{"A"}, Raw: "same"},
+	}, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := []string{"A"}
+	wantValues := []any{"", "", "", "same", "same"}
+	values, err := cfg.GetAll(path, "string")
+	if err != nil || !reflect.DeepEqual(values, wantValues) {
+		t.Fatalf("GetAll = %#v, %v; want %#v", values, err, wantValues)
+	}
+	wantStates := []bool{true, false, false, false, false}
+	states, err := cfg.IsUnsetAll(path)
+	if err != nil || !reflect.DeepEqual(states, wantStates) {
+		t.Fatalf("IsUnsetAll = %#v, %v; want %#v", states, err, wantStates)
+	}
+	// Results must not expose the Config's slices or another call's slices.
+	values[0], states[0] = "caller change", false
+	values, err = cfg.GetAll(path, "string")
+	if err != nil || !reflect.DeepEqual(values, wantValues) {
+		t.Errorf("GetAll was changed by caller: %#v, %v", values, err)
+	}
+	states, err = cfg.IsUnsetAll(path)
+	if err != nil || !reflect.DeepEqual(states, wantStates) {
+		t.Errorf("IsUnsetAll was changed by caller: %#v, %v", states, err)
+	}
+	_, err = cfg.Get(path, "unknown")
+	assertProfileErrorLine(t, err, ErrMultipleValues, 5)
+	_, err = cfg.IsUnset(path)
+	assertProfileErrorLine(t, err, ErrMultipleValues, 5)
+	for i, want := range wantValues {
+		value, err := cfg.GetAt(path, i, "string")
+		if err != nil || value != want {
+			t.Errorf("GetAt(%d) = %#v, %v; want %#v", i, value, err, want)
+		}
+	}
+	single, err := cfg.GetAll([]string{"B"}, "string")
+	if err != nil || !reflect.DeepEqual(single, []any{"unrelated"}) {
+		t.Errorf("single-occurrence GetAll = %#v, %v", single, err)
+	}
+}
+
+func TestRepeatedParsedAliasesRetainEachOccurrenceAndKeyBoundary(t *testing.T) {
+	entries, err := Parse(strings.NewReader(
+		"\"A.B\": first\n\"\\u0041.B\": second\nA.B: separate\nA.\n .B: relative",
+	))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Build(entries, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, test := range []struct {
+		path []string
+		want []any
+	}{
+		{[]string{"A.B"}, []any{"first", "second"}},
+		{[]string{"A", "B"}, []any{"separate", "relative"}},
+	} {
+		got, err := cfg.GetAll(test.path, "string")
+		if err != nil || !reflect.DeepEqual(got, test.want) {
+			t.Errorf("GetAll(%q) = %#v, %v; want %#v", test.path, got, err, test.want)
+		}
+	}
+}
+
+func TestRepeatedRetrievalConversionIsPerOccurrenceAndPerCall(t *testing.T) {
+	calls := 0
+	profile := Profile{StringType: "text", Types: map[string]Converter{
+		"number": func(text Text) (any, error) {
+			calls++
+			return "number:" + text.Value, nil
+		},
+	}}
+	cfg, err := Build([]Entry{
+		{Line: 3, Kind: Value, Path: []string{"A"}, Raw: "001", Type: "number", HasType: true},
+		{Line: 6, Kind: Value, Path: []string{"A"}, Raw: "002"},
+		{Line: 9, Kind: Value, Path: []string{"A"}, Raw: "003", Type: "number", HasType: true},
+	}, profile)
+	if err != nil || calls != 2 {
+		t.Fatalf("Build error = %v, converter calls = %d; want 2", err, calls)
+	}
+	path := []string{"A"}
+	for range 2 {
+		value, err := cfg.GetAt(path, 0, "number")
+		if err != nil || value != "number:001" {
+			t.Errorf("declared GetAt = %#v, %v", value, err)
+		}
+	}
+	if calls != 2 {
+		t.Errorf("declared GetAt converted again: calls=%d", calls)
+	}
+	for iteration := 0; iteration < 2; iteration++ {
+		values, err := cfg.GetAll(path, "number")
+		want := []any{"number:001", "number:002", "number:003"}
+		if err != nil || !reflect.DeepEqual(values, want) || calls != 3+iteration {
+			t.Errorf("GetAll = %#v, %v; calls=%d", values, err, calls)
+		}
+	}
+	for iteration := 0; iteration < 2; iteration++ {
+		value, err := cfg.GetAt(path, 1, "number")
+		if err != nil || value != "number:002" || calls != 5+iteration {
+			t.Errorf("untyped GetAt = %#v, %v; calls=%d", value, err, calls)
+		}
+	}
+	value, err := cfg.GetAt(path, 1, "text")
+	if err != nil || value != "002" || calls != 6 {
+		t.Errorf("conversion changed original untyped string: %#v, %v; calls=%d", value, err, calls)
+	}
+	values, err := cfg.GetAll(path, "text")
+	assertProfileErrorLine(t, err, ErrTypeMismatch, 3)
+	if values != nil || calls != 6 {
+		t.Errorf("declared mismatch converted or returned partial values: %#v calls=%d", values, calls)
+	}
+}
+
+func TestRepeatedMixedDeclarationsAreIndependent(t *testing.T) {
+	cfg, err := Build([]Entry{
+		{Line: 2, Kind: Value, Path: []string{"A"}, Raw: "1", Type: "int", HasType: true},
+		{Line: 7, Kind: Value, Path: []string{"A"}, Raw: "2", Type: "string", HasType: true},
+	}, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := cfg.GetAt([]string{"A"}, 0, "int")
+	if err != nil || first != int64(1) {
+		t.Errorf("first mixed declaration = %#v, %v", first, err)
+	}
+	second, err := cfg.GetAt([]string{"A"}, 1, "string")
+	if err != nil || second != "2" {
+		t.Errorf("second mixed declaration = %#v, %v", second, err)
+	}
+	values, err := cfg.GetAll([]string{"A"}, "int")
+	assertProfileErrorLine(t, err, ErrTypeMismatch, 7)
+	if values != nil {
+		t.Errorf("mixed mismatch returned partial values: %#v", values)
+	}
+	states, err := cfg.IsUnsetAll([]string{"A"})
+	if err != nil || !reflect.DeepEqual(states, []bool{false, false}) {
+		t.Errorf("mixed unset query = %#v, %v", states, err)
+	}
+	_, err = cfg.Get([]string{"A"}, "bool")
+	assertProfileErrorLine(t, err, ErrMultipleValues, 7)
+}
+
+func TestRepeatedRetrievalFailureReturnsNoPartialValuesOrPrivateError(t *testing.T) {
+	calls := 0
+	profile := Profile{StringType: "string", Types: map[string]Converter{
+		"number": func(text Text) (any, error) {
+			calls++
+			if strings.Contains(text.Value, "private") {
+				return nil, errors.New("converter input: " + text.Value)
+			}
+			return text.Value, nil
+		},
+	}}
+	cfg, err := Build([]Entry{
+		{Line: 2, Kind: Value, Path: []string{"A"}, Raw: "first"},
+		{Line: 9, Kind: Value, Path: []string{"A"}, Raw: "private-bad-value"},
+		{Line: 12, Kind: Value, Path: []string{"A"}, Raw: "third"},
+	}, profile)
+	if err != nil || calls != 0 {
+		t.Fatalf("untyped Build = %v; calls=%d", err, calls)
+	}
+	for iteration := 1; iteration <= 2; iteration++ {
+		values, err := cfg.GetAll([]string{"A"}, "number")
+		assertProfileErrorLine(t, err, ErrTypeMismatch, 9)
+		if values != nil || calls != iteration*2 || strings.Contains(err.Error(), "private") {
+			t.Errorf("failed GetAll = %#v, %v; calls=%d", values, err, calls)
+		}
+	}
+	_, err = cfg.GetAt([]string{"A"}, 1, "number")
+	assertProfileErrorLine(t, err, ErrTypeMismatch, 9)
+	if calls != 5 || strings.Contains(err.Error(), "private") {
+		t.Errorf("failed GetAt = %v; calls=%d", err, calls)
+	}
+}
+
+func TestRepeatedBuildFailureDoesNotBecomeDuplicateOrPartialConfig(t *testing.T) {
+	cfg, err := Build([]Entry{
+		{Line: 1, Kind: Value, Path: []string{"A"}, Raw: "1", Type: "int", HasType: true},
+		{Line: 4, Kind: Value, Path: []string{"A"}, Raw: "private-bad-value", Type: "int", HasType: true},
+	}, DemoProfile())
+	assertProfileErrorLine(t, err, ErrTypeConversion, 4)
+	if cfg != nil || strings.Contains(err.Error(), "private") {
+		t.Errorf("failed repeated Build = %#v, %v", cfg, err)
+	}
+}
+
+func TestRepeatedRetrievalMissingAndIndexBounds(t *testing.T) {
+	cfg, err := Build([]Entry{{Kind: Value, Path: []string{"A"}, Raw: "value"}}, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, config := range []*Config{nil, cfg} {
+		for _, path := range [][]string{nil, {}, {"missing"}} {
+			values, err := config.GetAll(path, "string")
+			assertProfileErrorLine(t, err, ErrMissing, 0)
+			if values != nil {
+				t.Errorf("missing GetAll returned %#v", values)
+			}
+			states, err := config.IsUnsetAll(path)
+			assertProfileErrorLine(t, err, ErrMissing, 0)
+			if states != nil {
+				t.Errorf("missing IsUnsetAll returned %#v", states)
+			}
+			_, err = config.GetAt(path, 0, "string")
+			assertProfileErrorLine(t, err, ErrMissing, 0)
+		}
+	}
+	for _, index := range []int{-1, 1, 100} {
+		_, err := cfg.GetAt([]string{"A"}, index, "string")
+		assertProfileErrorLine(t, err, ErrMissing, 0)
+	}
+	states, err := cfg.IsUnsetAll([]string{"A"})
+	if err != nil || !reflect.DeepEqual(states, []bool{false}) {
+		t.Errorf("single IsUnsetAll = %#v, %v", states, err)
+	}
 }
 
 func TestProfileConversionDiagnosticsDoNotLeakValues(t *testing.T) {

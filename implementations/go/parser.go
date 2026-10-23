@@ -56,17 +56,16 @@ func Parse(r io.Reader) ([]Entry, error) {
 	return entries, nil
 }
 
-// ParseEach visits headings and values synchronously in source order.
+// ParseEach visits headings and every value occurrence in source order.
 // Multiline bodies are consumed before their value is visited. A visitor error
 // is returned unchanged, before validating or parsing the next logical entry.
-// The reader may buffer bytes ahead. Each call starts with fresh scopes/keys.
+// The reader may buffer bytes ahead. Each call starts with fresh scopes.
 func ParseEach(r io.Reader, visit func(Entry) error) error {
 	if nilReader(r) || visit == nil {
 		return problem(0, ErrInput)
 	}
 	lines := sourceLines{reader: bufio.NewReader(r), nextLine: 1}
 	var scopes []*pathNode
-	seen := make(map[string]struct{})
 	for {
 		physical := lines.next()
 		if err := physical.validate(); err != nil {
@@ -120,11 +119,6 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 				// Store a persistent path, separate from the visitor's slice.
 				scopes = append(scopes, node)
 			} else {
-				id := pathID(e.Path)
-				if _, exists := seen[id]; exists {
-					return problem(line, ErrDuplicate)
-				}
-				seen[id] = struct{}{}
 				switch {
 				case e.Raw == `"""`:
 					e.Raw, eof, err = lines.tripleBody(line)

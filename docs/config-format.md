@@ -4,11 +4,12 @@ This document defines a configuration file notation for key paths containing one
 
 ## 1. Scope and specification status
 
-Resolution produces a flat space of “fully qualified key → value”. An empty right-hand side means that the key is present and its value is unset unless the immediately following physical line starts a pipe block as defined in section 8.4. Explicit multiline blocks are set values, even when their bodies are empty. Every set value is initially treated as a string. Syntax parsing preserves the undecoded right-hand side or block body and its value form, and common string decoding takes place before it is delivered as a value. Type conversion according to a type expression declared in advance or requested at retrieval is a separate, subsequent stage. When retrieval as a string is permitted, an unset value is treated as equivalent to an empty string. General syntax processing and string decoding are separate from value type conversion and the application's configuration schema.
+Resolution produces a flat space of fully qualified keys and their ordered value occurrences. Every occurrence is retained in source order, including repeated identical values; later occurrences do not overwrite earlier ones. An empty right-hand side means that the key is present and that occurrence is unset unless the immediately following physical line starts a pipe block as defined in section 8.4. Explicit multiline blocks are set values, even when their bodies are empty. Every set value is initially treated as a string. Syntax parsing preserves the undecoded right-hand side or block body and its value form, and common string decoding takes place before it is delivered as a value. Type conversion according to a type expression declared in advance or requested at retrieval is a separate, subsequent stage, applied independently to each occurrence. When retrieval as a string is permitted, an unset occurrence is treated as equivalent to an empty string. General syntax processing and string decoding are separate from value type conversion and the application's configuration schema.
 
 | Area | Status |
 |-----------------------|--------------------------------------|
 | Value keys containing one or more elements, headings and relative notation | Defined in this document |
+| Repeated value keys | All occurrences, including identical repeated values, are retained in source order without overwriting or deduplication |
 | Prohibited characters in key elements, quoting, empty names and the unset state of an empty right-hand side | Defined in this document |
 | Treating an unset value as a string | Equivalent to a zero-length string, provided that there is no type expression mismatch with a declaration |
 | Double-quoted values and common escapes | This document defines removal of the surrounding quotes before delivery, preservation of whitespace within quotes, and decoding of the basic and Unicode escapes in section 3.4 only within quotes. Backslashes in unquoted values are preserved |
@@ -43,7 +44,7 @@ This line has the fully qualified key `A.Code` and the undecoded right-hand side
 A.Code: 001
 ```
 
-Examples that represent the same setting are independent inputs. Combining them in one file produces a duplicate assignment error.
+Examples that represent the same setting are independent inputs. Combining them in one file records repeated value occurrences; it does not collapse them into one occurrence.
 
 A value line with no value after the separating colon means that the key's value is unset unless the immediately following physical line starts a pipe block under section 8.4. The same applies when the colon is followed only by outer ASCII spaces or tabs.
 
@@ -181,7 +182,7 @@ For example, `"A B"`, `"A:B"`, `"A(B)"` and `"A#B"` are each one-element names. 
 
 Key identity is determined by the element sequence after quotes and escapes within quotes have been interpreted and decoded, and relative paths have been resolved. `A.B` and `A."B"` are the same key. `"A.B"` and `"A\.B"` are also the same key, distinct from the two-element key `A.B`. `A."B.C"` and `A."B\.C"` are the same two-element key, distinct from the three-element key `A.B.C`. A Unicode character written directly and an escape within quotes that decodes to that character compare as the same element name.
 
-Unicode normalisation is not performed. Each decoded element is compared by exact equality as a valid UTF-8 string. Appearance or canonical equivalence alone does not establish identity: the precomposed character “が” (U+304C) and “か” followed by a combining voiced sound mark (U+304B U+3099) are distinct names. This rule also applies to duplicate detection, retrieval keys and matching against a configuration schema. Format processing does not implicitly normalise type expressions or values either.
+Unicode normalisation is not performed. Each decoded element is compared by exact equality as a valid UTF-8 string. Appearance or canonical equivalence alone does not establish identity: the precomposed character “が” (U+304C) and “か” followed by a combining voiced sound mark (U+304B U+3099) are distinct names. This rule also applies when grouping value occurrences by key, retrieving values and matching against a configuration schema. Format processing does not implicitly normalise type expressions or values either.
 
 Syntax results retain the element sequence itself or a representation from which element boundaries can be recovered. Keys are not identified solely by a string made by removing quotes and joining elements with dots. A single element with an empty name `[""]` is also distinct from having no elements `[]`. This requirement also applies to a flat key space and does not require keys to be converted to nested objects.
 
@@ -630,7 +631,7 @@ A.Symbol: :
 A.Url: https://example.test:
 ```
 
-A value line with an empty right-hand side still records the presence of its key and is subject to duplicate detection. It is distinct from omitting the key itself or writing a heading line, which does not create a value-key occurrence.
+A value line with an empty right-hand side still records a value occurrence for its key. Repeated unset or explicit empty occurrences are all retained. This is distinct from omitting the key itself or writing a heading line, which does not create a value occurrence.
 
 Apart from rejecting invalid UTF-8 and lone CR, there is no blanket prohibition on NUL, internal tabs or similar characters on the right-hand side. The consuming application validates any necessary control-character restrictions.
 
@@ -641,6 +642,8 @@ Environment variable expansion, path expansion, includes, additional file reads 
 Except for unset values, a value that has completed common string decoding according to sections 8.2–8.4 is initially treated as a string. A “declaration” is a type expression specified separately from a retrieval request, for example in a value line's type annotation. The appearance of a value does not trigger automatic inference of numbers, booleans or other types. Enclosing a value in double quotes does not also declare it to have the string type; the same conversion procedure applies according to whether a type annotation is present.
 
 Type conversion and retrieval follow this procedure.
+
+Apply this procedure independently to each value occurrence, retaining its own type declaration and unset state. The format does not require all occurrences of a key to declare the same type, and a type annotation does not change which key an occurrence belongs to. Collection-retrieval APIs and their policy for groups with different declarations remain implementation choices; this section does not prescribe an aggregate API.
 
 1. If there is a declaration, convert only to its specified type expression. Do not try another type expression or fall back to a string for a value that cannot be converted.
 2. If there is no declaration, initially retain the value as a string. When retrieval requests a type expression, attempt conversion to that requested expression. Without a retrieval request either, retain the string.
@@ -803,25 +806,27 @@ A.Empty:
 
 The first line that does not qualify ends the block and is processed normally, with no line discarded. End of input also completes a pipe block without a closing marker. Blank lines, comments, same-depth or shallower lines, and non-pipe lines therefore end a block. A same-depth or shallower `|:` line is not body content; it must satisfy ordinary key and indentation rules. In particular, an unindented `|: value` can assign to the key named `|`, while an indented absolute key is still invalid. Outside blocks, normal scope, indentation and whole-line comment rules apply. Type annotations and assignment to a heading itself work for both multiline forms; block bodies do not create or close headings.
 
-## 9. Duplicates and read state
+## 9. Repeated values and read state
 
-Within one read operation, a second assignment is rejected if its resolved fully qualified value key has the same element sequence as an earlier assignment. Fully qualified keys, relative keys, assignments to headings themselves, quoting key elements and alternative escape forms cannot bypass duplicate detection.
+Within one read operation, the same fully qualified value key can occur more than once. Retain every occurrence in original source order, including occurrences with identical values. Do not overwrite earlier values, deduplicate equal values or treat repetition as a syntax error. Fully qualified keys, relative keys, assignments to headings themselves, quoted key elements and alternative escape forms use the same key-identity rules in section 3.3.
 
-The following produces a duplicate assignment error.
+The following records three values for `A.Tag`, in the order `red`, `green`, `red`.
 
 ```text
-A.B: first
-A.
- .B: second
+A.Tag:red
+A.Tag:green
+A.Tag:red
 ```
 
-Headings may be redeclared because a heading alone does not set a value. There is no last-assignment-wins overwriting, automatic merging or sharing of headings across files. Duplicate detection and heading state start empty on every call to the read operation.
+A heading alone does not create a value occurrence, and headings may be redeclared. Each read operation starts with fresh heading state and its own occurrence sequence. Do not implicitly share headings or values across read calls or merge separately read files.
 
-The same applies to one-element value keys. Writing both `A: value` and ` .: value` under the heading `A.` within one read operation is a duplicate assignment to the same fully qualified key `A`.
+The same applies to one-element value keys. Writing both `A: value` and ` .: value` under the heading `A.` within one read operation records two occurrences for the same fully qualified key `A`.
 
-Adding a type annotation does not change key identity, which is based on the resolved fully qualified key. The presence or absence of a type annotation, or a different type expression, does not permit multiple assignments to the same key.
+Adding a type annotation does not change key identity, which is based on the resolved fully qualified key. Preserve the type annotation, unset state, value form and source position of each occurrence independently. Typed and untyped occurrences may coexist; individual type conversion follows section 8.1.
 
-Assignments to `A.B` and `A."B"` are also rejected as duplicates. `"A\.B"` and `"A.B"`, and `A."B\.C"` and `A."B.C"`, are likewise duplicate pairs. `A."B.C"` and `A.B.C` have different element sequences and may coexist. Multiple assignments to the key `""` are rejected as duplicates in the usual way; an empty name does not mean that the key was omitted.
+Assignments to `A.B` and `A."B"` belong to the same key and are both retained. `"A\.B"` and `"A.B"`, and `A."B\.C"` and `A."B.C"`, likewise identify the same key within each pair. `A."B.C"` and `A.B.C` have different element sequences and remain separate keys. Multiple occurrences of the key `""` are retained normally; an empty name does not mean that the key was omitted.
+
+A consuming application may require a particular key to have one value, limit its occurrence count or impose other cardinality rules through its configuration schema. Such a constraint belongs to application validation, rather than the general syntax. Concrete collection-retrieval APIs, indexed retrieval and handling of mixed declared types during aggregate retrieval remain outside the format's settled API contract.
 
 ## 10. Character encoding, line endings and length
 
@@ -843,7 +848,7 @@ An implementation or consuming application may impose resource constraints accor
 
 | Layer | Responsibilities |
 |-----------------|------------------------------------------------------------------------------------------------|
-| General syntax processing | Processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; rejecting duplicates; preserving line numbers and source order; separating keys and type expressions; recognising value forms; removing block markers and margins while retaining undecoded bodies and their internal source line endings; identifying the unset state |
+| General syntax processing | Processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; preserving every value occurrence, line number and source order without overwriting or deduplication; separating keys and type expressions; recognising value forms; removing block markers and margins while retaining undecoded bodies and their internal source line endings; identifying each occurrence's unset state |
 | Common string decoding | Removing ordinary surrounding quotes before delivering a value; decoding the basic and Unicode escapes in section 3.4 in ordinary quoted values and triple-quoted bodies; preserving unquoted single-line values and pipe bodies literally under their whitespace rules; not trimming again after decoding; distinguishing unset from an explicit empty string |
 | Type conversion and retrieval | Retaining values with strings as the basis; converting only to the declared type expression; matching the requested type expression at retrieval; converting at retrieval when there is no declaration; reporting type expression mismatch errors; interpreting unset as equivalent to an empty string when string retrieval is permitted |
 | Value decoders and profiles | Assigning meaning to type expressions and defining individual conversion rules for numbers, booleans, enums, lists and other types. Their input is the result of common string decoding |
@@ -854,6 +859,7 @@ An implementation or consuming application may impose resource constraints accor
 A consuming application defines the following rules as required. Their concrete details are not fixed rules of the general syntax.
 
 - Supported keys and headings, required fields and defaults.
+- Whether each key accepts one or more value occurrences, and any occurrence-count constraints.
 - Type-specific interpretation and validation of values after common string decoding. Double quoting and basic and Unicode escapes in key elements and values follow this document; the entirety of JSON's string rules is not applied automatically.
 - Whether unset and empty strings are allowed, and validation of explicit empty strings and the string `null`. The unset state of an empty right-hand side, its equivalence to an empty string when string retrieval is permitted, and type conversion and type expression mismatch handling at retrieval follow this document.
 - Formats, conversions and per-value constraints for numbers, booleans, codes, enums, lists and other types.
@@ -873,7 +879,7 @@ Before configuration values are delivered, common string decoding according to t
 
 An incremental notification interface delivers headings and complete values in source order and receives the result of each recipient's processing before parsing or delivering the next entry. Multiline bodies are collected before their value is notified. Determining whether an empty header starts a pipe block, or whether that block has ended, can require inspecting one following physical line; if it is not body content, retain it for normal parsing after the current notification succeeds. If a recipient returns an error, return that error immediately and unchanged, without parsing or delivering later entries. Physical-line lookahead for block boundaries and byte-level read-ahead from the underlying input are permitted. Changes to external state already made by a recipient are not rolled back.
 
-An interface that collects and returns results returns a failure, without partial parse results, if processing fails partway through. A duplicate assignment is rejected before delivering the second value line. Empty input succeeds with zero results. An error is returned if a required input source or notification recipient has not been supplied.
+An interface that collects and returns results returns a failure, without partial parse results, if processing fails partway through. Repeated keys are delivered and collected as separate occurrences in source order, including repeated identical values. Empty input succeeds with zero results. An error is returned if a required input source or notification recipient has not been supplied.
 
 Syntax errors include line numbers, keys and causes as required, but do not include right-hand sides or error strings from underlying input processing. The consuming application is responsible for the safety of diagnostics independently returned by notification recipients.
 
@@ -895,7 +901,7 @@ This document does not settle the following matters.
 | Type expression identity | Matching of type aliases, alternative spellings, compound types and similar expressions |
 | Failure of conversion to a declared type | Error categories and notification points when conversion to the specified type expression is impossible. No fallback to another type expression or a string is permitted |
 | Relationship to schemas | Connecting configuration schemas to declarations and retrieval requests, and handling unknown type names |
-| APIs and value retention | Output representation and canonical notation for key paths that preserve element boundaries; output representation for type expressions; retrieval API; retention of conversion results at retrieval; schema API; profile selection method |
+| APIs and value retention | Output representation and canonical notation for key paths that preserve element boundaries; output representation for type expressions; single, collection and indexed retrieval APIs, including aggregate handling of mixed declared types; retention of conversion results at retrieval; schema API; profile selection method. Preserving all source-ordered occurrences without overwriting is established |
 | Formatter | Whether one will be provided and its formatting policy |
 
 ## 13. Conformance checking
@@ -923,7 +929,7 @@ Implementation conformance is checked against the rules defined in this document
 | Type conversion and retrieval | Initially treating values as strings; converting only to the declared type expression; retaining strings without a declaration and converting to the type expression requested at retrieval |
 | Type expression mismatch errors | Reporting a mismatch when the declaration differs from the retrieval request, regardless of convertibility; the same error when an undeclared value cannot be converted as requested at retrieval |
 | String interpretation of unset | Treating an unset value received from the parser as equivalent to a zero-length string when a string is requested without a type expression mismatch with a declaration; also retaining the unset state in syntax results |
-| Duplicates | Rejecting a second assignment to the same element sequence before notification, regardless of relative notation, quotes or type annotations; distinguishing an element containing a dot from a different sequence split by dots |
+| Repeated values | Preserving every occurrence in source order, including repeated identical values, across fully qualified and relative notation, quotes and type annotations; retaining each occurrence's type and unset state; no overwriting, deduplication or syntax-level rejection of repeated keys; distinct element boundaries; no value occurrence from a heading; fresh state for each read |
 | Character encoding and length | UTF-8, BOM, LF, CRLF, final lines without a line ending, rejection of lone CR; no format-defined fixed upper limits on physical lines, keys, expanded paths, hierarchy depth or the entire file |
 | Output and failure | Source order and physical line numbers; empty input; stopping on a notification recipient's error; no partial results from a collecting interface; no right-hand sides in diagnostics |
 

@@ -8,10 +8,10 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 
 | Document | Read it to… |
 |---|---|
-| [Getting started](getting-started.md) | Learn value lines, headings, quoted and multiline strings, and unset values through small examples |
+| [Getting started](getting-started.md) | Learn value lines, repeated values, headings, quoted and multiline strings, and unset values through small examples |
 | [Configuration file format](config-format.md) | Consult the reference specification, including syntax, processing responsibilities and conformance checks |
 | [Undecided matters](config-format.md#12-undecided-matters) | Check which parts of the format remain open |
-| [Example configuration](../examples/sample.txt) | Explore quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
+| [Example configuration](../examples/sample.txt) | Explore repeated values, quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
 | [Go sample guide](../implementations/go/README.md) | Run the optional parser and CLI, use its API, or inspect its supported scope and provisional choices |
 
 ## Project status
@@ -32,6 +32,7 @@ For a first read, follow [Getting started](getting-started.md). For a particular
 - [Headings, relative notation and indentation](config-format.md#5-headings-relative-notation-and-indentation).
 - [Type annotations](config-format.md#6-type-annotations).
 - [String decoding and unset values](config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
+- [Repeated values and read state](config-format.md#9-repeated-values-and-read-state).
 - [Triple-quoted multiline values](config-format.md#83-triple-quoted-multiline-values) and [literal pipe blocks](config-format.md#84-literal-pipe-blocks).
 - [Processing and application responsibilities](config-format.md#11-responsibilities-of-syntax-processing-and-consuming-applications).
 

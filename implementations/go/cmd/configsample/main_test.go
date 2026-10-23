@@ -265,6 +265,94 @@ func TestRunUnsetAndExplicitEmptyRemainDistinct(t *testing.T) {
 	}
 }
 
+func TestRunRepeatedValuesKeepEachOccurrence(t *testing.T) {
+	tests := []struct {
+		name    string
+		source  string
+		raw     []string
+		decoded []string
+		demo    []any
+		unset   []bool
+	}{
+		{
+			name:    "repeated identical values",
+			source:  "A.Tag: red\nA.Tag: green\nA.Tag: red\n",
+			raw:     []string{"red", "green", "red"},
+			decoded: []string{"red", "green", "red"},
+			demo:    []any{"red", "green", "red"},
+			unset:   []bool{false, false, false},
+		},
+		{
+			name:    "independent type declarations",
+			source:  "A(string):001\nA(int):2\nA:003\nA(bool):false\n",
+			raw:     []string{"001", "2", "003", "false"},
+			decoded: []string{"001", "2", "003", "false"},
+			demo:    []any{"001", json.Number("2"), "003", false},
+			unset:   []bool{false, false, false, false},
+		},
+		{
+			name:    "unset and empty forms",
+			source:  "A:\nA:\"\"\nA:\n |\nA:\"\"\"\n\"\"\"\n",
+			raw:     []string{"", "\"\"", "", ""},
+			decoded: []string{"", "", "", ""},
+			demo:    []any{"", "", "", ""},
+			unset:   []bool{true, false, false, false},
+		},
+	}
+	for _, test := range tests {
+		for _, mode := range []string{"raw", "strings", "demo"} {
+			t.Run(test.name+"/"+mode, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				if err := run([]string{"-mode", mode}, strings.NewReader(test.source), &stdout, &stderr); err != nil {
+					t.Fatal(err)
+				}
+				got := decodeCLIOutput(t, stdout.Bytes())
+				if len(got) != len(test.raw) {
+					t.Fatalf("entry count = %d, want %d", len(got), len(test.raw))
+				}
+				for i, entry := range got {
+					if entry["raw"] != test.raw[i] || entry["unset"] != test.unset[i] {
+						t.Errorf("occurrence %d source/state changed: %#v", i, entry)
+					}
+					if mode == "strings" && entry["decoded"] != test.decoded[i] {
+						t.Errorf("occurrence %d decoded = %#v, want %q", i, entry["decoded"], test.decoded[i])
+					}
+					if mode == "demo" && entry["value"] != test.demo[i] {
+						t.Errorf("occurrence %d value = %#v, want %#v", i, entry["value"], test.demo[i])
+					}
+				}
+			})
+		}
+	}
+}
+
+func TestRunDemoCountsRepeatedDecodedPathsWithoutLosingBoundaries(t *testing.T) {
+	const source = "A.B: first\nA.\n .B: second\nA.\n .\"\\u0042\": third\n" +
+		"\"A.B\": literal-first\n\"A.B\": literal-second\n" +
+		"\"\": empty-first\n\"\": empty-second\n" +
+		"\"A\\u0000B\": nul-first\nA.\"\": child-first\n" +
+		"\"A\\u0000B\": nul-second\nA.\"\": child-second\n"
+	want := []string{"first", "second", "third", "literal-first", "literal-second", "empty-first", "empty-second", "nul-first", "child-first", "nul-second", "child-second"}
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"-mode", "demo"}, strings.NewReader(source), &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	got := decodeCLIOutput(t, stdout.Bytes())
+	i := 0
+	for _, entry := range got {
+		if entry["kind"] == string(dotreg.Heading) {
+			continue
+		}
+		if i >= len(want) || entry["value"] != want[i] {
+			t.Fatalf("occurrence %d = %#v; expected values %v", i, entry, want)
+		}
+		i++
+	}
+	if i != len(want) {
+		t.Fatalf("value count = %d, want %d", i, len(want))
+	}
+}
+
 func TestRunFailureProducesNoPartialJSON(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -273,14 +361,14 @@ func TestRunFailureProducesNoPartialJSON(t *testing.T) {
 		code   dotreg.Code
 	}{
 		{"late syntax failure", "raw", "A: first\nB..C: private-RHS", dotreg.ErrSyntax},
-		{"late duplicate", "strings", "A: first\nA: private-RHS", dotreg.ErrDuplicate},
+		{"late repeated string failure", "strings", "A: first\nA: \"private-RHS\"tail", dotreg.ErrString},
 		{"late string failure", "strings", "A: first\nB: \"private-RHS\"tail", dotreg.ErrString},
 		{"late profile failure", "demo", "A: first\nB(int): private-RHS", dotreg.ErrTypeConversion},
 		{"unclosed triple block", "raw", "A: first\nB: \"\"\"\nprivate-RHS", dotreg.ErrSyntax},
 		{"triple margin failure", "raw", "A: first\nB: \"\"\"\n private-RHS\n  \"\"\"", dotreg.ErrSyntax},
 		{"triple escape failure", "strings", "A: first\nB: \"\"\"\nprivate-RHS\\q\n\"\"\"", dotreg.ErrString},
 		{"pipe profile failure", "demo", "A: first\nB(int):\n |private-RHS", dotreg.ErrTypeConversion},
-		{"multiline duplicate", "strings", "A:\n |first\nA: private-RHS", dotreg.ErrDuplicate},
+		{"repeated multiline escape failure", "strings", "A:\n |first\nA: \"\"\"\nprivate-RHS\\q\n\"\"\"", dotreg.ErrString},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

@@ -25,7 +25,7 @@ A.
  .Count:42
 ```
 
-This is an alternative input to the first example: the resolved keys and values are the same. Try the examples separately; combining them would assign the same keys twice, which is an error.
+This is an alternative input to the first example: the resolved keys and values are the same. Try the examples separately when comparing their notation; combining them records two occurrences of each key and retains both values.
 
 Use one additional **ASCII space** for each written heading level. Tabs cannot replace these spaces. Indentation follows the headings you write, rather than the number of dot-separated key elements:
 
@@ -36,6 +36,20 @@ A.B.
 ```
 
 Here `A.B.` occupies one heading level, so `.C.` has one leading space. `.Code` has two and resolves to `A.B.C.Code`. A value line does not create another heading level.
+
+## Keep repeated values
+
+A key can appear repeatedly. Every value occurrence is kept in source order, even when the same value appears again:
+
+```text
+A.Tag:red
+A.Tag:green
+A.Tag:red
+```
+
+The values of `A.Tag` are `red`, `green`, `red`. No occurrence is overwritten or deduplicated. Fully qualified keys, relative keys and equivalent quoted spellings use the same key identity. A heading alone adds no value. Each occurrence keeps its own type annotation and unset state; an application may require a particular key to occur only once through its schema.
+
+See [repeated values and read state](config-format.md#9-repeated-values-and-read-state). The [Go sample](../implementations/go/README.md#using-the-library) offers collection and indexed retrieval; its exact API remains provisional.
 
 ## Write strings naturally
 

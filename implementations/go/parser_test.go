@@ -334,7 +334,7 @@ func TestParseEscapedKeyCharactersAreNotReinterpretedAsSyntax(t *testing.T) {
 	}
 }
 
-func TestParseUnicodeEscapeAliasesAreDuplicateKeys(t *testing.T) {
+func TestParseUnicodeEscapeAliasesPreserveRepeatedKeys(t *testing.T) {
 	for _, source := range []string{
 		"\"\\u0041\": first\nA: second",
 		"\"\\u{1F600}\": first\n\"\\uD83D\\uDE00\": second",
@@ -344,9 +344,13 @@ func TestParseUnicodeEscapeAliasesAreDuplicateKeys(t *testing.T) {
 	} {
 		t.Run(source, func(t *testing.T) {
 			got, err := Parse(strings.NewReader(source))
-			parserRequireCode(t, err, ErrDuplicate, 2)
-			if got != nil {
-				t.Error("duplicate escaped key returned partial results")
+			if err != nil || len(got) != 2 {
+				t.Fatalf("repeated escaped key: entries=%#v, error=%v", got, err)
+			}
+			if !reflect.DeepEqual(got[0].Path, got[1].Path) ||
+				got[0].Line != 1 || got[1].Line != 2 ||
+				got[0].Raw != "first" || got[1].Raw != "second" {
+				t.Errorf("escaped aliases lost identity or order: %#v", got)
 			}
 		})
 	}
@@ -556,20 +560,91 @@ func TestParseRejectsInvalidMultilineStructure(t *testing.T) {
 	}
 }
 
-func TestParseMultilineDuplicateBeforeNotification(t *testing.T) {
+func TestParseMultilineRepeatedValuesAreNotifiedInOrder(t *testing.T) {
 	for _, source := range []string{
 		"A: \"\"\"\nfirst\n\"\"\"\nA: second",
 		"A:\n |first\nA: second",
 	} {
-		count := 0
-		err := ParseEach(strings.NewReader(source), func(Entry) error {
-			count++
+		var got []Entry
+		err := ParseEach(strings.NewReader(source), func(entry Entry) error {
+			got = append(got, entry)
 			return nil
 		})
-		parserRequireCode(t, err, ErrDuplicate, 0)
-		if count != 1 {
-			t.Errorf("duplicate multiline key produced %d callbacks, want 1", count)
+		if err != nil || len(got) != 2 {
+			t.Fatalf("repeated multiline values: entries=%#v, error=%v", got, err)
 		}
+		if got[0].Form == "" || got[1].Form != "" ||
+			got[0].Raw != "first" || got[1].Raw != "second" ||
+			!reflect.DeepEqual(got[0].Path, got[1].Path) {
+			t.Errorf("repeated multiline values lost form, identity or order: %#v", got)
+		}
+	}
+}
+
+func TestParseRepeatedValuesPreserveAllOccurrences(t *testing.T) {
+	const source = "A: red\nB: blue\nA: green\nA: red\nA:\nA: \"\"\nA:\n"
+	want := []Entry{
+		parserValue(1, []string{"A"}, "red"),
+		parserValue(2, []string{"B"}, "blue"),
+		parserValue(3, []string{"A"}, "green"),
+		parserValue(4, []string{"A"}, "red"),
+		parserValue(5, []string{"A"}, ""),
+		parserValue(6, []string{"A"}, `""`),
+		parserValue(7, []string{"A"}, ""),
+	}
+	got, err := Parse(strings.NewReader(source))
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Fatalf("collected occurrences=%#v, error=%v; want %#v", got, err, want)
+	}
+	var visited []Entry
+	err = ParseEach(strings.NewReader(source), func(entry Entry) error {
+		visited = append(visited, entry)
+		return nil
+	})
+	if err != nil || !reflect.DeepEqual(visited, want) {
+		t.Errorf("visited occurrences=%#v, error=%v; want %#v", visited, err, want)
+	}
+}
+
+func TestParseRepeatedValuesRetainTheirFormsAndTypes(t *testing.T) {
+	const source = "A(T): \"\"\"\none\n\"\"\"\nA(U):\n |two\nA: \"\"\nA:\nA: \"\"\"\n\"\"\"\nA:\n |"
+	triple := parserBlockValue(1, []string{"A"}, "one", TripleQuoted)
+	triple.Type, triple.HasType = "T", true
+	pipe := parserBlockValue(4, []string{"A"}, "two", PipeBlock)
+	pipe.Type, pipe.HasType = "U", true
+	want := []Entry{
+		triple,
+		pipe,
+		parserValue(6, []string{"A"}, `""`),
+		parserValue(7, []string{"A"}, ""),
+		parserBlockValue(8, []string{"A"}, "", TripleQuoted),
+		parserBlockValue(10, []string{"A"}, "", PipeBlock),
+	}
+	got, err := Parse(strings.NewReader(source))
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Errorf("repeated forms/types=%#v, error=%v; want %#v", got, err, want)
+	}
+}
+
+func TestParseRepeatedValueCallbackCanStopBeforeLaterErrors(t *testing.T) {
+	for _, source := range []string{
+		"A: red\nA: green\nA: \"\"\"\nunclosed",
+		"A: red\nA:\n |green\nA: \xff",
+	} {
+		t.Run(source, func(t *testing.T) {
+			stop := errors.New("stop after the second occurrence")
+			var got []Entry
+			err := ParseEach(strings.NewReader(source), func(entry Entry) error {
+				got = append(got, entry)
+				if len(got) == 2 {
+					return stop
+				}
+				return nil
+			})
+			if err != stop || len(got) != 2 || got[0].Raw != "red" || got[1].Raw != "green" {
+				t.Errorf("repeated callback stop: entries=%#v, error=%v", got, err)
+			}
+		})
 	}
 }
 
@@ -743,7 +818,7 @@ func TestParseReportsUndecidedGrammarAsUnsupported(t *testing.T) {
 	}
 }
 
-func TestParseDuplicateIdentity(t *testing.T) {
+func TestParseRepeatedKeyIdentity(t *testing.T) {
 	for _, source := range []string{
 		"A.B: first\nA.\n .B: second",
 		"A: first\nA.\n .: second",
@@ -757,9 +832,22 @@ func TestParseDuplicateIdentity(t *testing.T) {
 	} {
 		t.Run(source, func(t *testing.T) {
 			got, err := Parse(strings.NewReader(source))
-			parserRequireCode(t, err, ErrDuplicate, strings.Count(source, "\n")+1)
-			if got != nil {
-				t.Errorf("failure returned partial entries: %#v", got)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var values []Entry
+			for _, entry := range got {
+				if entry.Kind == Value {
+					values = append(values, entry)
+				}
+			}
+			if len(values) != 2 {
+				t.Fatalf("repeated key lost an occurrence: %#v", got)
+			}
+			if !reflect.DeepEqual(values[0].Path, values[1].Path) ||
+				values[0].Raw != "first" || values[1].Raw != "second" ||
+				values[0].Line != 1 || values[1].Line != strings.Count(source, "\n")+1 {
+				t.Errorf("repeated key lost identity or source order: %#v", got)
 			}
 		})
 	}
@@ -794,28 +882,31 @@ func TestParseEachCallbackContracts(t *testing.T) {
 			t.Errorf("error = %v, count = %d; want identical sentinel and one callback", err, count)
 		}
 	})
-	t.Run("duplicate is rejected before callback", func(t *testing.T) {
+	t.Run("repeated values are delivered in source order", func(t *testing.T) {
 		var got []Entry
 		err := ParseEach(strings.NewReader("A: first\nA: second\nB: third\n"), func(entry Entry) error {
 			got = append(got, entry)
 			return nil
 		})
-		parserRequireCode(t, err, ErrDuplicate, 2)
-		if len(got) != 1 || got[0].Raw != "first" {
-			t.Errorf("callbacks = %#v; want only the first assignment", got)
+		want := []Entry{
+			parserValue(1, []string{"A"}, "first"),
+			parserValue(2, []string{"A"}, "second"),
+			parserValue(3, []string{"B"}, "third"),
+		}
+		if err != nil || !reflect.DeepEqual(got, want) {
+			t.Errorf("callbacks=%#v, error=%v; want %#v", got, err, want)
 		}
 	})
-	t.Run("callback cannot mutate scope or duplicate identity", func(t *testing.T) {
+	t.Run("callback cannot mutate scope or later repeated paths", func(t *testing.T) {
 		var paths [][]string
 		err := ParseEach(strings.NewReader("A.\n .B: first\nA.B: second\n"), func(entry Entry) error {
 			paths = append(paths, append([]string(nil), entry.Path...))
 			entry.Path[0] = "changed"
 			return nil
 		})
-		parserRequireCode(t, err, ErrDuplicate, 3)
-		want := [][]string{{"A"}, {"A", "B"}}
-		if !reflect.DeepEqual(paths, want) {
-			t.Errorf("callback paths = %#v, want %#v", paths, want)
+		want := [][]string{{"A"}, {"A", "B"}, {"A", "B"}}
+		if err != nil || !reflect.DeepEqual(paths, want) {
+			t.Errorf("callback paths=%#v, error=%v; want %#v", paths, err, want)
 		}
 	})
 }
@@ -968,7 +1059,7 @@ func TestParseHasNoWholeFileByteLimit(t *testing.T) {
 func TestParseStateIsPerCall(t *testing.T) {
 	for range 2 {
 		if _, err := Parse(strings.NewReader("A.\n .B: value")); err != nil {
-			t.Fatalf("duplicate state leaked between calls: %v", err)
+			t.Fatalf("repeated parse failed: %v", err)
 		}
 	}
 	_, err := Parse(strings.NewReader(" .C: value"))
@@ -985,6 +1076,7 @@ func FuzzSampleParserNoPanic(f *testing.F) {
 		"\"\\uD800\": value", "\"line\\nkey\": \"\\u{0}\"",
 		"A: \"\"\"\n  first\\nsecond\n  \"\"\"\nB: value",
 		"A:\n |literal \\q\n |\nB: value",
+		"A:red\nA:green\nA:red\nA:\nA:\"\"",
 		"A: \"\"\"\n body\n  \"\"\"", "A:\n |body\nB: \xff",
 	} {
 		f.Add(source)

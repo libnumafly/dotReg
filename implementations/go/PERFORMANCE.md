@@ -1,5 +1,10 @@
 # Parser refactor measurements
 
+These are historical measurements from before support for repeated value keys.
+The measured implementation rejected repeated keys; the current implementation
+retains every occurrence. The figures below are not measurements of the current
+multiple-value implementation.
+
 This records the Go parser refactor on 2026-10-23. The comparison uses an exact
 working-tree snapshot taken immediately before the refactor, including both
 multiline forms. It does not use the repository's older Git HEAD as the baseline.

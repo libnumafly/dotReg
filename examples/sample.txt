@@ -14,6 +14,11 @@ A.
  .NullText: null
  .Pattern: ^foo\.bar$
 
+ # Every occurrence is retained, including repeated identical values.
+ .Tag:red
+ .Tag:green
+ .Tag:red
+
  # Triple quotes decode the same escapes as ordinary quoted values.
  .Multiline(string): """
    first line

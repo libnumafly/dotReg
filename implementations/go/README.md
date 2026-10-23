@@ -14,7 +14,7 @@ Use Go 1.22 or later. From `implementations/go`, run:
 go run ./cmd/configsample ../../examples/sample.txt
 ```
 
-By default, the CLI writes JSON containing the parsed key path, undecoded right-hand side or block body, unset state and type annotation, together with the result of common string decoding. Multiline entries also include their `form`. This mode does not convert values, even when a type annotation is present.
+By default, the CLI writes JSON containing each parsed occurrence's key path, undecoded right-hand side or block body, unset state and type annotation, together with the result of common string decoding. Repeated keys remain separate entries in source order, including identical repeated values. Multiline entries also include their `form`. This mode does not convert values, even when a type annotation is present.
 
 To try type conversion, select the experimental type profile:
 
@@ -58,8 +58,11 @@ The `raw` mode can retain an unterminated ordinary quote in a single-line value 
 | `ParseEach(io.Reader, func(Entry) error) error` | Notify the callback of headings and complete values in source order, with header line numbers |
 | `DecodeString(Entry) (Text, error)` | Decode according to the value form: ordinary quotes, triple-quoted escapes or a literal pipe body |
 | `Build([]Entry, Profile) (*Config, error)` | Decode strings and convert annotated values only to their declared type |
-| `Config.Get([]string, string) (any, error)` | Retrieve a value with an explicit key path and requested type name |
-| `Config.IsUnset([]string) (bool, error)` | Query the unset state without retrieving or converting the value |
+| `Config.Get([]string, string) (any, error)` | Retrieve exactly one occurrence; report `ErrMultipleValues` if the key has more than one |
+| `Config.GetAll([]string, string) ([]any, error)` | Retrieve every occurrence in source order as the requested type; return no partial values if any occurrence fails |
+| `Config.GetAt([]string, int, string) (any, error)` | Retrieve a zero-based occurrence within a key's source-ordered values |
+| `Config.IsUnset([]string) (bool, error)` | Query the unset state of exactly one occurrence; report `ErrMultipleValues` if there is more than one |
+| `Config.IsUnsetAll([]string) ([]bool, error)` | Query every occurrence's unset state in source order without retrieving or converting values |
 
 `Entry` has `Line`, `Kind`, `Path`, `Raw`, `Unset`, `Type`, `HasType` and `Form` fields. `Line` identifies the heading or value header, including for a multiline body. `Kind` is either `Heading` or `Value`. A heading alone does not create a value. `Form` is a `ValueForm`: its zero value denotes ordinary single-line handling, `TripleQuoted` is `"triple_quoted"` and `PipeBlock` is `"pipe"`. Preserve `Form` along with `Raw` when retaining or constructing entries; block contents alone must not be inspected to guess the value syntax. For blocks, `Raw` is already stripped of structural markers and margin, and `Unset` is always false, even for an empty body. `Text` holds the decoded `Value string` and `Unset bool`.
 
@@ -82,11 +85,34 @@ count, err := config.Get([]string{"A", "Count"}, "int") // int64(42)
 // Handle count and err.
 ```
 
+Repeated keys retain every occurrence. For this input:
+
+```text
+A.Tag:red
+A.Tag:green
+A.Tag:red
+```
+
+build the configuration as above, then use:
+
+```go
+tags, err := config.GetAll([]string{"A", "Tag"}, "string") // []any{"red", "green", "red"}
+// Handle tags and err.
+second, err := config.GetAt([]string{"A", "Tag"}, 1, "string") // "green"
+// Handle second and err.
+unset, err := config.IsUnsetAll([]string{"A", "Tag"}) // []bool{false, false, false}
+// Handle unset and err.
+```
+
+`Get` and `IsUnset` require exactly one occurrence. They return `ErrMultipleValues` (`multiple_values`) for two or more, with the second occurrence's header line in the diagnostic; they do not silently select the first or last. A missing key returns `ErrMissing`. `GetAt` uses a zero-based index within that key, and returns `ErrMissing` for a missing key, a negative index or an out-of-range index.
+
+`GetAll` applies the requested type to each occurrence independently, following the declaration rules below. If any occurrence has a different declared type or cannot be converted as requested, it returns a type mismatch error and no partial values. `IsUnsetAll` only reports states and does not perform type conversion. These API names, singular-retrieval errors and aggregate-failure choices belong to this provisional Go sample; they do not establish the notation's public API or a universal aggregate policy for mixed declared types.
+
 Requesting the annotated `A.Code` as `int` returns `ErrTypeMismatch`, regardless of whether conversion would be possible. The unannotated `A.Count` can be retrieved as `"42"` when requesting `string`, or as `int64(42)` when requesting `int`. Retrieval conversions are not cached; the original string and unset state are retained.
 
 `A.Missing` and `A.Empty` both return a zero-length string when requested as `string`. `IsUnset` returns `true` and `false`, respectively. To address a key with an empty name, pass `[]string{""}`. An empty path, whether `nil` or `[]string{}`, does not mean a key with an empty name.
 
-The notation does not perform Unicode normalisation. Key elements are compared exactly after quote and escape decoding, using the same rule for duplicate detection, retrieval and matching against a configuration schema. For example, the precomposed character `が` (U+304C) and the sequence `か` plus a combining voiced sound mark (U+304B U+3099) are different names. Type expressions and values are not implicitly normalised either.
+The notation does not perform Unicode normalisation. Key elements are compared exactly after quote and escape decoding, using the same rule for grouping occurrences, retrieval and matching against a configuration schema. For example, the precomposed character `が` (U+304C) and the sequence `か` plus a combining voiced sound mark (U+304B U+3099) are different names. Type expressions and values are not implicitly normalised either.
 
 ## Multiline values
 
@@ -142,13 +168,13 @@ A `Profile` specifies `StringType`, the name of the string type, and `Types map[
 | `int` | Convert a decimal integer with an optional sign to `int64`; allow leading zeroes; reject hexadecimal, digit separators, out-of-range values and unset values |
 | `bool` | Accept only `true` and `false`; reject different capitalisation, numeric forms and unset values |
 
-If conversion to an annotated type fails, `Build` returns `ErrTypeConversion`. An unknown annotated type causes the same error. Failed retrieval conversion for an unannotated value, an unknown requested type, or a requested type different from the annotation returns `ErrTypeMismatch`. An annotated value is not substituted with a different type or converted back to a string as a fallback.
+`Build` independently processes each occurrence, preserving its declaration and unset state. It allows repeated keys with different annotations, provided that each declared conversion succeeds; it does not impose one shared type on the key. If conversion to an annotated type fails, `Build` returns `ErrTypeConversion`. An unknown annotated type causes the same error. Failed retrieval conversion for an unannotated occurrence, an unknown requested type, or a requested type different from that occurrence's annotation returns `ErrTypeMismatch`. An annotated occurrence is not substituted with a different type or converted back to a string as a fallback.
 
-Custom types can be added through a `Profile`. Known keys, required settings, defaults, ranges and consistency between settings are validated by the caller's configuration schema. This implementation has no dependency on any particular application's setting names, conversions or schema.
+Custom types can be added through a `Profile`. Known keys, required settings, defaults, ranges, single-value or other occurrence-count constraints, and consistency between settings are validated by the caller's configuration schema. This implementation has no dependency on any particular application's setting names, conversions or schema.
 
 ## Supported rules and provisional choices
 
-The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and duplicate rejection. Escapes are decoded in quoted key elements, ordinary quoted values and triple-quoted bodies. Backslashes in unquoted single-line values and pipe bodies are retained; backslashes in unquoted key elements are rejected.
+The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, ordinary quoted values and triple-quoted bodies. Backslashes in unquoted single-line values and pipe bodies are retained; backslashes in unquoted key elements are rejected.
 
 Quoted key elements generally allow spaces, tabs, syntax characters such as `: ( ) #`, and control characters. Key elements and ordinary quoted values cannot span physical lines; triple-quoted and pipe bodies use the explicit multiline rules above. Represent a quote or a backslash in an ordinary quoted string with `\"` or `\\`; decoded characters are not reinterpreted as syntax. A newline can also be represented as character data with `\n` or a Unicode escape in quoted text. The range of characters representable by escapes is generally unrestricted, but undefined escape forms remain errors.
 
@@ -167,7 +193,7 @@ A.Fixed: "\uD83D\uDE00"
 A.Direct: "😀"
 ```
 
-Unicode scalar values range from U+0000 to U+10FFFF, excluding U+D800–U+DFFF. Noncharacters and unassigned code points are accepted if they are within this range. Errors include surrogates in the braced form; isolated, reversed or incomplete surrogate pairs in the four-digit form; pairs that mix the two forms; invalid digit counts or hexadecimal digits; and out-of-range values. Invalid representations are not substituted with a replacement character. `"\u{1F600}"` and `"😀"` become the same key element and are therefore duplicates. This is equality of decoding results, distinct from Unicode normalisation.
+Unicode scalar values range from U+0000 to U+10FFFF, excluding U+D800–U+DFFF. Noncharacters and unassigned code points are accepted if they are within this range. Errors include surrogates in the braced form; isolated, reversed or incomplete surrogate pairs in the four-digit form; pairs that mix the two forms; invalid digit counts or hexadecimal digits; and out-of-range values. Invalid representations are not substituted with a replacement character. `"\u{1F600}"` and `"😀"` become the same key element, so their occurrences belong to the same key and are all retained. This is equality of decoding results, distinct from Unicode normalisation.
 
 The basic escapes other than the dot, and the four-digit Unicode form, are shared with JSON; the notation does not adopt the complete JSON string rules. Forms used by other languages, such as `\UXXXXXXXX`, `\xXX`, octal escapes, `\a`, `\v`, `\0` and `\'`, are undefined and rejected. See [section 3.4 of config-format.md](../../docs/config-format.md#34-common-escapes-within-quotes).
 
@@ -183,7 +209,7 @@ The following choices are specific to this implementation where the specificatio
 | Remaining whitespace around type annotations | Alignment tabs immediately before the type expression or after the closing parenthesis are unsupported; this is distinct from normal trimming of outer SP and HT on value lines |
 | Unicode whitespace and control-character detection in unquoted keys | Use Go's `unicode.IsSpace` and `unicode.IsControl`; do not apply this prohibition to quoted keys |
 | Future escape extensions | Reject additional forms as undefined; implement decoding of the adopted basic and Unicode forms as agreed rules |
-| API and error classification | Use this sample's API and `Code`; the public API and formal diagnostic format remain undecided |
+| API and error classification | Use this sample's singular, collection and indexed retrieval APIs and `Code`; singular methods report `ErrMultipleValues`, and `GetAll` fails without partial results; the public API and formal diagnostic format remain undecided |
 | Type-expression identity and conversion failure | Match type names exactly without resolving aliases; report conversion failure for an annotated type during `Build` |
 
 Unsupported type-expression syntax is generally reported as `ErrUnsupported`, syntax that violates agreed rules as `ErrSyntax`, and invalid value quoting or escapes as `ErrString`. Undefined escapes are not reinterpreted as ordinary characters. A backslash in an unquoted value is already an ordinary character, rather than an escape.
@@ -201,7 +227,7 @@ go vet ./...
 go build ./...
 ```
 
-The tests cover accepted and rejected input, heading state, key-element boundaries, backslashes within and outside quotes, basic and Unicode escapes, rejection of unknown forms and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, unset values, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
+The tests cover accepted and rejected input, heading state, key-element boundaries, backslashes within and outside quotes, basic and Unicode escapes, rejection of unknown forms and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
 
 Reproducible benchmarks and the local refactor measurements are described in
 [PERFORMANCE.md](PERFORMANCE.md), including allocation counts and trade-offs.

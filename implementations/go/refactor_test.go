@@ -41,6 +41,35 @@ func TestRefactorHeaderErrorPrecedence(t *testing.T) {
 	}
 }
 
+func TestRefactorRepeatedKeysPreserveLaterFailurePriority(t *testing.T) {
+	for _, test := range []struct {
+		source string
+		code   Code
+		line   int
+		visits int
+	}{
+		{"A:red\nA():private", ErrUnsupported, 2, 1},
+		{"A:red\nA:\"\"\"\nunclosed", ErrSyntax, 2, 1},
+		{"A:red\nA:\n |\xff", ErrSyntax, 3, 1},
+		{"A:red\nA:green\nA:\xff", ErrSyntax, 3, 2},
+	} {
+		t.Run(test.source, func(t *testing.T) {
+			var got []Entry
+			err := ParseEach(strings.NewReader(test.source), func(entry Entry) error {
+				got = append(got, entry)
+				return nil
+			})
+			parserRequireCode(t, err, test.code, test.line)
+			if len(got) != test.visits || got[0].Raw != "red" {
+				t.Errorf("valid occurrences before failure=%#v", got)
+			}
+			if entries, err := Parse(strings.NewReader(test.source)); err == nil || entries != nil {
+				t.Fatalf("failed collection returned partial occurrences: %#v, %v", entries, err)
+			}
+		})
+	}
+}
+
 type refactorTailErrorReader struct {
 	data string
 	err  error

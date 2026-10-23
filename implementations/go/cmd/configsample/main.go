@@ -56,11 +56,13 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return err
 	}
 	var config *dotreg.Config
+	var occurrences map[string]int
 	if *mode == "demo" {
 		config, err = dotreg.Build(entries, dotreg.DemoProfile())
 		if err != nil {
 			return err
 		}
+		occurrences = make(map[string]int)
 	}
 	results := make([]output, 0, len(entries))
 	for _, entry := range entries {
@@ -78,10 +80,16 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 				if !entry.HasType {
 					want = "string"
 				}
-				result.Value, err = config.Get(entry.Path, want)
+				// JSON preserves element boundaries, empty names and controls.
+				// Headings do not consume a value occurrence.
+				encodedPath, _ := json.Marshal(entry.Path)
+				key := string(encodedPath)
+				index := occurrences[key]
+				result.Value, err = config.GetAt(entry.Path, index, want)
 				if err != nil {
 					return err
 				}
+				occurrences[key] = index + 1
 			}
 		}
 		results = append(results, result)

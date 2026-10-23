@@ -49,3 +49,41 @@ func Example() {
 	// true false
 	// type_mismatch
 }
+
+func ExampleConfig_GetAll() {
+	entries, err := dotreg.Parse(strings.NewReader(
+		"A.Tag:red\nA.Tag:green\nA.Tag:red\n",
+	))
+	if err != nil {
+		panic(err)
+	}
+	config, err := dotreg.Build(entries, dotreg.DemoProfile())
+	if err != nil {
+		panic(err)
+	}
+	tags, err := config.GetAll([]string{"A", "Tag"}, "string")
+	if err != nil {
+		panic(err)
+	}
+	states, err := config.IsUnsetAll([]string{"A", "Tag"})
+	if err != nil {
+		panic(err)
+	}
+	second, err := config.GetAt([]string{"A", "Tag"}, 1, "string")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(tags)
+	fmt.Println(states)
+	fmt.Println(second)
+	_, err = config.Get([]string{"A", "Tag"}, "string")
+	var multiple *dotreg.Error
+	if errors.As(err, &multiple) {
+		fmt.Println(multiple.Code, multiple.Line)
+	}
+	// Output:
+	// [red green red]
+	// [false false false]
+	// green
+	// multiple_values 2
+}

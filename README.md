@@ -14,6 +14,16 @@ A.
 
 The grouped entries resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. The code `001` stays text, with its leading zeroes intact.
 
+Repeat a key to record multiple values in source order:
+
+```text
+A.Tag:red
+A.Tag:green
+A.Tag:red
+```
+
+All three occurrences remain, including the repeated `red`. Later values do not overwrite earlier ones. Your application can require a single value for particular keys through its configuration schema.
+
 Multiline values support triple quotes with the same escapes as ordinary quoted values, or a pipe block whose text is preserved literally:
 
 ```text

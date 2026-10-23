@@ -6,11 +6,14 @@ import "fmt"
 type Code string
 
 const (
-	ErrSyntax         Code = "syntax"
-	ErrUnsupported    Code = "unsupported"
-	ErrInput          Code = "input"
+	ErrSyntax      Code = "syntax"
+	ErrUnsupported Code = "unsupported"
+	ErrInput       Code = "input"
+	// ErrDuplicate is retained for API compatibility. Parse and Build preserve
+	// repeated values and no longer return this code.
 	ErrDuplicate      Code = "duplicate"
 	ErrString         Code = "string"
+	ErrMultipleValues Code = "multiple_values"
 	ErrTypeMismatch   Code = "type_mismatch"
 	ErrTypeConversion Code = "type_conversion"
 	ErrMissing        Code = "missing"
@@ -36,6 +39,8 @@ func (e *Error) Error() string {
 		message = "duplicate value key"
 	case ErrString:
 		message = "invalid quoted string"
+	case ErrMultipleValues:
+		message = "key has multiple values"
 	case ErrTypeMismatch:
 		message = "requested type does not match"
 	case ErrTypeConversion:
