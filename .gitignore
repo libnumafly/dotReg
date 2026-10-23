@@ -1,0 +1,17 @@
+# Local agent attachments
+/.codex-remote-attachments/
+
+# Local environment and editor settings
+/.env
+/.env.*
+!/.env.example
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

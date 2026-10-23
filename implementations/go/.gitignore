@@ -1,0 +1,10 @@
+# Build and test output for this sample module
+/bin/
+/dist/
+/configsample
+/configsample.exe
+*.test
+*.test.exe
+/coverage/
+/coverage.out
+/coverage.html

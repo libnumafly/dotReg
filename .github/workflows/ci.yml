@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: ${{ matrix.os }} / Go ${{ matrix.go }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        go: [1.22.x, stable]
+    env:
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: implementations/go
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+          # There are no external modules or go.sum to cache.
+          cache: false
+      - name: Check formatting
+        run: |
+          $unformatted = gofmt -l .
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if ($unformatted) {
+            Write-Output 'Run gofmt on these files:'
+            Write-Output $unformatted
+            exit 1
+          }
+      - name: Run tests
+        run: go test -count=1 ./...
+      - name: Run vet
+        run: go vet ./...
+      - name: Build packages
+        run: go build ./...
+      - name: Smoke test CLI modes
+        run: |
+          foreach ($mode in @('raw', 'strings', 'demo')) {
+            go run ./cmd/configsample -mode $mode ../../examples/sample.txt > $null
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }
+      - name: Run race detector
+        if: matrix.os == 'ubuntu-latest' && matrix.go == 'stable'
+        run: go test -race -count=1 ./...
+      - name: Fuzz parser
+        if: matrix.os == 'ubuntu-latest' && matrix.go == 'stable'
+        run: go test -run='^$' -fuzz='^FuzzSampleParserNoPanic$' -fuzztime=5s -parallel=2 .

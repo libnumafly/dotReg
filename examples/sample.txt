@@ -1,0 +1,24 @@
+# Sample: string / int / bool are type names from the demo profile.
+A.
+ .Code(string):001
+ .Count(int):42
+ .Enabled(bool):true
+ .Path: C:\temp\new
+ .QuotedPath: "C:\\temp\\new"
+ .Message: "  say \"hello\"  "
+ .LineBreak: "first\nsecond"
+ .Emoji: "\u{1F600}"
+ .EmojiJson: "\uD83D\uDE00"
+ .Missing:
+ .Empty: ""
+ .NullText: null
+ .Pattern: ^foo\.bar$
+
+ .Group.
+  .: group-value
+  ."B.C": dot-in-one-name
+  ."": empty-child-name
+
+"A.B": one-element-key
+"": empty-key-name
+"A B:C(D)#": quoted-key-symbols
