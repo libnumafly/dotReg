@@ -134,7 +134,7 @@ assert.deepEqual(
 assert(documents.get(path.join(outputRoot, 'specification/index.html'))?.ids.has('12-undecided-matters'), 'The undecided matters section must remain reachable');
 assert(documents.has(path.join(outputRoot, 'open-issues/index.html')), 'The undecided matters page must remain reachable');
 const typeProfile = documents.get(path.join(outputRoot, 'type-profile/index.html'));
-assert(typeProfile?.ids.has('established-bytes-representation'), 'The established bytes representation must remain reachable');
+assert(typeProfile?.ids.has('established-base64-representation'), 'The established base64 representation must remain reachable');
 assert(typeProfile?.ids.has('candidate-type-names-and-sample-values'), 'The candidate type catalogue must remain reachable');
 assert((await readdir(path.join(outputRoot, 'pagefind'))).some((name) => name.endsWith('.js')), 'The search index is missing');
 

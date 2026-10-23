@@ -45,10 +45,16 @@ A.Path:
 
 The closing triple quotes set the indentation margin to remove. In a pipe block, everything after the first `|` belongs to the value, including spaces and backslashes. Both forms preserve line endings between body lines. To include a final newline, add an empty body line before the closing triple quotes, or an empty final pipe line (` |`). See the [value rules](docs/config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
 
-[Get started](docs/getting-started.md) · [Documentation](docs/README.md) · [Specification](docs/config-format.md) · [Go sample](implementations/go/README.md)
+[Get started](docs/getting-started.md) · [Documentation](docs/README.md) · [Specification](docs/config-format.md) · [Sample parsers](implementations/README.md)
+
+Try the notation in Go, Python, JavaScript, TypeScript, Java, C#, Rust or C++.
+The [parser set](implementations/README.md) provides dependency-free syntax and
+common string decoding, incremental APIs for bounded retention, shared
+conformance cases and [reproducible time and memory measurements](implementations/benchmarks/README.md).
+TypeScript shares the JavaScript engine through a typed interface.
 
 Website development and GitHub Pages setup: [Starlight website guide](pages/README.md).
 
 **In development.** The specification defines the core rules. [Type profiles and candidate types](docs/type-profile.md) records type-specific representations and candidate names; [undecided matters](docs/open-issues.md) lists the questions still open.
 
-The specification, examples and sample implementation are available under the [MIT License](LICENSE).
+The specification, examples and sample implementations are available under the [MIT License](LICENSE).

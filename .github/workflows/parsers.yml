@@ -1,0 +1,184 @@
+name: Parser samples
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parser:
+    name: ${{ matrix.language }} / Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [go, python, javascript, typescript, java, csharp, rust, cpp]
+    env:
+      DOTREG_LANGUAGE: ${{ matrix.language }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js for the shared runner
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Go
+        if: matrix.language == 'go'
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.22.x'
+          cache: false
+
+      - name: Set up Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Java
+        if: matrix.language == 'java'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up .NET
+        if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Select stable Rust
+        if: matrix.language == 'rust'
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustc --version
+
+      - name: Install the temporary TypeScript compiler
+        if: matrix.language == 'typescript'
+        run: npm install --prefix "$RUNNER_TEMP/dotreg-typescript" --no-package-lock --no-audit --no-fund typescript@5.7.3
+
+      - name: Build samples and run native checks
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/dotreg-rust-target"
+          case "$DOTREG_LANGUAGE" in
+            go)
+              go -C implementations/go build -o "$RUNNER_TEMP/dotreg-go" ./cmd/configsample
+              go -C implementations/go build -o "$RUNNER_TEMP/dotreg-go-benchmark" ./cmd/configbench
+              go -C implementations/go test -count=1 ./...
+              go -C implementations/go vet ./...
+              ;;
+            python)
+              python -m unittest discover -s implementations/python -v
+              ;;
+            javascript)
+              node --test implementations/javascript/test.mjs
+              ;;
+            typescript)
+              node "$RUNNER_TEMP/dotreg-typescript/node_modules/typescript/bin/tsc" --strict --noEmit --target ES2022 --module NodeNext implementations/typescript/example.mts
+              node --test implementations/javascript/test.mjs
+              ;;
+            java)
+              mkdir -p "$RUNNER_TEMP/dotreg-java"
+              javac -encoding UTF-8 -d "$RUNNER_TEMP/dotreg-java" implementations/java/DotReg.java implementations/java/DotRegTest.java implementations/java/DotRegBenchmark.java
+              java -ea -cp "$RUNNER_TEMP/dotreg-java" DotRegTest
+              ;;
+            csharp)
+              dotnet build implementations/csharp/tests/DotReg.Tests.csproj -c Release --nologo
+              dotnet build implementations/csharp/benchmarks/DotReg.Benchmark.csproj -c Release --nologo
+              dotnet implementations/csharp/tests/bin/Release/net8.0/DotReg.Tests.dll
+              ;;
+            rust)
+              cargo build --release --manifest-path implementations/rust/Cargo.toml
+              cargo test --release --manifest-path implementations/rust/Cargo.toml
+              ;;
+            cpp)
+              g++ --version
+              cmake -S implementations/cpp -B "$RUNNER_TEMP/dotreg-cpp" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+              cmake --build "$RUNNER_TEMP/dotreg-cpp" --config Release --parallel 2
+              ctest --test-dir "$RUNNER_TEMP/dotreg-cpp" -C Release --output-on-failure
+              ;;
+            *) exit 1 ;;
+          esac
+
+      - name: Register compiled CLI and benchmark commands
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          const temp = process.env.RUNNER_TEMP;
+          const node = process.execPath;
+          const cli = {
+            go: [join(temp, 'dotreg-go')],
+            python: ['python', 'implementations/python/dotreg.py'],
+            javascript: [node, 'implementations/javascript/configsample.mjs'],
+            typescript: [node, 'implementations/javascript/configsample.mjs'],
+            java: ['java', '-cp', join(temp, 'dotreg-java'), 'DotReg'],
+            csharp: ['dotnet', 'implementations/csharp/bin/Release/net8.0/DotReg.Sample.dll'],
+            rust: [join(temp, 'dotreg-rust-target/release/dotreg-sample')],
+            cpp: [join(temp, 'dotreg-cpp/dotreg-sample')],
+          };
+          const benchmark = {
+            go: [join(temp, 'dotreg-go-benchmark')],
+            python: ['python', 'implementations/python/benchmark.py'],
+            javascript: [node, 'implementations/javascript/benchmark.mjs'],
+            typescript: [node, 'implementations/javascript/benchmark.mjs'],
+            java: ['java', '-cp', join(temp, 'dotreg-java'), 'DotRegBenchmark'],
+            csharp: ['dotnet', 'implementations/csharp/benchmarks/bin/Release/net8.0/DotReg.Benchmark.dll'],
+            rust: [...cli.rust, '--benchmark'],
+            cpp: [...cli.cpp, '--benchmark'],
+          };
+          const language = process.env.DOTREG_LANGUAGE;
+          if (!cli[language] || !benchmark[language]) throw new Error('Unknown matrix language');
+          appendFileSync(process.env.GITHUB_ENV, `DOTREG_CLI=${JSON.stringify(cli[language])}\nDOTREG_BENCHMARK=${JSON.stringify(benchmark[language])}\n`);
+          JS
+
+      - name: Check raw and decoded CLI conformance
+        run: node implementations/conformance/run.mjs --command "$DOTREG_CLI"
+
+      - name: Generate the small common benchmark fixture
+        run: node implementations/benchmarks/fixture.mjs "$RUNNER_TEMP/dotreg-benchmark-smoke.txt" 100
+
+      - name: Smoke test streaming and collecting benchmarks
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { statSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { spawnSync } from 'node:child_process';
+          const command = JSON.parse(process.env.DOTREG_BENCHMARK);
+          const fixture = join(process.env.RUNNER_TEMP, 'dotreg-benchmark-smoke.txt');
+          for (const mode of ['stream', 'collect']) {
+            const child = spawnSync(command[0], [...command.slice(1), fixture, '1', mode], { encoding: 'utf8', timeout: 30000 });
+            assert.ifError(child.error);
+            assert.equal(child.status, 0, child.stderr);
+            assert.equal(child.signal, null);
+            const result = JSON.parse(child.stdout);
+            assert.equal(result.mode, mode);
+            assert.equal(result.iterations, 1);
+            assert.equal(result.input_bytes, statSync(fixture).size);
+            assert.equal(result.entries, 101);
+            assert(Number.isFinite(result.elapsed_seconds) && result.elapsed_seconds >= 0);
+            console.log(JSON.stringify(result));
+          }
+          JS

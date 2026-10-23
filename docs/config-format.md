@@ -49,7 +49,7 @@ Parsing resolves each entry to a fully qualified key. If a key appears more than
 
 Each set value starts as text. Its form determines how common string decoding works. A declared type expression controls conversion for that occurrence. Without a declaration, a consumer can request conversion when it retrieves the value. A request that conflicts with a declaration, or a failed requested conversion, produces a type expression mismatch. An unset value remains marked unset; when string retrieval is allowed, it is equivalent to an empty string.
 
-This specification defines file properties, key and heading syntax, values, common string decoding, and the conversion and retrieval procedure. Standard type names, concrete conversion rules, some type-expression details, future file properties, version policies and a dedicated file extension remain undecided; see [Undecided matters](open-issues.md). [Type profiles and candidate types](type-profile.md) records the candidate catalogue and established byte representation. The Go implementation is a sample parser and consumer with an illustrative type profile. See [the Go sample guide](../implementations/go/README.md) for its behaviour and provisional choices.
+This specification defines file properties, key and heading syntax, values, common string decoding, and the conversion and retrieval procedure. Standard type names, concrete conversion rules, some type-expression details, future file properties, version policies and a dedicated file extension remain undecided; see [Undecided matters](open-issues.md). [Type profiles and candidate types](type-profile.md) records the candidate catalogue and established Base64 representation. The Go implementation is a sample parser and consumer with an illustrative type profile. See [the Go sample guide](../implementations/go/README.md) for its behaviour and provisional choices.
 
 ### 1.1 File property declarations
 
@@ -937,7 +937,7 @@ Syntax errors include line numbers, keys and causes as required, but do not incl
 
 ## 12. Undecided matters
 
-The [undecided-matters register](open-issues.md) lists the remaining decisions and links to the rules already established here. [Type profiles and candidate types](type-profile.md) contains the candidate catalogue and the established Base64 representation for `bytes`. Candidate names do not establish standard valid types or Go sample capabilities.
+The [undecided-matters register](open-issues.md) lists the remaining decisions and links to the rules already established here. [Type profiles and candidate types](type-profile.md) contains the candidate catalogue and the established representation for `base64`. Candidate names do not establish standard valid types or Go sample capabilities.
 
 ## 13. Conformance checking
 

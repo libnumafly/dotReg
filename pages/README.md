@@ -41,7 +41,16 @@ The site imports these repository files rather than maintaining separate copies:
 | `../docs/type-profile.md` | `type-profile/` |
 | `../docs/open-issues.md` | `open-issues/` |
 | `../docs/conformance.md` | `conformance/` |
+| `../implementations/README.md` | `implementations/` |
 | `../implementations/go/README.md` | `implementations/go/` |
+| `../implementations/python/README.md` | `implementations/python/` |
+| `../implementations/javascript/README.md` | `implementations/javascript/` |
+| `../implementations/typescript/README.md` | `implementations/typescript/` |
+| `../implementations/java/README.md` | `implementations/java/` |
+| `../implementations/csharp/README.md` | `implementations/csharp/` |
+| `../implementations/rust/README.md` | `implementations/rust/` |
+| `../implementations/cpp/README.md` | `implementations/cpp/` |
+| `../implementations/benchmarks/README.md` | `implementations/benchmarks/` |
 | `../implementations/go/PERFORMANCE.md` | `implementations/go/performance/` |
 | `../examples/sample.txt` | `examples/` and the original `.txt` download |
 | `../LICENSE` | `license/` and the original text download |

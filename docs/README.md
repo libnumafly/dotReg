@@ -15,6 +15,8 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 | [Undecided matters](open-issues.md) | Check which parts of the format remain open |
 | [Example configuration](../examples/sample.txt) | Explore repeated values, quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
 | [Go sample guide](../implementations/go/README.md) | Run the optional parser and CLI, use its API, or inspect its supported scope and provisional choices |
+| [Sample parser set](../implementations/README.md) | Choose Go, Python, JavaScript, TypeScript, Java, C#, Rust or C++; compare the shared syntax contract and streaming APIs |
+| [Time and memory measurements](../implementations/benchmarks/README.md) | Reproduce native API measurements and distinguish allocation volume from process memory |
 
 ## Project status
 
@@ -22,7 +24,7 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 
 The current format version is declared by the mandatory `@dotReg 1` property region and blank separator. Future version policy, additional properties, a dedicated file extension and standard type names remain undecided. See [file properties](config-format.md#11-file-property-declarations) and [undecided matters](open-issues.md).
 
-The Go implementation is a sample for trying the notation. Its public API and experimental type profile are provisional. In particular, the `string`, `int` and `bool` annotations in the example configuration do not establish standard type names or conversion rules.
+The sample implementations are for trying the notation. Their public APIs are provisional. The new ports cover syntax and common string decoding, retaining type expressions without conversion. The Go sample additionally provides an experimental type profile and retrieval API. In particular, the `string`, `int` and `bool` annotations in the example configuration do not establish standard type names or conversion rules.
 
 ## How the documents fit together
 
@@ -47,13 +49,23 @@ For a first read, follow [Getting started](getting-started.md). For a particular
 ├── docs/                  # Guides and reference specification
 ├── examples/              # Configuration inputs
 ├── implementations/
-│   └── go/                # Optional Go sample, CLI, tests and guide
+│   ├── README.md          # Parser set and common contract
+│   ├── go/                # Go sample and experimental type consumer
+│   ├── python/            # Python sample
+│   ├── javascript/        # JavaScript engine
+│   ├── typescript/        # Typed interface to the JavaScript engine
+│   ├── java/              # Java sample
+│   ├── csharp/            # C# sample
+│   ├── rust/              # Rust sample
+│   ├── cpp/               # C++ sample
+│   ├── conformance/       # Shared syntax/decoding fixtures and runner
+│   └── benchmarks/        # Common fixture, measurement tools and observations
 ├── .github/               # CI and GitHub configuration
 └── LICENSE                # MIT licence
 ```
 
 ## Licence
 
-The specification, examples and sample implementation are available under the [MIT License](../LICENSE).
+The specification, examples and sample implementations are available under the [MIT License](../LICENSE).
 
 You may choose your own licence for configuration files you author with this notation and for independently written implementations. Copies of material from this repository remain subject to the MIT terms.

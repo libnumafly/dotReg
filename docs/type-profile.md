@@ -4,15 +4,15 @@ The [format specification](config-format.md) defines [type annotation syntax](co
 
 [Back to the documentation](README.md) · [Undecided matters](open-issues.md)
 
-## Established bytes representation
+## Established base64 representation
 
-For `bytes`, the text form uses the standard Base64 alphabet and required padding in [RFC 4648 section 4](https://www.rfc-editor.org/rfc/rfc4648#section-4), rather than the URL-safe alphabet. Encoded text has no line wrapping, and decoding rejects non-alphabet characters, including whitespace, following the default rules in RFC 4648 sections 3.1–3.3. `SGVsbG8=` decodes to the five octets spelling `Hello` in ASCII.
+For `base64`, the text form uses the standard Base64 alphabet and required padding in [RFC 4648 section 4](https://www.rfc-editor.org/rfc/rfc4648#section-4), rather than the URL-safe alphabet. Encoded text has no line wrapping, and decoding rejects non-alphabet characters, including whitespace, following the default rules in RFC 4648 sections 3.1–3.3. `SGVsbG8=` decodes to the five octets spelling `Hello` in ASCII.
 
-This representation decision is established. It does not by itself make `bytes` a standard permitted type name or a supported Go sample type. The remaining decisions about type names and profiles are listed in [Undecided matters](open-issues.md).
+This representation decision is established. It does not by itself make `base64` a standard permitted type name or a supported Go sample type. The remaining decisions about type names and profiles are listed in [Undecided matters](open-issues.md).
 
 ## Candidate type names and sample values
 
-These names and right-hand-side values are an illustrative candidate set, not a declaration that the core format or the Go sample accepts these types. Except for the `bytes` text representation described above, the samples do not define the accepted spelling or conversion rules for a type.
+These names and right-hand-side values are an illustrative candidate set, not a declaration that the core format or the Go sample accepts these types. Except for the `base64` text representation described above, the samples do not define the accepted spelling or conversion rules for a type.
 
 | Candidate type | Intended value | Sample right-hand side |
 |----------------|---------------|-----------------------|
@@ -24,7 +24,7 @@ These names and right-hand-side values are an illustrative candidate set, not a 
 | `uint64` | Unsigned 64-bit integer | `9000000000` |
 | `decimal` | Decimal number | `1234.50` |
 | `float64` | 64-bit floating-point number | `0.125` |
-| `bytes` | Octets encoded as standard Base64 | `SGVsbG8=` |
+| `base64` | Octets encoded as standard Base64 | `SGVsbG8=` |
 | `duration` | Duration | `PT1H30M` |
 | `date` | Calendar date | `2026-10-24` |
 | `time` | Time of day | `09:30:00` |
