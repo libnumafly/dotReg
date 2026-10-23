@@ -1,0 +1,77 @@
+---
+title: dotReg
+description: Readable configuration, built on dotted keys. Explore the notation, read the specification and try the Go sample.
+template: splash
+editUrl: false
+hero:
+  title: Readable configuration, built on dotted keys.
+  tagline: A line-oriented notation for settings you can read, group and interpret on your own terms.
+  actions:
+    - text: Get started
+      link: ./getting-started/
+      icon: right-arrow
+    - text: Read the specification
+      link: ./specification/
+      variant: secondary
+---
+
+<div class="project-status"><span class="status-dot" aria-hidden="true"></span> In development <span aria-hidden="true">/</span> Format version 1</div>
+
+## A full key. A shared heading. The same setting.
+
+Write each dotted key in full, or group related settings beneath a heading. Values begin as text; your application decides how to interpret them.
+
+<div class="notation-pair">
+
+```text title="Full keys"
+@dotReg 1
+
+A.Code:001
+A.Message: "Hello, dotReg"
+A.Group.Enabled:true
+```
+
+```text title="Grouped keys"
+@dotReg 1
+
+A.
+ .Code:001
+ .Message: "Hello, dotReg"
+ .Group.
+  .Enabled:true
+```
+
+</div>
+
+Both forms resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. The code `001` keeps its leading zeroes. Every complete file starts with `@dotReg 1` and a blank separator.
+
+<div class="notation-principles">
+  <section>
+    <h3>Text stays text</h3>
+    <p>Keep paths, codes and literal values intact. Use an initial double quote when you want quoted syntax and escapes.</p>
+  </section>
+  <section>
+    <h3>Every occurrence counts</h3>
+    <p>Repeat a key to record multiple values in source order. Repeated values are retained, including identical ones.</p>
+  </section>
+  <section>
+    <h3>Room for longer values</h3>
+    <p>Use triple quotes for decoded multiline strings, or pipe blocks for literal text.</p>
+  </section>
+</div>
+
+## From a first example to the precise rules
+
+<div class="reading-path">
+  <a href="./getting-started/"><span class="path-number">01</span><span><strong>Learn the notation</strong><span>Small examples of keys, headings, strings and repeated values.</span></span><span aria-hidden="true">↗</span></a>
+  <a href="./specification/"><span class="path-number">02</span><span><strong>Read the specification</strong><span>Syntax, processing responsibilities, conformance checks and open questions.</span></span><span aria-hidden="true">↗</span></a>
+  <a href="./implementations/go/"><span class="path-number">03</span><span><strong>Try the Go sample</strong><span>A parser, CLI and provisional type profile for exploring the format.</span></span><span aria-hidden="true">↗</span></a>
+</div>
+
+<div class="development-note">
+
+**A format in development.** The specification separates established rules from [undecided matters](./specification/#12-undecided-matters). The Go implementation is a sample; its API and experimental type profile remain provisional.
+
+The specification, examples and sample implementation are available under the [MIT License](./license/).
+
+</div>

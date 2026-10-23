@@ -47,6 +47,8 @@ The closing triple quotes set the indentation margin to remove. In a pipe block,
 
 [Get started](docs/getting-started.md) · [Documentation](docs/README.md) · [Specification](docs/config-format.md) · [Go sample](implementations/go/README.md)
 
+Website development and GitHub Pages setup: [Starlight website guide](pages/README.md).
+
 **In development.** The specification distinguishes agreed rules from [open questions](docs/config-format.md#12-undecided-matters).
 
 The specification, examples and sample implementation are available under the [MIT License](LICENSE).
