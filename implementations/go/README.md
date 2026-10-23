@@ -14,7 +14,7 @@ Use Go 1.22 or later. From `implementations/go`, run:
 go run ./cmd/configsample ../../examples/sample.txt
 ```
 
-By default, the CLI writes JSON containing the parsed key path, undecoded right-hand side, unset state and type annotation, together with the result of common string decoding. This mode does not convert values, even when a type annotation is present.
+By default, the CLI writes JSON containing the parsed key path, undecoded right-hand side or block body, unset state and type annotation, together with the result of common string decoding. Multiline entries also include their `form`. This mode does not convert values, even when a type annotation is present.
 
 To try type conversion, select the experimental type profile:
 
@@ -46,22 +46,22 @@ For input containing non-ASCII characters, passing a UTF-8 file avoids dependenc
 | `strings` (default) | Parsing and common string decoding | `raw` and `decoded` |
 | `demo` | Common string decoding, then conversion to annotated types with the experimental profile | `raw` and `value` |
 
-`path` is an array of strings. It distinguishes `["A.B"]` from `["A", "B"]`, and `[""]` from an empty array. `unset` is `true` for an unset value and `false` for the explicit empty string written as `""`. A JSON `\\` is part of JSON's representation; it does not change the configuration input syntax.
+`path` is an array of strings. It distinguishes `["A.B"]` from `["A", "B"]`, and `[""]` from an empty array. `unset` is `true` for an unset value and `false` for explicit empty quoted or block values. For a block, `raw` is its undecoded body after removing markers and its prescribed margin; it excludes boundary line endings and preserves LF or CRLF between body lines. The optional JSON field `form` is `"triple_quoted"` or `"pipe"` for blocks and omitted for ordinary single-line entries. A JSON `\\` or `\n` is part of JSON's representation; it does not change the configuration input syntax.
 
-The `raw` mode can retain an unterminated quote in a value. Always use `DecodeString` or `Build` before passing configuration values to a consumer. The CLI's `strings` and `demo` modes write output only after all processing succeeds, so a failure does not produce partial JSON.
+The `raw` mode can retain an unterminated ordinary quote in a single-line value or an invalid escape in a complete triple-quoted body. A missing triple-quoted closing marker or insufficient body margin is already a parsing failure. Always use `DecodeString` or `Build` before passing configuration values to a consumer. The CLI's `strings` and `demo` modes write output only after all processing succeeds, so a failure does not produce partial JSON.
 
 ## Using the library
 
 | API | Purpose |
 |---|---|
 | `Parse(io.Reader) ([]Entry, error)` | Collect parsed entries; return no partial result on failure |
-| `ParseEach(io.Reader, func(Entry) error) error` | Notify the callback of headings and value lines in source order, with physical line numbers |
-| `DecodeString(Entry) (Text, error)` | Remove the surrounding value quotes and decode escapes only within quotes |
+| `ParseEach(io.Reader, func(Entry) error) error` | Notify the callback of headings and complete values in source order, with header line numbers |
+| `DecodeString(Entry) (Text, error)` | Decode according to the value form: ordinary quotes, triple-quoted escapes or a literal pipe body |
 | `Build([]Entry, Profile) (*Config, error)` | Decode strings and convert annotated values only to their declared type |
 | `Config.Get([]string, string) (any, error)` | Retrieve a value with an explicit key path and requested type name |
 | `Config.IsUnset([]string) (bool, error)` | Query the unset state without retrieving or converting the value |
 
-`Entry` has `Line`, `Kind`, `Path`, `Raw`, `Unset`, `Type` and `HasType` fields. `Kind` is either `Heading` or `Value`. A heading alone does not create a value. `Text` holds the decoded `Value string` and `Unset bool`.
+`Entry` has `Line`, `Kind`, `Path`, `Raw`, `Unset`, `Type`, `HasType` and `Form` fields. `Line` identifies the heading or value header, including for a multiline body. `Kind` is either `Heading` or `Value`. A heading alone does not create a value. `Form` is a `ValueForm`: its zero value denotes ordinary single-line handling, `TripleQuoted` is `"triple_quoted"` and `PipeBlock` is `"pipe"`. Preserve `Form` along with `Raw` when retaining or constructing entries; block contents alone must not be inspected to guess the value syntax. For blocks, `Raw` is already stripped of structural markers and margin, and `Unset` is always false, even for an empty body. `Text` holds the decoded `Value string` and `Unset bool`.
 
 The following fragment demonstrates retrieval. See [example_test.go](example_test.go) for executable examples that include error handling.
 
@@ -88,6 +88,48 @@ Requesting the annotated `A.Code` as `int` returns `ErrTypeMismatch`, regardless
 
 The notation does not perform Unicode normalisation. Key elements are compared exactly after quote and escape decoding, using the same rule for duplicate detection, retrieval and matching against a configuration schema. For example, the precomposed character `が` (U+304C) and the sequence `か` plus a combining voiced sound mark (U+304B U+3099) are different names. Type expressions and values are not implicitly normalised either.
 
+## Multiline values
+
+Triple-quoted values use the same escapes as ordinary quoted values:
+
+```text
+A.Message: """
+  Hello, \u{1F600}
+    indented
+  """
+```
+
+The header right-hand side is exactly `"""`; no inline content follows it. The closing marker is on its own line, with optional trailing ASCII spaces or tabs. Its leading ASCII-space count is the margin removed from every non-empty source body line; truly empty lines are exempt. Non-empty lines with insufficient margin are rejected. A closing margin of zero is allowed. Ordinary quote characters are body data; only an exact closing line terminates the block. Escape one of its quotes, for example `\"""`, to represent such a line as body data, or use a pipe block instead.
+
+After structural processing, `DecodeString` decodes the body escapes exactly once and does not trim or normalise the result. With LF source endings, the example becomes `Hello, 😀`, LF and two spaces followed by `indented`. Invalid escapes still fail decoding, and a backslash never continues a physical line.
+
+A pipe block starts only when the physical line immediately after an empty header has more leading ASCII spaces than that header, followed by `|`:
+
+```text
+A.
+ .Literal:
+  |C:\temp\new
+  |"quotes" and \q remain literal
+  |# literal text
+ .Next: value
+```
+
+Collect consecutive deeper pipe lines, stripping their leading spaces and first pipe. Everything after each marker is literal: retain whitespace, additional pipes, quotes and backslashes without escape decoding. Different body-line indentation is allowed if every line remains deeper than the header. Do not skip blank lines or comments to find or continue a pipe body. The first non-body line is processed normally. `A:|` is an ordinary single-line value. A same-depth or shallower `|:` line is not body content and must satisfy ordinary key and indentation rules: unindented `|: value` can name the key `|`, but an indented absolute key remains invalid.
+
+Both forms preserve original LF or CRLF between body lines, exclude boundary line endings and infer no terminal newline. Add an empty body line before a triple-quoted close or an empty final pipe to retain a terminal newline:
+
+```text
+A.WithNewline:
+ |text
+ |
+A.Empty:
+ |
+```
+
+The first body is `text` followed by one source line ending; the second is an explicit empty string with `Unset == false`. An immediately closed triple-quoted block is also explicitly empty. Normal heading scope and type conversion apply to block headers; bodies do not create headings or comments. Type annotations and assignment to a heading itself support either form.
+
+See [triple-quoted values](../../docs/config-format.md#83-triple-quoted-multiline-values) and [pipe blocks](../../docs/config-format.md#84-literal-pipe-blocks) for the reference rules.
+
 ## Type conversion and the caller's configuration schema
 
 A `Profile` specifies `StringType`, the name of the string type, and `Types map[string]Converter` for other types. A `Converter` receives decoded `Text`. The string type always returns the decoded string, treating an unset value as an empty string. Type names in this implementation require an exact, case-sensitive match.
@@ -106,9 +148,9 @@ Custom types can be added through a `Profile`. Known keys, required settings, de
 
 ## Supported rules and provisional choices
 
-The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, common string decoding and duplicate rejection. Escapes are decoded only within quotes. Backslashes in unquoted values are retained; backslashes in unquoted key elements are rejected.
+The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and duplicate rejection. Escapes are decoded in quoted key elements, ordinary quoted values and triple-quoted bodies. Backslashes in unquoted single-line values and pipe bodies are retained; backslashes in unquoted key elements are rejected.
 
-Quoted key elements generally allow spaces, tabs, syntax characters such as `: ( ) #`, and control characters. Physical newlines delimit lines, so quotes cannot span physical lines. Represent a quote or a backslash with `\"` or `\\`; decoded characters are not reinterpreted as syntax. A newline can be represented as character data with `\n` or a Unicode escape. The range of characters representable by escapes is generally unrestricted, but undefined escape forms remain errors.
+Quoted key elements generally allow spaces, tabs, syntax characters such as `: ( ) #`, and control characters. Key elements and ordinary quoted values cannot span physical lines; triple-quoted and pipe bodies use the explicit multiline rules above. Represent a quote or a backslash in an ordinary quoted string with `\"` or `\\`; decoded characters are not reinterpreted as syntax. A newline can also be represented as character data with `\n` or a Unicode escape in quoted text. The range of characters representable by escapes is generally unrestricted, but undefined escape forms remain errors.
 
 | Form within quotes | Decoded character |
 |---|---|
@@ -131,7 +173,7 @@ The basic escapes other than the dot, and the four-digit Unicode form, are share
 
 A type expression cannot contain internal whitespace. Parsing is not limited to simple ASCII type names: expressions are extracted while maintaining balanced parentheses. Forms such as `list(int)`, `map(string,list(int))`, `A|B`, `名前` and `[]` can be parsed, but their meaning and validity are determined by the profile. These examples do not establish standard types or a standard grammar for compound types. Headings cannot have type annotations, and types are not inherited by children.
 
-The implementation handles UTF-8, one initial BOM, LF, CRLF and a final line without a newline. Encoding and newline validation also applies to comments and blank lines. Neither the notation nor this implementation imposes fixed length limits on physical lines, keys, expanded paths, nesting depth or the whole file. Resource limits in the execution environment and length constraints in the caller's schema are distinct from the notation's acceptance rules. There is no environment-variable expansion, include mechanism, additional file loading or multiline value support.
+The implementation handles UTF-8, one initial BOM, LF, CRLF and a final line without a newline. Encoding and newline validation also applies to comments, blank lines and multiline bodies; internal source line endings are preserved in block values. Neither the notation nor this implementation imposes fixed length limits on physical lines, keys, expanded paths, nesting depth or the whole file. Resource limits in the execution environment and length constraints in the caller's schema are distinct from the notation's acceptance rules. There is no environment-variable expansion, include mechanism or additional file loading.
 
 The following choices are specific to this implementation where the specification remains undecided. They do not replace a formal decision in [config-format.md](../../docs/config-format.md).
 
@@ -146,7 +188,7 @@ The following choices are specific to this implementation where the specificatio
 
 Unsupported type-expression syntax is generally reported as `ErrUnsupported`, syntax that violates agreed rules as `ErrSyntax`, and invalid value quoting or escapes as `ErrString`. Undefined escapes are not reinterpreted as ordinary characters. A backslash in an unquoted value is already an ordinary character, rather than an escape.
 
-`Error` contains a line number and `Code`. Its diagnostic does not include the right-hand side or the error text returned by underlying input or conversion operations. An error returned by the `ParseEach` callback is returned unchanged, and stops further parsing and notifications. Input bytes may have been read ahead. Changes already made by the callback are not rolled back.
+`Error` contains a line number and `Code`. Its diagnostic does not include the right-hand side, block body or error text returned by underlying input or conversion operations. `ParseEach` buffers a complete multiline body before notifying its value entry. Identifying a pipe block or its end can inspect one following physical line; a non-body line is retained for normal parsing only after the callback succeeds. An error returned by the callback is returned unchanged, and stops parsing and notifications for later entries. Input bytes may also have been read ahead. Changes already made by the callback are not rolled back.
 
 ## Verification
 
@@ -159,7 +201,10 @@ go vet ./...
 go build ./...
 ```
 
-The tests cover accepted and rejected input, heading state, key-element boundaries, backslashes within and outside quotes, basic and Unicode escapes, rejection of unknown forms and invalid surrogates, the absence of Unicode normalisation, unset values, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
+The tests cover accepted and rejected input, heading state, key-element boundaries, backslashes within and outside quotes, basic and Unicode escapes, rejection of unknown forms and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, unset values, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
+
+Reproducible benchmarks and the local refactor measurements are described in
+[PERFORMANCE.md](PERFORMANCE.md), including allocation counts and trade-offs.
 
 To generate arbitrary inputs during fuzzing:
 

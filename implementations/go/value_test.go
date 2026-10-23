@@ -140,9 +140,79 @@ func TestDecodeStringRejectsInconsistentEntries(t *testing.T) {
 		{Kind: Value, Raw: "value", Unset: true},
 		{Kind: Value, Raw: ""},
 		{Kind: Value, Raw: " \t"},
+		{Kind: Value, Form: ValueForm("unknown"), Raw: "value"},
+		{Kind: Value, Form: TripleQuoted, Unset: true},
+		{Kind: Value, Form: PipeBlock, Unset: true},
+		{Kind: Heading, Form: TripleQuoted},
 	} {
 		_, err := DecodeString(entry)
 		assertValueCode(t, err, ErrString)
+	}
+}
+
+func TestDecodeBlockStrings(t *testing.T) {
+	tests := []struct {
+		name string
+		form ValueForm
+		raw  string
+		want string
+	}{
+		{"triple empty is set", TripleQuoted, "", ""},
+		{"pipe empty is set", PipeBlock, "", ""},
+		{"triple whitespace remains", TripleQuoted, " \t  ", " \t  "},
+		{"pipe whitespace remains", PipeBlock, " \t  ", " \t  "},
+		{"triple physical line breaks", TripleQuoted, "first\n  second  \n", "first\n  second  \n"},
+		{"pipe physical line breaks", PipeBlock, "first\n  second  \n", "first\n  second  \n"},
+		{"triple mixed EOL remains", TripleQuoted, "first\r\nsecond\nthird\r\n", "first\r\nsecond\nthird\r\n"},
+		{"pipe mixed EOL remains", PipeBlock, "first\r\nsecond\nthird\r\n", "first\r\nsecond\nthird\r\n"},
+		{"triple literal quotes", TripleQuoted, `say "hello", then """`, `say "hello", then """`},
+		{"pipe literal quotes", PipeBlock, `"unterminated`, `"unterminated`},
+		{"pipe backslashes never decode", PipeBlock, `C:\temp\new\q\u{110000}\`, `C:\temp\new\q\u{110000}\`},
+		{"triple basic escapes", TripleQuoted, `\.\"\\\/\b\f\n\r\t`, ".\"\\/\b\f\n\r\t"},
+		{"triple Unicode and surrogate pair", TripleQuoted, `\u{1F600}\u0041\uD83D\uDE00`, "😀A😀"},
+		{"triple escaped controls", TripleQuoted, `\u0000\u{A}\u{D}\u0009`, "\x00\n\r\t"},
+		{"triple decoding happens once", TripleQuoted, `\u005Cu{41}\\n`, `\u{41}\n`},
+		{"triple decoded quote is data", TripleQuoted, `\u0022\"\"`, `"""`},
+		{"triple physical and escaped newlines", TripleQuoted, "A\\n\r\nB", "A\n\r\nB"},
+		{"triple decomposed Unicode remains", TripleQuoted, "e\\u{301}", "e\u0301"},
+		{"pipe decomposed Unicode remains", PipeBlock, "e\u0301", "e\u0301"},
+		{"triple syntax characters are data", TripleQuoted, ".A(T): # |", ".A(T): # |"},
+		{"pipe syntax characters are data", PipeBlock, ".A(T): # |", ".A(T): # |"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := DecodeString(Entry{Line: 5, Kind: Value, Form: test.form, Raw: test.raw})
+			if err != nil || got != (Text{Value: test.want}) {
+				t.Fatalf("DecodeString() = %#v, %v; want %q, set", got, err, test.want)
+			}
+		})
+	}
+}
+
+func TestDecodeBlockRejectsMalformedSource(t *testing.T) {
+	for _, form := range []ValueForm{TripleQuoted, PipeBlock} {
+		for _, raw := range []string{string([]byte{0xff}), "body\rline", "body\r"} {
+			t.Run(string(form)+"/"+raw, func(t *testing.T) {
+				_, err := DecodeString(Entry{Line: 5, Kind: Value, Form: form, Raw: raw})
+				assertValueCode(t, err, ErrString)
+			})
+		}
+	}
+}
+
+func TestDecodeTripleRejectsMalformedEscapes(t *testing.T) {
+	for _, raw := range []string{
+		`private\q`, `private\`, `\u`, `\u{}`, `\u{D800}`, `\u{110000}`,
+		`\uD83D`, `\uDE00`, `\uD83D\u0041`, `\x41`, `\U0001F600`,
+		"private\\\nnext", "private\\\r\nnext", "\\u{4\n1}",
+	} {
+		t.Run(raw, func(t *testing.T) {
+			_, err := DecodeString(Entry{Line: 5, Kind: Value, Form: TripleQuoted, Raw: raw})
+			assertValueCode(t, err, ErrString)
+			if strings.Contains(err.Error(), "private") {
+				t.Fatal("diagnostic contains the raw block")
+			}
+		})
 	}
 }
 

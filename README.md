@@ -14,6 +14,21 @@ A.
 
 The grouped entries resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. The code `001` stays text, with its leading zeroes intact.
 
+Multiline values support triple quotes with the same escapes as ordinary quoted values, or a pipe block whose text is preserved literally:
+
+```text
+A.Message: """
+  first line
+  say \"hello\"
+  """
+
+A.Path:
+ |C:\temp\new
+ |another line
+```
+
+The closing triple quotes set the indentation margin to remove. In a pipe block, everything after the first `|` belongs to the value, including spaces and backslashes. Both forms preserve line endings between body lines. To include a final newline, add an empty body line before the closing triple quotes, or an empty final pipe line (` |`). See the [value rules](docs/config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
+
 [Get started](docs/getting-started.md) · [Documentation](docs/README.md) · [Specification](docs/config-format.md) · [Go sample](implementations/go/README.md)
 
 **In development.** The specification distinguishes agreed rules from [open questions](docs/config-format.md#12-undecided-matters).

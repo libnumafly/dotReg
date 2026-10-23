@@ -14,6 +14,24 @@ A.
  .NullText: null
  .Pattern: ^foo\.bar$
 
+ # Triple quotes decode the same escapes as ordinary quoted values.
+ .Multiline(string): """
+   first line
+     indented second line: \u{1F600}
+   say \"hello\"
+   """
+
+ # Pipe blocks keep everything after | literally, including backslashes.
+ .Literal:
+  |C:\temp\new
+  |"quotes" and \n stay literal
+  ||this line begins with a pipe
+
+ # An extra empty body line explicitly includes a final newline.
+ .FinalNewline:
+  |first line
+  |
+
  .Group.
   .: group-value
   ."B.C": dot-in-one-name

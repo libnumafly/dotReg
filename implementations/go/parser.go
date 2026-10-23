@@ -19,16 +19,27 @@ const (
 	Heading Kind = "heading"
 )
 
-// Entry is a syntax result. Raw still contains any quotes and escapes.
+// ValueForm identifies a multiline value. The zero value is single-line syntax.
+type ValueForm string
+
+const (
+	TripleQuoted ValueForm = "triple_quoted"
+	PipeBlock    ValueForm = "pipe"
+)
+
+// Entry is a syntax result. Raw preserves undecoded quotes and escapes.
+// For multiline forms, Raw excludes markers and their indentation margins,
+// retaining the original line endings between body lines. Line is the opener.
 // Path holds decoded elements; joining them with dots loses information.
 type Entry struct {
-	Line    int      `json:"line"`
-	Kind    Kind     `json:"kind"`
-	Path    []string `json:"path"`
-	Raw     string   `json:"raw"`
-	Unset   bool     `json:"unset"`
-	Type    string   `json:"type,omitempty"`
-	HasType bool     `json:"has_type"`
+	Line    int       `json:"line"`
+	Kind    Kind      `json:"kind"`
+	Path    []string  `json:"path"`
+	Raw     string    `json:"raw"`
+	Unset   bool      `json:"unset"`
+	Type    string    `json:"type,omitempty"`
+	HasType bool      `json:"has_type"`
+	Form    ValueForm `json:"form,omitempty"`
 }
 
 // Parse collects syntax results. It returns no partial result on failure.
@@ -46,23 +57,25 @@ func Parse(r io.Reader) ([]Entry, error) {
 }
 
 // ParseEach visits headings and values synchronously in source order.
-// A visitor error is returned unchanged, before parsing another line.
+// Multiline bodies are consumed before their value is visited. A visitor error
+// is returned unchanged, before validating or parsing the next logical entry.
 // The reader may buffer bytes ahead. Each call starts with fresh scopes/keys.
 func ParseEach(r io.Reader, visit func(Entry) error) error {
 	if nilReader(r) || visit == nil {
 		return problem(0, ErrInput)
 	}
-	reader := bufio.NewReader(r)
+	lines := sourceLines{reader: bufio.NewReader(r), nextLine: 1}
 	var scopes []*pathNode
 	seen := make(map[string]struct{})
-	for line := 1; ; line++ {
-		source, eof, err := physicalLine(reader, line)
-		if err != nil {
+	for {
+		physical := lines.next()
+		if err := physical.validate(); err != nil {
 			return err
 		}
+		source, eof, line := physical.text, physical.eof, physical.number
 		trimmed := strings.Trim(source, " \t")
 		if trimmed != "" && !strings.HasPrefix(trimmed, "#") {
-			indent := len(source) - len(strings.TrimLeft(source, " "))
+			indent := leadingSpaces(source)
 			body := strings.TrimRight(source[indent:], " \t")
 			if body[0] == '\t' {
 				return problem(line, ErrSyntax)
@@ -112,6 +125,25 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 					return problem(line, ErrDuplicate)
 				}
 				seen[id] = struct{}{}
+				switch {
+				case e.Raw == `"""`:
+					e.Raw, eof, err = lines.tripleBody(line)
+					if err != nil {
+						return err
+					}
+					e.Form, e.Unset = TripleQuoted, false
+				case e.Unset && !eof:
+					var raw string
+					var blockEOF, found bool
+					raw, blockEOF, found, err = lines.pipeBody(indent)
+					if err != nil {
+						return err
+					}
+					if found {
+						e.Raw, e.Form, e.Unset = raw, PipeBlock, false
+						eof = blockEOF
+					}
+				}
 			}
 			if err := visit(e); err != nil {
 				return err
@@ -136,55 +168,148 @@ func nilReader(r io.Reader) bool {
 	}
 }
 
-// physicalLine reads one whole line without a format-specific size limit.
-// It removes CRLF and the one initial BOM before validating the source.
-func physicalLine(r *bufio.Reader, line int) (string, bool, error) {
-	var data []byte
-	eof := false
-	for {
-		part, err := r.ReadSlice('\n')
-		data = append(data, part...)
-		if err == bufio.ErrBufferFull {
-			continue
-		}
-		if err != nil && err != io.EOF {
-			return "", false, problem(line, ErrInput)
-		}
-		eof = err == io.EOF
-		break
+// sourceLines keeps one unvalidated lookahead line. A non-pipe line's errors
+// belong to its later turn, after the preceding value's visitor has completed.
+type sourceLines struct {
+	reader     *bufio.Reader
+	nextLine   int
+	pending    sourceLine
+	hasPending bool
+}
+
+type sourceLine struct {
+	text    string
+	ending  string
+	number  int
+	eof     bool
+	readErr error
+}
+
+func (lines *sourceLines) next() sourceLine {
+	if lines.hasPending {
+		line := lines.pending
+		lines.pending = sourceLine{}
+		lines.hasPending = false
+		return line
 	}
-	s := string(data)
+	line := readPhysicalLine(lines.reader, lines.nextLine)
+	lines.nextLine++
+	return line
+}
+
+func (lines *sourceLines) unread(line sourceLine) {
+	lines.pending, lines.hasPending = line, true
+}
+
+// readPhysicalLine has no format-specific size limit. Source validation is
+// deferred, but the original LF or CRLF is retained separately from the text.
+func readPhysicalLine(r *bufio.Reader, number int) sourceLine {
+	s, err := r.ReadString('\n')
+	line := sourceLine{number: number, eof: err == io.EOF}
+	if err != nil && err != io.EOF {
+		line.readErr = problem(number, ErrInput)
+	}
 	if strings.HasSuffix(s, "\n") {
-		s = strings.TrimSuffix(s, "\n")
-		s = strings.TrimSuffix(s, "\r")
+		s, line.ending = s[:len(s)-1], "\n"
+		if strings.HasSuffix(s, "\r") {
+			s, line.ending = s[:len(s)-1], "\r\n"
+		}
 	}
-	if line == 1 {
+	if number == 1 {
 		s = strings.TrimPrefix(s, bom)
 	}
-	if !utf8.ValidString(s) || strings.ContainsRune(s, '\r') {
-		return "", false, problem(line, ErrSyntax)
+	line.text = s
+	return line
+}
+
+func (line sourceLine) validate() error {
+	if line.readErr != nil {
+		return line.readErr
 	}
-	return s, eof, nil
+	if !utf8.ValidString(line.text) || strings.ContainsRune(line.text, '\r') {
+		return problem(line.number, ErrSyntax)
+	}
+	return nil
+}
+
+func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
+	var body []struct{ text, ending string }
+	for {
+		line := lines.next()
+		if err := line.validate(); err != nil {
+			return "", false, err
+		}
+		margin := leadingSpaces(line.text)
+		if strings.TrimRight(line.text[margin:], " \t") == `"""` {
+			var raw strings.Builder
+			for i, part := range body {
+				text := part.text
+				if text != "" {
+					if leadingSpaces(text) < margin {
+						return "", false, problem(opening+i+1, ErrSyntax)
+					}
+					text = text[margin:]
+				}
+				if i > 0 {
+					raw.WriteString(body[i-1].ending)
+				}
+				raw.WriteString(text)
+			}
+			return raw.String(), line.eof, nil
+		}
+		if line.eof {
+			return "", false, problem(opening, ErrSyntax)
+		}
+		body = append(body, struct{ text, ending string }{line.text, line.ending})
+	}
+}
+
+func (lines *sourceLines) pipeBody(indent int) (string, bool, bool, error) {
+	var raw strings.Builder
+	var previousEnding string
+	found := false
+	for {
+		line := lines.next()
+		prefix := leadingSpaces(line.text)
+		if prefix <= indent || prefix == len(line.text) || line.text[prefix] != '|' {
+			lines.unread(line)
+			return raw.String(), false, found, nil
+		}
+		if err := line.validate(); err != nil {
+			return "", false, false, err
+		}
+		if found {
+			raw.WriteString(previousEnding)
+		}
+		raw.WriteString(line.text[prefix+1:])
+		found, previousEnding = true, line.ending
+		if line.eof {
+			return raw.String(), true, true, nil
+		}
+	}
+}
+
+func leadingSpaces(s string) int {
+	return len(s) - len(strings.TrimLeft(s, " "))
 }
 
 // splitLine stops at the delimiter. It never scans or decodes the right side.
 func splitLine(body string, line int) (Entry, string, error) {
 	e := Entry{Line: line}
+	var key, rhs string
 	for i := 0; i < len(body); {
 		switch body[i] {
 		case '"':
-			_, end, err := decodeQuoted(body[i:])
+			end, err := scanQuoted(body[i:], nil)
 			if err != nil {
 				return Entry{}, "", problem(line, ErrSyntax)
 			}
 			i += end
+			continue
 		case ':':
-			e.Kind = Value
-			e.Raw = strings.Trim(body[i+1:], " \t")
-			e.Unset = e.Raw == ""
-			return e, strings.Trim(body[:i], " \t"), nil
+			key, rhs = strings.Trim(body[:i], " \t"), body[i+1:]
 		case '(':
-			key := strings.TrimRight(body[:i], " ")
+			key = strings.TrimRight(body[:i], " ")
 			if strings.HasSuffix(key, "\t") {
 				return Entry{}, "", problem(line, ErrUnsupported)
 			}
@@ -197,22 +322,20 @@ func splitLine(body string, line int) (Entry, string, error) {
 				return Entry{}, "", problem(line, ErrUnsupported)
 			}
 			tail := strings.TrimLeft(body[close+1:], " ")
-			if tail == "." {
-				return Entry{}, "", problem(line, ErrSyntax)
-			}
 			if strings.HasPrefix(tail, "\t") {
 				return Entry{}, "", problem(line, ErrUnsupported)
 			}
 			if tail == "" || tail[0] != ':' {
 				return Entry{}, "", problem(line, ErrSyntax)
 			}
-			e.Kind, e.HasType, e.Type = Value, true, name
-			e.Raw = strings.Trim(tail[1:], " \t")
-			e.Unset = e.Raw == ""
-			return e, key, nil
+			e.HasType, e.Type, rhs = true, name, tail[1:]
 		default:
 			i++
+			continue
 		}
+		e.Kind, e.Raw = Value, strings.Trim(rhs, " \t")
+		e.Unset = e.Raw == ""
+		return e, key, nil
 	}
 	if strings.HasSuffix(body, ".") {
 		e.Kind = Heading
@@ -227,15 +350,14 @@ func splitLine(body string, line int) (Entry, string, error) {
 func typeEnd(body string, open, line int) (int, error) {
 	depth := 1
 	for offset, c := range body[open+1:] {
-		if unicode.IsSpace(c) {
+		switch {
+		case unicode.IsSpace(c):
 			return 0, problem(line, ErrSyntax)
-		}
-		switch c {
-		case '"', '\\':
+		case c == '"' || c == '\\':
 			return 0, problem(line, ErrUnsupported)
-		case '(':
+		case c == '(':
 			depth++
-		case ')':
+		case c == ')':
 			depth--
 			if depth == 0 {
 				return open + 1 + offset, nil
@@ -246,11 +368,11 @@ func typeEnd(body string, open, line int) (int, error) {
 }
 
 func parsePath(key string, line int) ([]string, error) {
-	if key == "" {
-		return nil, problem(line, ErrSyntax)
-	}
 	var path []string
 	for {
+		if key == "" {
+			return nil, problem(line, ErrSyntax)
+		}
 		var element string
 		if key[0] == '"' {
 			text, end, err := decodeQuoted(key)
@@ -281,9 +403,6 @@ func parsePath(key string, line int) ([]string, error) {
 			return path, nil
 		}
 		key = key[1:] // An element separator outside quotes.
-		if key == "" {
-			return nil, problem(line, ErrSyntax)
-		}
 	}
 }
 
@@ -315,6 +434,11 @@ func (n *pathNode) elements() []string {
 
 func pathID(path []string) string {
 	var b strings.Builder
+	size := 2 * len(path) // At least one length digit and a colon per element.
+	for _, s := range path {
+		size += len(s)
+	}
+	b.Grow(size)
 	for _, s := range path {
 		b.WriteString(strconv.Itoa(len(s)))
 		b.WriteByte(':')

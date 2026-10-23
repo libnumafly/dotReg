@@ -1,7 +1,9 @@
 // Package dotreg implements an experimental parser for the configuration
 // notation described in ../../docs/config-format.md.
 //
-// Parse and ParseEach resolve key paths and preserve raw right-hand sides.
+// Parse and ParseEach resolve key paths and preserve raw right-hand sides,
+// including multiline bodies with their syntax margins removed. Entry.Form
+// distinguishes escaped triple-quoted bodies from literal pipe blocks.
 // DecodeString performs common string decoding. Build applies an
 // application-defined Profile, and Config provides typed lookup while
 // preserving the distinction between unset values and explicit empty strings.

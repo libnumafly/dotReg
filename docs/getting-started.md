@@ -1,6 +1,6 @@
 # Getting started
 
-dotReg describes settings as key paths and values, one value per line. You can write each key in full or group related settings beneath a heading.
+dotReg describes settings as key paths and values. Each key and value header occupies one line; explicit blocks allow a value to span several lines. You can write each key in full or group related settings beneath a heading.
 
 This guide introduces the notation. The [reference specification](config-format.md) defines the complete rules, and [section 12](config-format.md#12-undecided-matters) records what remains undecided.
 
@@ -54,9 +54,48 @@ Quote an entire key element when its name contains a dot or another syntax chara
 
 See [key paths](config-format.md#3-key-paths) and [common escapes](config-format.md#34-common-escapes-within-quotes) for the detailed rules.
 
+## Write multiline strings
+
+Use triple quotes when a multiline value should support the same escapes as an ordinary quoted string:
+
+```text
+A.Message: """
+  Hello, \u{1F600}
+    second line
+  """
+```
+
+The opening marker has no inline content. The closing marker occupies its own line, and its two leading ASCII spaces set the margin removed from each non-empty body line. With LF source endings, this value is `Hello, 😀`, one LF and two spaces followed by `second line`. Empty source lines are exempt from margin removal; non-empty lines with too little margin are errors. A zero-space closing margin is allowed when pasting text directly.
+
+Use a pipe block for literal text, including paths, backslashes or quote characters:
+
+```text
+A.Literal:
+ |C:\temp\new
+ |"quotes" and \q stay literal
+ |# this is content
+A.Next: value
+```
+
+Only the physical line immediately after an empty header can start this block. It must begin with more ASCII spaces than the header, followed by `|`. Consecutive lines meeting that rule belong to the body. Their leading spaces and first pipe are removed; all remaining characters are preserved without escapes or trimming. `A.Next` ends the block and is read normally. Blank lines and comments are not skipped to find a pipe block. `A:|` is simply the single-line value `|`.
+
+Both forms preserve the original LF or CRLF between body lines. They exclude boundary line endings and add no terminal newline automatically. Add an empty body line before a triple-quoted closing marker, or add an empty final pipe, when a terminal newline is needed:
+
+```text
+A.WithNewline:
+ |text
+ |
+A.EmptyBlock:
+ |
+```
+
+`A.WithNewline` is `text` followed by one source line ending. `A.EmptyBlock` is an explicit empty string, not unset. In a pipe block, spaces after the marker are content: ` |  text` retains two leading spaces. Multiline bodies neither create headings nor change their scope. Type annotations and assignment to a heading itself work with both forms.
+
+See [triple-quoted values](config-format.md#83-triple-quoted-multiline-values) and [pipe blocks](config-format.md#84-literal-pipe-blocks) for exact closing-marker and indentation rules.
+
 ## Distinguish unset from empty
 
-An empty right-hand side leaves a value unset. An empty quoted string specifies a value explicitly:
+An empty right-hand side leaves a value unset unless its immediately following line starts a pipe block. An empty quoted string or empty multiline body specifies a value explicitly:
 
 ```text
 A.Missing:

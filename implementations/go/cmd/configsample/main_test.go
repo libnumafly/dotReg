@@ -174,6 +174,44 @@ func TestRunUnicodeAndControlEscapesPreserveRawAndDecodeForJSON(t *testing.T) {
 	}
 }
 
+func TestRunMultilineFormsKeepRawAndDecodeByForm(t *testing.T) {
+	const source = "Triple: \"\"\"\n  first\\nsecond\n  \"\"\"\n" +
+		"Pipe:\n |first\\nsecond\n" +
+		"Empty:\n |\n"
+	for _, mode := range []string{"raw", "strings", "demo"} {
+		t.Run(mode, func(t *testing.T) {
+			var stdout, stderr bytes.Buffer
+			err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := decodeCLIOutput(t, stdout.Bytes())
+			if len(got) != 3 {
+				t.Fatalf("multiline CLI count = %d, want 3", len(got))
+			}
+			if got[0]["form"] != "triple_quoted" || got[1]["form"] != "pipe" || got[2]["form"] != "pipe" {
+				t.Errorf("multiline forms were not retained: %#v", got)
+			}
+			if got[0]["raw"] != "first\\nsecond" || got[1]["raw"] != "first\\nsecond" || got[2]["raw"] != "" || got[2]["unset"] != false {
+				t.Errorf("multiline raw/state output = %#v", got)
+			}
+			if mode == "raw" {
+				if _, ok := got[0]["decoded"]; ok {
+					t.Error("raw multiline output unexpectedly contained decoded text")
+				}
+				return
+			}
+			field := "decoded"
+			if mode == "demo" {
+				field = "value"
+			}
+			if got[0][field] != "first\nsecond" || got[1][field] != "first\\nsecond" || got[2][field] != "" {
+				t.Errorf("multiline decoded output = %#v", got)
+			}
+		})
+	}
+}
+
 func TestRunInvalidSurrogateDoesNotEmitPartialJSON(t *testing.T) {
 	for _, raw := range []string{"\"private\\uD800\"", "\"private\\uD83D\\u0041\""} {
 		for _, mode := range []string{"raw", "strings", "demo"} {
@@ -238,6 +276,11 @@ func TestRunFailureProducesNoPartialJSON(t *testing.T) {
 		{"late duplicate", "strings", "A: first\nA: private-RHS", dotreg.ErrDuplicate},
 		{"late string failure", "strings", "A: first\nB: \"private-RHS\"tail", dotreg.ErrString},
 		{"late profile failure", "demo", "A: first\nB(int): private-RHS", dotreg.ErrTypeConversion},
+		{"unclosed triple block", "raw", "A: first\nB: \"\"\"\nprivate-RHS", dotreg.ErrSyntax},
+		{"triple margin failure", "raw", "A: first\nB: \"\"\"\n private-RHS\n  \"\"\"", dotreg.ErrSyntax},
+		{"triple escape failure", "strings", "A: first\nB: \"\"\"\nprivate-RHS\\q\n\"\"\"", dotreg.ErrString},
+		{"pipe profile failure", "demo", "A: first\nB(int):\n |private-RHS", dotreg.ErrTypeConversion},
+		{"multiline duplicate", "strings", "A:\n |first\nA: private-RHS", dotreg.ErrDuplicate},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

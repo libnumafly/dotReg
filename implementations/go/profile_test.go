@@ -78,6 +78,102 @@ func TestDecodedUnicodeKeysAndValuesReachProfileWithoutNormalization(t *testing.
 	assertValueCode(t, err, ErrMissing)
 }
 
+func TestMultilineFormsReachProfileWithTheirOwnDecodingRules(t *testing.T) {
+	const source = "A.\n" +
+		" .(string): \"\"\"\n" +
+		"  say \"hello\"\\n\\u{1F600}\n" +
+		"  \"\"\"\n" +
+		" .Literal:\n" +
+		"  |say \"hello\"\\n\\u{1F600}\n" +
+		"EmptyTriple: \"\"\"\n\"\"\"\n" +
+		"EmptyPipe:\n |\n" +
+		"Unset:\n"
+	entries, err := Parse(strings.NewReader(source))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Build(entries, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, test := range []struct {
+		path  []string
+		want  string
+		unset bool
+	}{
+		{[]string{"A"}, "say \"hello\"\n😀", false},
+		{[]string{"A", "Literal"}, "say \"hello\"\\n\\u{1F600}", false},
+		{[]string{"EmptyTriple"}, "", false},
+		{[]string{"EmptyPipe"}, "", false},
+		{[]string{"Unset"}, "", true},
+	} {
+		value, err := cfg.Get(test.path, "string")
+		if err != nil || value != test.want {
+			t.Errorf("Get(%q) = %#v, %v; want %q", test.path, value, err, test.want)
+		}
+		unset, err := cfg.IsUnset(test.path)
+		if err != nil || unset != test.unset {
+			t.Errorf("IsUnset(%q) = %v, %v; want %v", test.path, unset, err, test.unset)
+		}
+	}
+}
+
+func TestMultilineDecodingPrecedesDeclaredTypeConversion(t *testing.T) {
+	for _, source := range []string{
+		"A(int): \"\"\"\n00\\u0031\n\"\"\"",
+		"A(int):\n |001",
+	} {
+		entries, err := Parse(strings.NewReader(source))
+		if err != nil {
+			t.Fatal(err)
+		}
+		cfg, err := Build(entries, DemoProfile())
+		if err != nil {
+			t.Fatal(err)
+		}
+		value, err := cfg.Get([]string{"A"}, "int")
+		if err != nil || value != int64(1) {
+			t.Errorf("multiline declared int = %#v, %v", value, err)
+		}
+	}
+	entries, err := Parse(strings.NewReader("Good: first\nA(int):\n |00\\u0031"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Build(entries, DemoProfile())
+	assertValueCode(t, err, ErrTypeConversion)
+	if cfg != nil {
+		t.Error("literal pipe conversion failure returned a partial config")
+	}
+}
+
+func TestEscapedTripleClosingMarkerIsLiteralThroughLookup(t *testing.T) {
+	const source = "A.\n .B: \"\"\"\n  \\\"\"\"\n  \"\"\"\n .C: next"
+	entries, err := Parse(strings.NewReader(source))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 3 || entries[1].Form != TripleQuoted || entries[1].Raw != "\\\"\"\"" || entries[1].Line != 2 || entries[2].Line != 5 {
+		t.Fatalf("escaped closing marker was treated as structure: %#v", entries)
+	}
+	cfg, err := Build(entries, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, test := range []struct {
+		path []string
+		want string
+	}{
+		{[]string{"A", "B"}, "\"\"\""},
+		{[]string{"A", "C"}, "next"},
+	} {
+		got, err := cfg.Get(test.path, "string")
+		if err != nil || got != test.want {
+			t.Errorf("Get(%q) = %#v, %v; want %q", test.path, got, err, test.want)
+		}
+	}
+}
+
 func TestParsedOpaqueTypeIsInterpretedOnlyByProfile(t *testing.T) {
 	const typeName = "map(string,list(int))"
 	entries, err := Parse(strings.NewReader(

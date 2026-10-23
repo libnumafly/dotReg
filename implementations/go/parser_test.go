@@ -367,6 +367,277 @@ func TestParseEscapedNewlineDoesNotCreatePhysicalLines(t *testing.T) {
 	}
 }
 
+func parserBlockValue(line int, path []string, raw string, form ValueForm) Entry {
+	return Entry{Line: line, Kind: Value, Path: path, Raw: raw, Form: form}
+}
+
+func TestParseMultilineValues(t *testing.T) {
+	tests := []struct {
+		name   string
+		source string
+		want   []Entry
+	}{
+		{
+			name:   "triple margin and next line",
+			source: "A: \"\"\"\n  first\n  second\n  \"\"\"\nB: next",
+			want: []Entry{
+				parserBlockValue(1, []string{"A"}, "first\nsecond", TripleQuoted),
+				parserValue(5, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "triple preserves extra indentation and trailing empty line",
+			source: "A: \"\"\"\n    first \t\n  second\n\n  \"\"\" \t\n",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "  first \t\nsecond\n", TripleQuoted)},
+		},
+		{
+			name:   "triple zero margin and literal quotes",
+			source: "A: \"\"\"\nsay \"hello\" and \\n\n\"\"\"",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "say \"hello\" and \\n", TripleQuoted)},
+		},
+		{
+			name:   "triple empty",
+			source: "A: \"\"\"\n\"\"\"",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "", TripleQuoted)},
+		},
+		{
+			name:   "triple one empty body line",
+			source: "A: \"\"\"\n\n\"\"\"",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "", TripleQuoted)},
+		},
+		{
+			name:   "triple mixed source line endings",
+			source: "A: \"\"\"\r\n  first\r\n  second\n  \"\"\"\r\nB: next",
+			want: []Entry{
+				parserBlockValue(1, []string{"A"}, "first\r\nsecond", TripleQuoted),
+				parserValue(5, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "pipe literal whitespace and next line",
+			source: "A:\n |first\n   | second \t\nB: next",
+			want: []Entry{
+				parserBlockValue(1, []string{"A"}, "first\n second \t", PipeBlock),
+				parserValue(4, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "pipe literal syntax and escapes",
+			source: "A:\n |\"quotes\" \\n # comment : value\n ||: second\n",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "\"quotes\" \\n # comment : value\n|: second", PipeBlock)},
+		},
+		{
+			name:   "pipe explicit empty at EOF",
+			source: "A:\n |",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "", PipeBlock)},
+		},
+		{
+			name:   "pipe trailing newline",
+			source: "A:\n |first\n |\n",
+			want:   []Entry{parserBlockValue(1, []string{"A"}, "first\n", PipeBlock)},
+		},
+		{
+			name:   "pipe mixed source line endings",
+			source: "A:\r\n |first\r\n |second\nB: next",
+			want: []Entry{
+				parserBlockValue(1, []string{"A"}, "first\r\nsecond", PipeBlock),
+				parserValue(4, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "pipe terminates at blank and replays line",
+			source: "A:\n |first\n\nB: next",
+			want: []Entry{
+				parserBlockValue(1, []string{"A"}, "first", PipeBlock),
+				parserValue(4, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "comment immediately after header does not start pipe",
+			source: "A:\n# comment\nB: next",
+			want: []Entry{
+				parserValue(1, []string{"A"}, ""),
+				parserValue(3, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "blank immediately after header does not start pipe",
+			source: "A:\n \t\nB: next",
+			want: []Entry{
+				parserValue(1, []string{"A"}, ""),
+				parserValue(3, []string{"B"}, "next"),
+			},
+		},
+		{
+			name:   "unindented pipe is a key",
+			source: "A:\n|: ordinary key",
+			want: []Entry{
+				parserValue(1, []string{"A"}, ""),
+				parserValue(2, []string{"|"}, "ordinary key"),
+			},
+		},
+		{
+			name:   "shallow pipe is an absolute key",
+			source: "A.\n .B:\n|: ordinary key",
+			want: []Entry{
+				parserHeading(1, "A"),
+				parserValue(2, []string{"A", "B"}, ""),
+				parserValue(3, []string{"|"}, "ordinary key"),
+			},
+		},
+		{
+			name:   "nonempty RHS does not start pipe",
+			source: "A:|",
+			want:   []Entry{parserValue(1, []string{"A"}, "|")},
+		},
+		{
+			name:   "triple opener must be exact",
+			source: "A: \"\"\"suffix",
+			want:   []Entry{parserValue(1, []string{"A"}, "\"\"\"suffix")},
+		},
+		{
+			name:   "pipe leaves heading scope unchanged",
+			source: "A.\n .B:\n  |first\n .C: second",
+			want: []Entry{
+				parserHeading(1, "A"),
+				parserBlockValue(2, []string{"A", "B"}, "first", PipeBlock),
+				parserValue(4, []string{"A", "C"}, "second"),
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := Parse(strings.NewReader(test.source))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("multiline entries = %#v, want %#v", got, test.want)
+			}
+		})
+	}
+}
+
+func TestParseTypedMultilineSelfAndChild(t *testing.T) {
+	got, err := Parse(strings.NewReader("A.\n .(string): \"\"\"\n   first\n   \"\"\"\n .B(string):\n  |second"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	self := parserBlockValue(2, []string{"A"}, "first", TripleQuoted)
+	self.Type, self.HasType = "string", true
+	child := parserBlockValue(5, []string{"A", "B"}, "second", PipeBlock)
+	child.Type, child.HasType = "string", true
+	want := []Entry{parserHeading(1, "A"), self, child}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("typed multiline values = %#v, want %#v", got, want)
+	}
+}
+
+func TestParseRejectsInvalidMultilineStructure(t *testing.T) {
+	for _, source := range []string{
+		"A: \"\"\"",
+		"A: \"\"\"\nbody",
+		"A: \"\"\"\n body\n  \"\"\"",
+		"A: \"\"\"\n \n  \"\"\"",
+		"A: \"\"\"\n\tbody\n  \"\"\"",
+		"A: \"\"\"\nbody\n\"\"\"suffix",
+		"A: \"\"\"\n\xff\n\"\"\"",
+		"A:\n\n |not immediate",
+		"A:\n# comment\n |not immediate",
+		"A.\n .B:\n  |value\n  .C: values do not create scope",
+	} {
+		t.Run(source, func(t *testing.T) {
+			got, err := Parse(strings.NewReader(source))
+			parserRequireCode(t, err, ErrSyntax, 0)
+			if got != nil {
+				t.Error("invalid multiline structure returned partial results")
+			}
+		})
+	}
+}
+
+func TestParseMultilineDuplicateBeforeNotification(t *testing.T) {
+	for _, source := range []string{
+		"A: \"\"\"\nfirst\n\"\"\"\nA: second",
+		"A:\n |first\nA: second",
+	} {
+		count := 0
+		err := ParseEach(strings.NewReader(source), func(Entry) error {
+			count++
+			return nil
+		})
+		parserRequireCode(t, err, ErrDuplicate, 0)
+		if count != 1 {
+			t.Errorf("duplicate multiline key produced %d callbacks, want 1", count)
+		}
+	}
+}
+
+func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
+	for _, source := range []string{"A:\nB: \xff", "A:\n |body\nB: \xff"} {
+		t.Run(source, func(t *testing.T) {
+			sentinel := errors.New("callback wins over peeked invalid UTF-8")
+			count := 0
+			err := ParseEach(strings.NewReader(source), func(Entry) error {
+				count++
+				return sentinel
+			})
+			if err != sentinel || count != 1 {
+				t.Errorf("peek preempted callback: error=%v count=%d", err, count)
+			}
+			count = 0
+			err = ParseEach(strings.NewReader(source), func(Entry) error {
+				count++
+				return nil
+			})
+			parserRequireCode(t, err, ErrSyntax, 0)
+			if count != 1 {
+				t.Errorf("invalid next line changed current callback count: %d", count)
+			}
+		})
+	}
+	t.Run("reader error is deferred until unset callback", func(t *testing.T) {
+		sentinel := errors.New("callback wins over peeked input error")
+		reader := &parserFailReader{data: []byte("A:\n"), err: errors.New("private read failure")}
+		count := 0
+		err := ParseEach(reader, func(entry Entry) error {
+			count++
+			if !entry.Unset {
+				t.Errorf("expected current entry to remain unset: %#v", entry)
+			}
+			return sentinel
+		})
+		if err != sentinel || count != 1 {
+			t.Errorf("input-error peek preempted callback: error=%v count=%d", err, count)
+		}
+		reader = &parserFailReader{data: []byte("A:\n"), err: errors.New("private read failure")}
+		count = 0
+		err = ParseEach(reader, func(Entry) error { count++; return nil })
+		parserRequireCode(t, err, ErrInput, 0)
+		if count != 1 {
+			t.Errorf("input error discarded current unset callback: %d", count)
+		}
+	})
+}
+
+func TestParsePipeLookaheadReplaysSameIndentLine(t *testing.T) {
+	var got []Entry
+	err := ParseEach(strings.NewReader("A.\n .B:\n |:x"), func(entry Entry) error {
+		got = append(got, entry)
+		return nil
+	})
+	parserRequireCode(t, err, ErrSyntax, 3)
+	// The pipe is not deeper than the header. It must be replayed as an ordinary
+	// line, whose indentation is invalid without the relative leading dot.
+	want := []Entry{
+		parserHeading(1, "A"),
+		parserValue(2, []string{"A", "B"}, ""),
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("same-indent lookahead callbacks = %#v, want %#v", got, want)
+	}
+}
+
 func TestParsePreservesRawBeforeStringDecoding(t *testing.T) {
 	for _, raw := range []string{
 		"\"  value  \"", "\"\"", "\"unterminated", "\"\\q\"", "\"value\"tail",
@@ -712,6 +983,9 @@ func FuzzSampleParserNoPanic(f *testing.F) {
 		"\"A\x00 B:#()\": value", "A(map(T:U,list(V))): first:second",
 		"\"\\u{1F600}\": \"\\uD83D\\uDE00\\n\"",
 		"\"\\uD800\": value", "\"line\\nkey\": \"\\u{0}\"",
+		"A: \"\"\"\n  first\\nsecond\n  \"\"\"\nB: value",
+		"A:\n |literal \\q\n |\nB: value",
+		"A: \"\"\"\n body\n  \"\"\"", "A:\n |body\nB: \xff",
 	} {
 		f.Add(source)
 	}

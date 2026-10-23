@@ -1,10 +1,10 @@
 # Configuration file format
 
-This document defines a configuration file notation for key paths containing one or more elements and values written one line at a time. Fully qualified keys are the basic form, with dots separating their elements. Headings, relative notation and indentation allow a shared prefix to be omitted.
+This document defines a configuration file notation for key paths containing one or more elements and single-line or explicitly delimited multiline values. Keys, headings and value headers occupy one physical line. Fully qualified keys are the basic form, with dots separating their elements. Headings, relative notation and indentation allow a shared prefix to be omitted.
 
 ## 1. Scope and specification status
 
-Resolution produces a flat space of “fully qualified key → value”. An empty right-hand side means that the key is present and its value is unset. Every other right-hand side is initially treated as a string. Syntax parsing preserves the undecoded right-hand side, and common string decoding takes place before it is delivered as a value. Type conversion according to a type expression declared in advance or requested at retrieval is a separate, subsequent stage. When retrieval as a string is permitted, an unset value is treated as equivalent to an empty string. General syntax processing and string decoding are separate from value type conversion and the application's configuration schema.
+Resolution produces a flat space of “fully qualified key → value”. An empty right-hand side means that the key is present and its value is unset unless the immediately following physical line starts a pipe block as defined in section 8.4. Explicit multiline blocks are set values, even when their bodies are empty. Every set value is initially treated as a string. Syntax parsing preserves the undecoded right-hand side or block body and its value form, and common string decoding takes place before it is delivered as a value. Type conversion according to a type expression declared in advance or requested at retrieval is a separate, subsequent stage. When retrieval as a string is permitted, an unset value is treated as equivalent to an empty string. General syntax processing and string decoding are separate from value type conversion and the application's configuration schema.
 
 | Area | Status |
 |-----------------------|--------------------------------------|
@@ -12,6 +12,7 @@ Resolution produces a flat space of “fully qualified key → value”. An empt
 | Prohibited characters in key elements, quoting, empty names and the unset state of an empty right-hand side | Defined in this document |
 | Treating an unset value as a string | Equivalent to a zero-length string, provided that there is no type expression mismatch with a declaration |
 | Double-quoted values and common escapes | This document defines removal of the surrounding quotes before delivery, preservation of whitespace within quotes, and decoding of the basic and Unicode escapes in section 3.4 only within quotes. Backslashes in unquoted values are preserved |
+| Multiline values | Triple-quoted blocks use the same escapes as ordinary quoted values. Pipe blocks preserve their body literally. Sections 8.3 and 8.4 define markers, margins and line endings |
 | Optional type annotations on the left-hand side of a value line | This document defines their position and the outer whitespace used for alignment |
 | Type conversion and retrieval requests | This document defines the conversion procedure with and without a declaration, and type expression mismatch errors at retrieval |
 | Whitespace within type expressions and compound type notation | Internal whitespace is prohibited. Symbols that can express compound types and nested parentheses are not prohibited outright. The type conversion layer defines their meaning |
@@ -44,13 +45,13 @@ A.Code: 001
 
 Examples that represent the same setting are independent inputs. Combining them in one file produces a duplicate assignment error.
 
-A value line with no value after the separating colon means that the key's value is unset. The same applies when the colon is followed only by outer ASCII spaces or tabs.
+A value line with no value after the separating colon means that the key's value is unset unless the immediately following physical line starts a pipe block under section 8.4. The same applies when the colon is followed only by outer ASCII spaces or tabs.
 
 ```text
 A:
 ```
 
-This is an unset value line containing the fully qualified key `A`, rather than a heading. When received as a string, its value is equivalent to a zero-length string. Section 8 explains the distinctions in detail.
+By itself, this is an unset value line containing the fully qualified key `A`, rather than a heading. When received as a string, its value is equivalent to a zero-length string. Section 8 explains the distinctions and explicit multiline forms in detail.
 
 ### 2.1 Equivalent notation using headings
 
@@ -172,7 +173,7 @@ To include a dot in a name, quote the entire element. Within quotes, a dot can b
 
 Escapes are taken into account when identifying quote boundaries. A decoded escape character is part of the element name and is not reinterpreted as a path separator, closing quote, type annotation or value-line separator.
 
-In principle, quoted element names allow any valid UTF-8 string. Whitespace, tabs, syntax symbols including `: ( ) #`, and control characters are not prohibited outright. A double quote or backslash itself is written as `\"` or `\\`, respectively. Physical line breaks are line boundaries, so quoted text cannot span LF or CRLF either. Line breaks and control characters can be represented using the escapes in section 3.4, but decoded characters are not reinterpreted as physical lines or syntax separators.
+In principle, quoted element names allow any valid UTF-8 string. Whitespace, tabs, syntax symbols including `: ( ) #`, and control characters are not prohibited outright. A double quote or backslash itself is written as `\"` or `\\`, respectively. A quoted key element cannot span physical LF or CRLF boundaries; multiline forms apply only to values. Line breaks and control characters can be represented in a key using the escapes in section 3.4, but decoded characters are not reinterpreted as physical lines or syntax separators.
 
 For example, `"A B"`, `"A:B"`, `"A(B)"` and `"A#B"` are each one-element names. A consuming application can impose further restrictions on key-name characters through its configuration schema. Key-element escapes belong to the general syntax rules and are distinct from the rule that preserves the undecoded right-hand side in syntax results.
 
@@ -188,7 +189,7 @@ The concrete output representation, canonical notation and retrieval API are und
 
 ### 3.4 Common escapes within quotes
 
-A backslash starts an escape only inside double quotes around a key element or value. Backslashes in unquoted values are preserved as ordinary characters; backslashes in unquoted key elements are syntax errors. The following basic escapes and the Unicode escapes described below are available in both kinds of quoted text.
+A backslash starts an escape only inside double quotes around a key element or value, including the body of a triple-quoted value. Backslashes in unquoted single-line values and pipe blocks are preserved as ordinary characters; backslashes in unquoted key elements are syntax errors. The following basic escapes and the Unicode escapes described below are available in all quoted text.
 
 | Notation | Decoded character |
 |------|-------------|
@@ -206,9 +207,9 @@ The basic forms above other than the dot, and the four-digit form described belo
 
 Escapes within quotes are recognised when finding the closing quote. Only symbols outside quotes that have syntactic meaning at their position are treated as key-element or value-line separators. An escaped double quote inside quotes does not end the quoted text. A backslash outside quotes does not protect quotes or separators. Processing must not decode the entire file before searching for separators.
 
-Quoted text is decoded exactly once. Decoded characters are not reinterpreted as syntax such as path separators, quotes, type annotations, comments or indentation. Element boundaries are retained after keys are decoded. Unquoted values are preserved unchanged apart from removal of outer ASCII spaces and tabs.
+Quoted text is decoded exactly once. Decoded characters are not reinterpreted as syntax such as path separators, quotes, type annotations, comments or indentation. Element boundaries are retained after keys are decoded. Unquoted single-line values are preserved unchanged apart from removal of outer ASCII spaces and tabs; pipe-block bodies are preserved after their line markers are removed, without whitespace trimming.
 
-Unknown escapes that are not defined by this specification, and incomplete escapes that end prematurely, are errors within quotes. A quoted `\q`, or a lone backslash that reaches the end of a line or input while inside quotes, is neither delivered as literal characters nor silently removed. An unquoted `\q` or trailing backslash is an ordinary string and is not subject to this escape validation. A backslash at the end of a line never indicates line continuation, whether quoted or unquoted.
+Unknown escapes that are not defined by this specification, and incomplete escapes that end prematurely, are errors within quotes. A quoted `\q`, or a lone backslash that reaches the end of a physical line or body while inside quotes, is neither delivered as literal characters nor silently removed. An unquoted `\q` or trailing backslash, including one in a pipe block, is ordinary text and is not subject to this escape validation. A backslash at the end of a line never indicates line continuation in any value form.
 
 In principle, the range of characters expressible through escapes is unrestricted, provided that the file structure and the parser's separators remain intact. By not reinterpreting decoded characters as syntax, syntax symbols, line breaks and control characters can be treated as character data. This principle does not mean that arbitrary backslash notation is accepted unchanged.
 
@@ -238,7 +239,7 @@ Accepted escape notation is limited to the basic forms and the two Unicode forms
 
 ## 4. Line classification and separators
 
-Other than blank lines and comment lines, lines are classified after processing indentation and outer trailing whitespace.
+Outside multiline bodies, lines other than blank lines and comment lines are classified after processing indentation and outer trailing whitespace. A value header can switch processing to one of the multiline forms in sections 8.3 and 8.4; body lines are not classified as headings, value lines or comments.
 
 | Condition | Classification |
 |----------------|-----------------------|
@@ -258,10 +259,10 @@ A.Url: https://example.test:8787/path
 
 | Notation | Meaning or result |
 |---------|--------------------------------------|
-| `A.B:` | A value line that includes the key `A.B` and leaves its value unset. It is not a heading |
+| `A.B:` | A value header for `A.B`; unset unless the immediately following line starts a pipe block. It is not a heading |
 | `A.B.` | A heading. It does not set a value |
 | `A.B.:` | Rejected because the final element is omitted |
-| `A."":` | A value line that explicitly includes a final element with an empty name. Its value is unset |
+| `A."":` | A value header with an explicit empty final name; unset unless the immediately following line starts a pipe block |
 | `"A.B".` | A one-element heading containing a dot |
 | `"A.B"` | Rejected because it has neither a value-line colon nor a heading's terminating dot |
 
@@ -295,7 +296,7 @@ A.B.D.E: second
 A.F: third
 ```
 
-An indented non-comment line without a leading `.`, a relative line at column one, tab indentation, and a jump to a depth without a parent heading are rejected. Relative lines without indentation are not accepted.
+Outside multiline bodies, an indented non-comment line without a leading `.`, a relative line at column one, tab indentation, and a jump to a depth without a parent heading are rejected. Relative lines without indentation are not accepted. Multiline body indentation follows sections 8.3 and 8.4 and does not create headings.
 
 ### 5.2 Depth follows the number of written heading levels
 
@@ -415,7 +416,7 @@ The same rules apply to a heading with an empty name.
 
 This example assigns a value to the one-element key `""`. The single dot in relative notation is not interpreted as a child element with an empty name.
 
-For assignment to a heading itself, omitting the right-hand side as in ` .:` still includes the resolved key and leaves its value unset. A heading line on its own does not create a value-key occurrence.
+For assignment to a heading itself, omitting the right-hand side as in ` .:` still includes the resolved key and leaves its value unset unless its immediately following line starts a pipe block. Either multiline form can assign to the heading itself. A heading line on its own does not create a value-key occurrence.
 
 Entirely numeric headings follow the same rules.
 
@@ -537,13 +538,13 @@ Syntax processing is responsible for separating the key, type expression and und
 
 The output field names and API for type expressions, and the connection between configuration schemas, declarations and retrieval requests, are undecided. If a declared type expression differs from the retrieval request, the result is a type expression mismatch error. The general syntax layer does not begin automatic type inference for values without a type annotation.
 
-With or without a type annotation, syntax parsing treats an empty right-hand side as unset. This also applies to `A.Code(string):`. When a string is requested and there is no declaration, or the declared type expression also matches the string type, an unset value is treated as equivalent to an empty string. A different type expression causes a type expression mismatch error even when the value is unset. The interpretation of unset values for non-string types will be defined separately.
+With or without a type annotation, syntax parsing treats an empty right-hand side as unset unless the immediately following line starts a pipe block. This also applies to `A.Code(string):`. Explicit triple-quoted and pipe blocks are set values, even when their bodies are empty, and can use the same type annotations and assignment-to-self syntax as single-line values. When a string is requested and there is no declaration, or the declared type expression also matches the string type, an unset value is treated as equivalent to an empty string. A different type expression causes a type expression mismatch error even when the value is unset. The interpretation of unset values for non-string types will be defined separately.
 
 ## 7. Whitespace, blank lines and comments
 
 ### 7.1 Outer whitespace and whitespace within right-hand sides
 
-After processing indentation, remove ASCII spaces and tabs at the end of a line, from both ends of the left-hand side of value lines without type annotations, and from both ends of the right-hand side of every value line. Outer alignment spaces around type annotations follow section 6.
+Outside multiline bodies, after processing indentation, remove ASCII spaces and tabs at the end of a line, from both ends of the left-hand side of value lines without type annotations, and from both ends of a value header's right-hand side. Outer alignment spaces around type annotations follow section 6. Multiline bodies are exempt from this trimming: remove only the margin or line markers specified in sections 8.3 and 8.4.
 
 ```text
 A.Message:     hello world
@@ -560,7 +561,7 @@ Unicode whitespace other than ASCII spaces and tabs, such as an ideographic spac
 
 ### 7.2 Blank lines and comment lines
 
-After removing ASCII spaces and tabs from both ends of a line, an empty result is skipped as a blank line, and a result beginning with `#` is skipped as a comment line. Blank lines and comment lines do not change the current headings.
+Outside multiline bodies, after removing ASCII spaces and tabs from both ends of a line, an empty result is skipped as a blank line, and a result beginning with `#` is skipped as a comment line. Blank lines and comment lines do not change the current headings. Within a triple-quoted body, these lines are content; within a pipe block, only consecutive marked lines belong to the body. Blank lines and comments are not skipped when checking whether an empty header is immediately followed by a pipe block.
 
 ```text
 A.
@@ -593,7 +594,7 @@ Quote an entire key element when its name contains dots, double quotes or backsl
 
 ## 8. Preserving right-hand sides and interpreting values
 
-When extracting the right-hand side, an empty result after removing outer ASCII spaces and tabs is treated as unset. Every other right-hand side is preserved undecoded, with or without a type annotation. All the following can be preserved as undecoded syntax results, but require the common string decoding in section 8.2 before they are delivered as values. Preserving undecoded text alone does not establish that it is a valid value.
+For a single-line value, an empty right-hand side after removing outer ASCII spaces and tabs is treated as unset, provided that the immediately following line does not start a pipe block. Other single-line right-hand sides are preserved undecoded. For a multiline value, preserve its form and undecoded body after removing structural markers and the prescribed margin; the value is set even when the body is empty. These rules apply with or without a type annotation. The following single-line examples can be preserved as undecoded syntax results, but require common string decoding before they are delivered as values. Preserving undecoded text alone does not establish that it is a valid value.
 
 ```text
 A.Text: value
@@ -609,20 +610,20 @@ A.Sequence: [1,2]
 
 | Input right-hand side | Undecoded right-hand side | Treatment by the format |
 |-----------------|------------------|-----------------------------|
-| Empty | A zero-length string | The value is unset |
-| ASCII spaces and tabs only | A zero-length string after outer whitespace is removed | The value is unset |
+| Empty, without an immediately following pipe body | A zero-length string | The value is unset |
+| ASCII spaces and tabs only, without an immediately following pipe body | A zero-length string after outer whitespace is removed | The value is unset |
 | `""` | Two quote characters | Distinct from an empty right-hand side. An explicit empty string after common string decoding |
 | `null` | The four characters `null` | A non-empty right-hand side. Neither unset nor a special literal |
 | `001` | Three characters, including the leading zeroes | Preserved undecoded |
 | `"unterminated` | A string including an unclosed quote | Can be preserved undecoded, but string decoding fails because the quote is not closed |
 
-Syntax results preserve the distinction between unset, the two-quote right-hand side `""` and the four-character right-hand side `null`. Unset means that no value has been specified; it is not a literal representing a value of a particular type. Extracting the right-hand side does not infer types such as numbers, booleans, lists or arrays, nor decode quotes or backslashes. Common string decoding removes surrounding double quotes, decodes escapes only within quotes and passes the result to type conversion. Backslashes in unquoted values are preserved unchanged. Adoption of JSON's entire string rules is not specified.
+Syntax results preserve the distinction between unset, the two-quote single-line right-hand side `""`, an explicitly empty multiline body and the four-character right-hand side `null`. Unset means that no value has been specified; it is not a literal representing a value of a particular type. Extracting right-hand sides or block bodies does not infer types such as numbers, booleans, lists or arrays, nor decode backslashes. Common string decoding removes ordinary surrounding double quotes, decodes escapes in ordinary quoted values and triple-quoted bodies, and passes the result to type conversion. Pipe bodies and backslashes in unquoted single-line values are preserved literally. Adoption of JSON's entire string rules is not specified.
 
 When a consuming application requests a string and there is no type expression mismatch with a declaration, the received unset value is treated as equivalent to a zero-length string, that is, the string value `""`. The unset state is not rewritten to a right-hand side containing two quote characters. An explicit empty string is a value obtained through common string decoding and is retained separately from whether the value is unset.
 
 For example, receiving the parse result of `A:` as a string gives the equivalent of an empty string. Syntax results preserve whether the value is unset, so the consuming application can also inspect that state as required. The interpretation of unset values for non-string types, and their relationship to required fields and defaults, will be defined separately.
 
-A value is unset only when there is no content after the separating colon. A non-empty right-hand side does not become unset merely because it ends with a colon. The following right-hand sides are preserved as the strings `:` and `https://example.test:`, respectively.
+A single-line value is unset only when there is no content after the separating colon and no immediately following pipe body. An explicit empty block is set. A non-empty right-hand side does not become unset merely because it ends with a colon. The following right-hand sides are preserved as the strings `:` and `https://example.test:`, respectively.
 
 ```text
 A.Symbol: :
@@ -633,11 +634,11 @@ A value line with an empty right-hand side still records the presence of its key
 
 Apart from rejecting invalid UTF-8 and lone CR, there is no blanket prohibition on NUL, internal tabs or similar characters on the right-hand side. The consuming application validates any necessary control-character restrictions.
 
-Environment variable expansion, path expansion, includes, additional file reads, multiline values and string concatenation do not happen automatically. Square and curly brackets are not grouping syntax and can be preserved as characters on the right-hand side.
+Environment variable expansion, path expansion, includes, additional file reads and implicit string concatenation do not happen automatically. Multiline values use only the explicit forms in sections 8.3 and 8.4. Square and curly brackets are not grouping syntax and can be preserved as characters on the right-hand side.
 
 ### 8.1 Type conversion and retrieval
 
-Except for unset values, a value that has completed the common string decoding in section 8.2 is initially treated as a string. A “declaration” is a type expression specified separately from a retrieval request, for example in a value line's type annotation. The appearance of a value does not trigger automatic inference of numbers, booleans or other types. Enclosing a value in double quotes does not also declare it to have the string type; the same conversion procedure applies according to whether a type annotation is present.
+Except for unset values, a value that has completed common string decoding according to sections 8.2–8.4 is initially treated as a string. A “declaration” is a type expression specified separately from a retrieval request, for example in a value line's type annotation. The appearance of a value does not trigger automatic inference of numbers, booleans or other types. Enclosing a value in double quotes does not also declare it to have the string type; the same conversion procedure applies according to whether a type annotation is present.
 
 Type conversion and retrieval follow this procedure.
 
@@ -667,13 +668,15 @@ The following are independent retrieval examples. `string` and `int` are provisi
 | `A.Count(string):123` | Integer | Type expression mismatch error |
 | `A.Count:`            | String | Equivalent to an empty string |
 
-The error category and notification point when conversion to the declared type expression itself fails, type expression identity and aliases, the concrete retrieval API, and how conversion results are retained at retrieval are undecided. Common string decoding follows section 3.4; conversion rules for individual types will be defined separately.
+The error category and notification point when conversion to the declared type expression itself fails, type expression identity and aliases, the concrete retrieval API, and how conversion results are retained at retrieval are undecided. Common string decoding follows the value-form rules in sections 8.2–8.4, using the escapes in section 3.4 where applicable; conversion rules for individual types will be defined separately.
 
 ### 8.2 Double-quoted values and common string decoding
 
-A value can be enclosed in double quotes in its entirety to preserve leading or trailing whitespace, or to include double quotes themselves in the value. The surrounding double quotes are removed before delivery as a value. Leading and trailing whitespace inside the quotes is preserved as part of the value, and the decoded string is not trimmed again.
+A single-line value can be enclosed in double quotes in its entirety to preserve leading or trailing whitespace, or to include double quotes themselves in the value. The surrounding double quotes are removed before delivery as a value. Leading and trailing whitespace inside the quotes is preserved as part of the value, and the decoded string is not trimmed again. An entire header right-hand side consisting of `"""` opens the multiline form in section 8.3 instead; a pipe body under section 8.4 is interpreted literally.
 
 Common string decoding happens before type conversion; removing quotes is not a rule left for each application to implement. The undecoded right-hand side can be retained separately as a syntax result. If the undecoded right-hand side begins with a double quote after outer ASCII spaces and tabs have been removed, it is treated as a quoted value, and the escapes in section 3.4 are decoded only within those quotes. Ordinary values that do not use quoted syntax preserve backslashes unchanged.
+
+Quoted syntax is selected at the beginning of the trimmed header right-hand side. A quote or triple-quote sequence encountered later does not switch an unquoted single-line value into quoted syntax or open a multiline block. Such quotes remain errors in an unquoted single-line value; they are not accepted as literal characters merely because they do not open a block. Pipe bodies preserve all quotes literally under section 8.4, while an already open triple-quoted body recognises only the closing-line rule in section 8.3.
 
 Surrounding quotes are identified before escape decoding. `"\"hello\""` decodes to a string that includes double quotes at both ends. Those decoded quotes are not read again as surrounding quotes and removed. The unquoted form `\"hello\"` is rejected as an invalid value containing bare quotes, because backslashes do not protect quotes outside quoted text.
 
@@ -704,9 +707,9 @@ The following are independent input examples. The right-hand column explains the
 | `A: "\u{1F600}"` | The single emoji `😀` |
 | `A: "\uD83D\uDE00"` | The single emoji `😀` |
 
-Whether a value is unset is determined from the right-hand side before string decoding. An explicit value is not changed to unset even if it decodes to an empty string. `A:` and `A: ""` are equivalent when retrieved as strings, but remain distinct in syntax results and configuration state.
+Whether a value is unset is determined from its source form before string decoding. An explicit value is not changed to unset even if it decodes to an empty string. By itself, `A:` and `A: ""` are equivalent when retrieved as strings, but remain distinct in syntax results and configuration state. Empty triple-quoted and pipe bodies are also explicit set values.
 
-A quoted value requires a closing quote. Although `A: "unterminated` can be retained as an undecoded syntax result, string decoding fails and it is not delivered as a configuration value. Only outer ASCII spaces and tabs are allowed after the closing quote; any other trailing characters are errors. A quoted value must be quoted in its entirety, and double quotes within an unquoted value are also errors. Backslashes outside quotes cannot bypass this restriction. There is no partial quoting or implicit string concatenation.
+An ordinary single-line quoted value requires a closing quote. Although `A: "unterminated` can be retained as an undecoded syntax result, string decoding fails and it is not delivered as a configuration value. Only outer ASCII spaces and tabs are allowed after the closing quote; any other trailing characters are errors. An ordinary quoted value must be quoted in its entirety, and double quotes within an unquoted single-line value are also errors. Backslashes outside quotes cannot bypass this restriction. There is no partial quoting or implicit string concatenation. Triple-quoted bodies and literal pipe bodies follow their own quote rules below.
 
 Each of the following independent examples fails string decoding and is not delivered as a configuration value.
 
@@ -716,6 +719,10 @@ A: "value"tail
 
 ```text
 A: some"value"
+```
+
+```text
+A: text """ more
 ```
 
 ```text
@@ -733,6 +740,68 @@ A: "\q"
 Unknown or incomplete escapes within quotes are errors under section 3.4. This escape validation does not apply to an unquoted `\q` or a trailing backslash.
 
 To deliver a quote itself as a character in a value, quote the entire value and use `\"` within it. The concrete categories and notification points for decoding errors are undecided. Neither quoted keys nor quoted values reinterpret decoded characters as syntax. The prohibition on whitespace, control characters and similar characters in unquoted key elements does not apply to values as a blanket rule.
+
+### 8.3 Triple-quoted multiline values
+
+A header whose entire right-hand side, after removing outer ASCII spaces and tabs, is exactly `"""` opens a triple-quoted value. The opening marker has no inline body content. Its body starts on the next physical line and ends at a closing marker on its own line. An opening marker without a closing line is a syntax error.
+
+This header check is the only way to start a triple-quoted block. A `"""` sequence later in a value or on a subsequent physical line does not retroactively open one. A line matching the closing-marker shape has delimiter meaning only while a triple-quoted block is open; otherwise it is processed under the ordinary line rules and must satisfy those rules.
+
+```text
+A.
+ .Message: """
+  first\nsecond
+    indented
+  """
+ .Next: value
+```
+
+A closing line consists of zero or more leading ASCII spaces, exactly `"""`, and optional trailing ASCII spaces or tabs. Let `m` be its number of leading spaces. Remove exactly `m` leading ASCII spaces from every non-empty source body line; a line with no characters is exempt. A non-empty line with fewer than `m` leading spaces is an error, including a whitespace-only line that is too short. Additional leading spaces and all other body whitespace are preserved. Tabs do not count towards this margin. The closing margin is independent of the header indentation and can be zero, including for pasted public-key text.
+
+In the example, `m` is two. The first source body line becomes `first\nsecond`, and the second retains two leading spaces. With LF source line endings, the decoded value is `first`, LF, `second`, LF and two spaces followed by `indented`. The body neither creates headings nor changes the heading scope; `.Next` remains a child of `A`.
+
+After margin removal, preserve the original LF or CRLF between body lines. The line ending following the opening marker and the line ending immediately before the closing marker are boundaries and are excluded from the value. No terminal newline is inferred. To retain a terminal newline, add an empty body line before the closing marker:
+
+```text
+A.Message: """
+  text
+
+  """
+```
+
+This body is `text` followed by one source line ending. An opening marker immediately followed by a closing marker produces an explicit empty string, with the unset state false.
+
+Decode the body using exactly the same basic and Unicode escapes as an ordinary quoted value. Preserve literal LF or CRLF and literal quote characters in the body; do not treat ordinary quotes as delimiters. Triple quotes on a line containing any other non-whitespace content are also data. Only an exact closing line ends the block. To include a body line that would otherwise be a closing marker, escape at least one of its quotes, for example `\"""`, or use a pipe block. Escape validation remains strict, a backslash does not continue a physical line, and Unicode normalisation is not performed.
+
+### 8.4 Literal pipe blocks
+
+A value header with an empty right-hand side starts a pipe block only when its immediately following physical line has more leading ASCII spaces than the header and then begins with `|`. Do not skip blank lines or comments when making this decision. If that immediate next line does not qualify, the header is unset and that next line is processed normally. A non-empty header such as `A:|` has the ordinary single-line string value `|`.
+
+```text
+A.
+ .Literal:
+  |C:\temp\new
+  |"quoted" \q
+  |"""
+  |# literal body text
+ .Next: value
+```
+
+Collect consecutive qualifying pipe lines. Each line independently needs more leading ASCII spaces than the value header; their indentation need not be identical. Remove all leading ASCII spaces and the first `|` from each collected line. Everything after that first marker, including spaces, tabs, additional pipes, quotes and backslashes, is literal body text. There is no escape decoding or further whitespace trimming, and encountering a quote never switches the body into quoted syntax. In the example, the Windows path and `\q` retain their backslashes, `"""` is three literal quote characters rather than a block delimiter, and `#` does not begin a comment.
+
+Preserve the original LF or CRLF between collected body lines, excluding the line ending between the header and the first body line and the final body line ending. A final pipe with no content explicitly adds a terminal source line ending after the preceding body text:
+
+```text
+A.Literal:
+ |text
+ |
+A.Empty:
+ |
+```
+
+`A.Literal` is `text` followed by one source line ending. `A.Empty` is an explicit empty string, with the unset state false. A body line such as ` |  text` retains the two spaces after its marker. Quotes and backslashes need no escaping in this form.
+
+The first line that does not qualify ends the block and is processed normally, with no line discarded. End of input also completes a pipe block without a closing marker. Blank lines, comments, same-depth or shallower lines, and non-pipe lines therefore end a block. A same-depth or shallower `|:` line is not body content; it must satisfy ordinary key and indentation rules. In particular, an unindented `|: value` can assign to the key named `|`, while an indented absolute key is still invalid. Outside blocks, normal scope, indentation and whole-line comment rules apply. Type annotations and assignment to a heading itself work for both multiline forms; block bodies do not create or close headings.
 
 ## 9. Duplicates and read state
 
@@ -766,7 +835,7 @@ Assignments to `A.B` and `A."B"` are also rejected as duplicates. `"A\.B"` and `
 | Hierarchy depth | The format imposes no fixed upper limit |
 | Total file length | The format imposes no fixed upper limit |
 
-Blank lines and comment lines are also subject to character encoding and line-ending validation. Each heading or value line occupies one physical line. The number of alignment whitespace characters is also unrestricted.
+Blank lines, comment lines and multiline body lines are also subject to character encoding and line-ending validation. Each heading, key and value header occupies one physical line. A triple-quoted or pipe value continues over its body lines under sections 8.3 and 8.4. Between body lines, preserve the original LF or CRLF; do not normalise one to the other. The number of alignment whitespace characters is also unrestricted.
 
 An implementation or consuming application may impose resource constraints according to its memory usage, input source or other circumstances. Such constraints must be distinguished from the format's own acceptance conditions, with their content and the behaviour when exceeded stated explicitly. Key and value length constraints imposed by an application's configuration schema are also distinct from format limits.
 
@@ -774,8 +843,8 @@ An implementation or consuming application may impose resource constraints accor
 
 | Layer | Responsibilities |
 |-----------------|------------------------------------------------------------------------------------------------|
-| General syntax processing | Processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; rejecting duplicates; preserving line numbers and source order; separating keys and type expressions; retaining undecoded right-hand sides; identifying the unset state |
-| Common string decoding | Removing surrounding quotes before delivering a value; decoding the basic and Unicode escapes in section 3.4 only within quotes; preserving backslashes in unquoted values; preserving whitespace within quotes; not trimming again after decoding; distinguishing unset from an explicit empty string |
+| General syntax processing | Processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; rejecting duplicates; preserving line numbers and source order; separating keys and type expressions; recognising value forms; removing block markers and margins while retaining undecoded bodies and their internal source line endings; identifying the unset state |
+| Common string decoding | Removing ordinary surrounding quotes before delivering a value; decoding the basic and Unicode escapes in section 3.4 in ordinary quoted values and triple-quoted bodies; preserving unquoted single-line values and pipe bodies literally under their whitespace rules; not trimming again after decoding; distinguishing unset from an explicit empty string |
 | Type conversion and retrieval | Retaining values with strings as the basis; converting only to the declared type expression; matching the requested type expression at retrieval; converting at retrieval when there is no declaration; reporting type expression mismatch errors; interpreting unset as equivalent to an empty string when string retrieval is permitted |
 | Value decoders and profiles | Assigning meaning to type expressions and defining individual conversion rules for numbers, booleans, enums, lists and other types. Their input is the result of common string decoding |
 | The application's configuration schema | Validating known keys and headings, required fields, whether unset and empty strings are allowed, ranges, lengths, control characters, file ownership boundaries, and consistency between keys and between files |
@@ -796,13 +865,13 @@ A version number independently assigned by a consuming application identifies it
 
 ### 11.2 Syntax results and failure contracts
 
-Syntax results retain the one-based physical line number, resolved key or heading path, undecoded right-hand side, whether the value is unset, whether the line is a heading or a value line, and the type expression if a type annotation is present. Blank lines and comments count towards physical line numbers but do not generate result items. Heading paths do not include the syntactic trailing dot. A heading does not create a value-key occurrence and is distinct from an unset value line. The concrete API and field names are undecided.
+Syntax results retain the one-based physical line number of the heading or value header, resolved key or heading path, value form, undecoded right-hand side or block body, whether the value is unset, whether the entry is a heading or a value, and the type expression if a type annotation is present. Single-line, triple-quoted and pipe forms must be distinguishable without inspecting the body to guess its syntax. A block body excludes markers, its prescribed margin and boundary line endings; it preserves original line endings between body lines. Blocks always have the unset state false. All physical lines count towards line numbers; body lines belong to one value entry, while blank lines and comments outside bodies do not generate result items. Heading paths do not include the syntactic trailing dot. A heading does not create a value-key occurrence and is distinct from an unset value. The concrete public API and field names remain undecided.
 
 Resolved keys and heading paths retain element boundaries and empty names according to section 3.3. Quotes surrounding key elements are not included as name characters, and escapes are retained as decoded names. This is separate from the rule that preserves quotes and backslashes on the right-hand side undecoded.
 
-Before configuration values are delivered, common string decoding in section 8.2 takes place, and its results form the basis of type conversion and retrieval in section 8.1. The undecoded right-hand side retained as a syntax result is distinct from the decoded string or converted value delivered as a value. Access to the undecoded right-hand side does not mean that it may be delivered as a configuration value with its surrounding quotes still attached.
+Before configuration values are delivered, common string decoding according to the form in sections 8.2–8.4 takes place, and its results form the basis of type conversion and retrieval in section 8.1. The undecoded right-hand side or body retained as a syntax result is distinct from the decoded string or converted value delivered as a value. Access to undecoded text does not bypass form-specific decoding. A complete triple-quoted body with an invalid escape can be retained undecoded, but it cannot be delivered as a setting value; a missing closing marker or insufficient margin is already a syntax failure.
 
-An incremental notification interface delivers headings and value lines in source order and receives the result of each recipient's processing before processing the next line. If a recipient returns an error, that error is immediately returned unchanged, and no later lines are parsed or delivered. Byte-level read-ahead from the underlying input is not prohibited. Changes to external state already made by a recipient are not rolled back.
+An incremental notification interface delivers headings and complete values in source order and receives the result of each recipient's processing before parsing or delivering the next entry. Multiline bodies are collected before their value is notified. Determining whether an empty header starts a pipe block, or whether that block has ended, can require inspecting one following physical line; if it is not body content, retain it for normal parsing after the current notification succeeds. If a recipient returns an error, return that error immediately and unchanged, without parsing or delivering later entries. Physical-line lookahead for block boundaries and byte-level read-ahead from the underlying input are permitted. Changes to external state already made by a recipient are not rolled back.
 
 An interface that collects and returns results returns a failure, without partial parse results, if processing fails partway through. A duplicate assignment is rejected before delivering the second value line. Empty input succeeds with zero results. An error is returned if a required input source or notification recipient has not been supplied.
 
@@ -820,8 +889,8 @@ This document does not settle the following matters.
 | Remaining whitespace rules for type annotations | Alignment tabs between the key and the type expression, or between the closing parenthesis and the colon |
 | Future escape extensions | Whether to add forms beyond the basic notation, `\u{H...}` and `\uXXXX` defined in section 3.4. The Unicode scalar value range, surrogate pairs in the four-digit form, rejection of invalid notation and absence of replacement are established |
 | Unicode character classification | The concrete classification of whitespace and control characters in unquoted key elements. The absence of Unicode normalisation, and the principle that quoted key elements allow any valid UTF-8 string, are established |
-| Remaining details of value quoting | Categories and notification points for decoding errors. Errors for non-whitespace characters after the closing quote, double quotes in unquoted values and partial quoting are established, as are removal of surrounding quotes, basic and Unicode escape decoding only within quotes, preservation of whitespace within quotes, and preservation of backslashes in unquoted values |
-| Type-specific decoders | Concrete meaning and conversion for numbers, booleans, lists and other types. Common string decoding, the unset state of an empty right-hand side and its equivalence to an empty string when string retrieval is permitted are established |
+| Remaining details of value quoting | Categories and notification points for decoding errors. Ordinary single-line quote rules, triple-quoted markers and margins, literal pipe detection, form-specific whitespace and escape handling, and explicit empty block state are established in sections 8.2–8.4 |
+| Type-specific decoders | Concrete meaning and conversion for numbers, booleans, lists and other types. Common string decoding, empty-header detection including pipe blocks, explicit empty block values and the equivalence of unset to an empty string when string retrieval is permitted are established |
 | Type-specific interpretation of unset | Treatment in non-string types and the relationship to required fields and defaults |
 | Type expression identity | Matching of type aliases, alternative spellings, compound types and similar expressions |
 | Failure of conversion to a declared type | Error categories and notification points when conversion to the specified type expression is impossible. No fallback to another type expression or a string is permitted |
@@ -845,9 +914,12 @@ Implementation conformance is checked against the rules defined in this document
 | Equivalent notation | Fully qualified keys, headings, relative notation and assignments to headings themselves resolve to the same fully qualified keys and right-hand sides |
 | Indentation and headings | Parent selection by written heading levels; closing headings when indentation decreases; closing headings with absolute lines; preserving state across blank lines and comments |
 | Type annotation position and alignment | Optional left-hand annotations only on value lines; rejection of annotations on headings and inheritance to children; zero or more ASCII spaces between the key and type expression, between the closing parenthesis and colon, and after the colon, with equivalent meaning; rejection of internal whitespace; extraction with balanced parentheses; no blanket prohibition on symbols for compound types; distinction from parentheses on the right-hand side |
-| Preserving right-hand sides | Removing only outer ASCII spaces and tabs; preserving internal whitespace, Unicode whitespace, quotes, leading zeroes, colons and `#` |
-| Common string decoding of values | Removal of surrounding quotes before delivery; decoding of the basic and Unicode escapes in section 3.4 only within quotes; preservation of backslashes in unquoted values; no reinterpretation of decoded quotes, line breaks or syntax symbols; preservation of leading and trailing whitespace within quotes or produced by escapes; no trimming again after decoding; distinction between an explicit empty string and unset; rejection of unclosed quotes, non-whitespace characters after the closing quote, double quotes in unquoted values and partial quoting |
-| Empty right-hand sides | Treating empty right-hand sides, and those containing only outer ASCII spaces and tabs, as unset; retaining their distinction in syntax results from a two-quote right-hand side, the string `null`, heading lines, omitted keys and non-empty right-hand sides ending in a colon; applying the same rules to type annotations and assignments to headings themselves |
+| Preserving right-hand sides | Removing outer ASCII spaces and tabs only from single-line values and headers; preserving internal whitespace, Unicode whitespace, quotes, leading zeroes, colons and `#`; retaining each block body after removing only its structural markers and margin |
+| Common string decoding of values | Removal of ordinary surrounding quotes before delivery; decoding basic and Unicode escapes in ordinary quoted values and triple-quoted bodies; literal pipe bodies and unquoted single-line backslashes; no reinterpretation of decoded quotes, line breaks or syntax symbols; no trimming again after decoding; distinction between explicit empty and unset; rejection of invalid ordinary single-line quotes and escapes |
+| Empty right-hand sides | Treating empty right-hand sides, and those containing only outer ASCII spaces and tabs, as unset unless the immediately following line starts a pipe block; distinguishing unset from explicit empty quoted or block values, the string `null`, headings, omitted keys and non-empty right-hand sides ending in a colon; applying the same rules to type annotations and assignments to headings themselves |
+| Triple-quoted values | Exact opening marker without inline content, recognised only in the value header; no transition into a block at later quotes or lines; closing-marker meaning only within an open block; own-line closing marker; closing-margin removal from every non-empty source line with empty-line exemption; insufficient-margin and missing-close rejection; ordinary quoted escapes; literal internal quotes and triple quotes outside exact closing lines; no reinterpretation or normalisation |
+| Pipe blocks | Immediate-next-line detection after an empty header; strictly deeper ASCII-space indentation; consecutive markers only; literal body after stripping leading spaces and the first pipe; no skipped blank lines or comments; normal processing of the first non-body line; `A:\|` as a single-line value and non-body `\|:` lines subject to ordinary key and indentation rules |
+| Multiline state and line endings | Explicit empty bodies are set; original LF or CRLF between body lines; no opening or closing boundary newline and no inferred terminal newline; an additional empty body line or pipe retains a terminal newline; header line numbers, form metadata, one entry per complete block, unchanged heading scope and support for typed and assignment-to-self entries |
 | Type conversion and retrieval | Initially treating values as strings; converting only to the declared type expression; retaining strings without a declaration and converting to the type expression requested at retrieval |
 | Type expression mismatch errors | Reporting a mismatch when the declaration differs from the retrieval request, regardless of convertibility; the same error when an undeclared value cannot be converted as requested at retrieval |
 | String interpretation of unset | Treating an unset value received from the parser as equivalent to a zero-length string when a string is requested without a type expression mismatch with a declaration; also retaining the unset state in syntax results |

@@ -7,18 +7,37 @@ import (
 )
 
 // Text is the common string-decoding result, before any profile conversion.
-// Unset distinguishes an empty right-hand side from an explicitly quoted "".
+// Unset distinguishes an empty right-hand side without a block from an
+// explicitly empty string, including an empty block.
 type Text struct {
 	Value string
 	Unset bool
 }
 
 // DecodeString removes value quotes and decodes the specified escapes inside
-// them. Bare values preserve backslashes. Entry must be a value entry, and its
-// Unset flag must agree with the trimmed raw right-hand side.
+// them. Triple-quoted blocks use the same escapes; pipe blocks and bare values
+// preserve backslashes. Block bodies preserve all whitespace. Entry must be a
+// value entry with a consistent form and Unset flag.
 func DecodeString(entry Entry) (Text, error) {
 	if entry.Kind != Value {
 		return Text{}, problem(entry.Line, ErrString)
+	}
+	if entry.Form != "" {
+		if entry.Unset || !validBlockText(entry.Raw) {
+			return Text{}, problem(entry.Line, ErrString)
+		}
+		switch entry.Form {
+		case PipeBlock:
+			return Text{Value: entry.Raw}, nil
+		case TripleQuoted:
+			value, err := decodeBlockEscapes(entry.Raw)
+			if err != nil {
+				return Text{}, problem(entry.Line, ErrString)
+			}
+			return Text{Value: value}, nil
+		default:
+			return Text{}, problem(entry.Line, ErrString)
+		}
 	}
 	raw := strings.Trim(entry.Raw, " \t")
 	if !utf8.ValidString(raw) || strings.ContainsAny(raw, "\r\n") || entry.Unset != (raw == "") {
@@ -42,54 +61,112 @@ func DecodeString(entry Entry) (Text, error) {
 
 var errQuoted = errors.New("invalid quoted string")
 
+// Block Raw has already had its structural markers and margin removed by the
+// parser. Source CR is valid only as part of CRLF; decoded \r remains data.
+func validBlockText(s string) bool {
+	if !utf8.ValidString(s) {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\r' && (i+1 == len(s) || s[i+1] != '\n') {
+			return false
+		}
+	}
+	return true
+}
+
+// Quotes and physical line breaks in a triple-quoted body are ordinary data.
+// Escapes are decoded once, using exactly the ordinary quoted-string repertoire.
+func decodeBlockEscapes(s string) (string, error) {
+	escape := strings.IndexByte(s, '\\')
+	if escape < 0 {
+		return s, nil
+	}
+	var decoded strings.Builder
+	for escape >= 0 {
+		decoded.WriteString(s[:escape])
+		value, end, err := decodeEscape(s, escape)
+		if err != nil {
+			return "", err
+		}
+		decoded.WriteRune(value)
+		s = s[end:]
+		escape = strings.IndexByte(s, '\\')
+	}
+	decoded.WriteString(s)
+	return decoded.String(), nil
+}
+
 // decodeQuoted decodes a quoted element beginning at s[0], returning the byte
 // index immediately after its closing quote. Its errors never contain input.
 // Callers validate UTF-8 before calling and validate the remaining characters
 // for their own key/value grammar.
 func decodeQuoted(s string) (string, int, error) {
-	if len(s) == 0 || s[0] != '"' {
-		return "", 0, errQuoted
-	}
 	var decoded strings.Builder
+	end, err := scanQuoted(s, &decoded)
+	if err != nil {
+		return "", 0, err
+	}
+	return decoded.String(), end, nil
+}
+
+// scanQuoted validates the same quoted grammar with or without output.
+// A nil builder locates the closing quote without allocating decoded text.
+func scanQuoted(s string, decoded *strings.Builder) (int, error) {
+	if len(s) == 0 || s[0] != '"' {
+		return 0, errQuoted
+	}
+	literal := 1
 	for i := 1; i < len(s); i++ {
 		switch s[i] {
 		case '"':
-			return decoded.String(), i + 1, nil
+			if decoded != nil {
+				decoded.WriteString(s[literal:i])
+			}
+			return i + 1, nil
 		case '\r', '\n':
-			return "", 0, errQuoted
+			return 0, errQuoted
 		case '\\':
-			i++
-			if i >= len(s) {
-				return "", 0, errQuoted
+			value, end, err := decodeEscape(s, i)
+			if err != nil {
+				return 0, err
 			}
-			switch s[i] {
-			case '.', '"', '\\', '/':
-				decoded.WriteByte(s[i])
-			case 'b':
-				decoded.WriteByte('\b')
-			case 'f':
-				decoded.WriteByte('\f')
-			case 'n':
-				decoded.WriteByte('\n')
-			case 'r':
-				decoded.WriteByte('\r')
-			case 't':
-				decoded.WriteByte('\t')
-			case 'u':
-				value, end, err := decodeUnicodeEscape(s, i+1)
-				if err != nil {
-					return "", 0, errQuoted
-				}
+			if decoded != nil {
+				decoded.WriteString(s[literal:i])
 				decoded.WriteRune(value)
-				i = end - 1
-			default:
-				return "", 0, errQuoted
 			}
-		default:
-			decoded.WriteByte(s[i])
+			literal = end
+			i = end - 1
 		}
 	}
-	return "", 0, errQuoted
+	return 0, errQuoted
+}
+
+// decodeEscape starts at a backslash and returns the scalar and the byte index
+// after the escape. It never treats a decoded character as source syntax.
+func decodeEscape(s string, start int) (rune, int, error) {
+	if start+1 >= len(s) || s[start] != '\\' {
+		return 0, 0, errQuoted
+	}
+	end := start + 2
+	switch s[start+1] {
+	case '.', '"', '\\', '/':
+		return rune(s[start+1]), end, nil
+	case 'b':
+		return '\b', end, nil
+	case 'f':
+		return '\f', end, nil
+	case 'n':
+		return '\n', end, nil
+	case 'r':
+		return '\r', end, nil
+	case 't':
+		return '\t', end, nil
+	case 'u':
+		return decodeUnicodeEscape(s, end)
+	default:
+		return 0, 0, errQuoted
+	}
 }
 
 // decodeUnicodeEscape starts immediately after the u and returns one scalar

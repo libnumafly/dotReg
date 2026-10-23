@@ -66,10 +66,7 @@ type setting struct {
 // types. Untyped values stay strings until Get requests a conversion. Heading
 // entries do not create settings. Failure returns no partial Config.
 func Build(entries []Entry, profile Profile) (*Config, error) {
-	if profile.StringType == "" {
-		return nil, problem(0, ErrInput)
-	}
-	if _, exists := profile.Types[profile.StringType]; exists {
+	if _, exists := profile.Types[profile.StringType]; profile.StringType == "" || exists {
 		return nil, problem(0, ErrInput)
 	}
 	copyProfile := Profile{StringType: profile.StringType, Types: make(map[string]Converter, len(profile.Types))}
@@ -95,7 +92,7 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 		if err != nil {
 			return nil, err
 		}
-		item := setting{line: entry.Line, text: text, typeName: entry.Type, hasType: entry.HasType, value: text.Value}
+		item := setting{line: entry.Line, text: text, typeName: entry.Type, hasType: entry.HasType}
 		if entry.HasType {
 			item.value, err = cfg.convert(text, entry.Type)
 			if err != nil {
