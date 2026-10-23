@@ -1,8 +1,8 @@
 # Getting started
 
-dotReg describes settings as key paths and values. Each key and value header occupies one line; explicit blocks allow a value to span several lines. You can write each key in full or group related settings beneath a heading.
+dotReg uses `key: value` lines. Dots separate key elements. Headings group related keys, and explicit blocks hold multiline values.
 
-This guide introduces the notation. The [reference specification](config-format.md) defines the complete rules, and [section 12](config-format.md#12-undecided-matters) records what remains undecided.
+This guide introduces the notation. The [reference specification](config-format.md) defines every rule, and [section 12](config-format.md#12-undecided-matters) lists the parts still open.
 
 ## Contents
 
@@ -18,7 +18,7 @@ This guide introduces the notation. The [reference specification](config-format.
 
 ## Start with file properties
 
-A complete file begins with the format declaration and a blank line:
+Every complete file begins with this declaration and a blank line:
 
 ```text
 @dotReg 1
@@ -26,24 +26,26 @@ A complete file begins with the format declaration and a blank line:
 A.Code:001
 ```
 
-Both the declaration and the blank separator are required. The declaration starts in column one; `@dotReg` is case-sensitive and only version `1` is currently supported. Separate the property and value with one or more ASCII spaces or tabs; trailing ASCII spaces or tabs are allowed. Comments and settings cannot precede the separator. Unknown properties, unsupported versions and repeated declarations are errors. One initial UTF-8 BOM is allowed.
+The declaration and blank line are required. `@dotReg 1` is the only declaration currently supported. The first setting, `A.Code`, is on physical line 3.
 
-The declaration produces no setting or heading. `A.Code` above is on physical line 3. The shorter examples below are body fragments and omit the declaration and blank separator; add them when trying a fragment with a parser. See [file property declarations](config-format.md#11-file-property-declarations) for the full rules.
+The examples below are body fragments, so they omit the declaration and blank line. Add both when trying an example with a parser. See [file property declarations](config-format.md#11-file-property-declarations) for the detailed rules.
 
 ## Start with a full key
 
-A colon separates a key from its value. Dots separate the elements of a key path:
+A colon separates a key from its value. Dots separate key elements:
 
 ```text
 A.Code:001
 A.Count:42
 ```
 
-These lines assign strings to `A.Code` and `A.Count`. Values start as strings: `001` keeps its leading zeroes, and `42` does not automatically become a number. A key can also consist of a single element.
+These lines set the strings `001` and `42` under `A.Code` and `A.Count`. Values do not become numbers automatically. A key can also have just one element, as in `A: root`.
+
+To include a dot in one key element, quote the whole element: `A."Display.Name": value`. See [key paths](config-format.md#3-key-paths) for other quoted names and key rules.
 
 ## Group related settings
 
-A heading ends with a dot. It supplies a prefix without assigning a value. Relative lines begin with a dot and are indented beneath their heading:
+A heading ends with a dot and supplies a shared prefix. Relative lines begin with a dot and are indented beneath the heading:
 
 ```text
 A.
@@ -51,9 +53,9 @@ A.
  .Count:42
 ```
 
-This is an alternative input to the full-key example in the previous section: the resolved keys and values are the same. Try the examples separately when comparing their notation; combining them records two occurrences of each key and retains both values.
+This has the same result as the full-key example above. Include both examples in one file only when you want to record each value twice.
 
-Use one additional **ASCII space** for each written heading level. Tabs cannot replace these spaces. Indentation follows the headings you write, rather than the number of dot-separated key elements:
+Use one additional **ASCII space** for each heading level. Tabs cannot replace these spaces. The number of levels follows the headings you write, not the number of dots in a key:
 
 ```text
 A.B.
@@ -61,11 +63,11 @@ A.B.
   .Code:001
 ```
 
-Here `A.B.` occupies one heading level, so `.C.` has one leading space. `.Code` has two and resolves to `A.B.C.Code`. A value line does not create another heading level.
+`A.B.` is one heading level, so `.C.` has one leading space and `.Code` has two. The value belongs to `A.B.C.Code`.
 
 ## Keep repeated values
 
-A key can appear repeatedly. Every value occurrence is kept in source order, even when the same value appears again:
+A key can appear more than once. Every value is retained in source order, including identical values:
 
 ```text
 A.Tag:red
@@ -73,36 +75,24 @@ A.Tag:green
 A.Tag:red
 ```
 
-The values of `A.Tag` are `red`, `green`, `red`. No occurrence is overwritten or deduplicated. Fully qualified keys, relative keys and equivalent quoted spellings use the same key identity. A heading alone adds no value. Each occurrence keeps its own type annotation and unset state; an application may require a particular key to occur only once through its schema.
-
-See [repeated values and read state](config-format.md#9-repeated-values-and-read-state). The [Go sample](../implementations/go/README.md#using-the-library) offers collection and indexed retrieval; its exact API remains provisional.
+The values of `A.Tag` are `red`, `green`, `red`. An application can require a key to appear only once through its configuration schema. See [repeated values and read state](config-format.md#9-repeated-values-and-read-state). The [Go sample](../implementations/go/README.md#using-the-library) also shows collection and indexed retrieval.
 
 ## Write strings naturally
 
-After trimming outer ASCII spaces and tabs, a single-line value that starts with `"` uses quoted syntax for the whole value. Any other first character makes the entire value literal, including later quotes and backslashes. Quoted values preserve surrounding spaces and allow escapes, including Unicode escapes:
+After outer spaces and tabs are trimmed, a value that starts with `"` must be quoted in full. Escapes are decoded inside it. Any other starting character makes the whole value literal, including later quotes and backslashes:
 
 ```text
 A.Path: C:\temp\new
 A.Message: "  hello  "
-A.Emoji: "\u{1F600}"
-A."Display.Name": "Caf\u{E9}"
 A.Saying: say "hello"
-A.Unbalanced: x"unterminated
-A.QuoteText: \"hello\"
-A.JsonText: {"x": "\u0041"}
+A.Emoji: "\u{1F600}"
 ```
 
-`A.Path` contains the literal Windows path `C:\temp\new`; `\t` and `\n` are not escapes in a literal value. `A.Message` retains its two spaces at each end. `A.Emoji` decodes to `😀`, and `A."Display.Name"` has the value `Café`. The remaining four values retain their quotes and backslashes exactly as written. A later quote need not be balanced, and the JSON-looking text is not parsed or unescaped.
-
-A later `"""` also stays literal: `A.Text: text """ more` does not open a block. A value that starts with a quote must still close correctly: `"unterminated`, `"value"tail` and `"\q"` are errors, without fallback to literal text. The exact `"""` header and empty-header pipe forms follow the multiline rules below.
-
-Quote an entire key element when its name contains a dot or another syntax character. The key `A."Display.Name"` has two elements, `A` and `Display.Name`, rather than three. Key names are case-sensitive, and Unicode normalisation is not performed.
-
-See [key paths](config-format.md#3-key-paths) and [common escapes](config-format.md#34-common-escapes-within-quotes) for the detailed rules.
+`A.Path` keeps its backslashes, `A.Message` keeps its surrounding value spaces, and `A.Saying` keeps its embedded quotes. `A.Emoji` becomes `😀`. See [common escapes](config-format.md#34-common-escapes-within-quotes) for the full escape list and [single-line values](config-format.md#82-double-quoted-values-and-common-string-decoding) for quoting details.
 
 ## Write multiline strings
 
-Use triple quotes when a multiline value should support the same escapes as an ordinary quoted string:
+Use triple quotes for multiline text that needs the same escapes as an ordinary quoted string:
 
 ```text
 A.Message: """
@@ -111,9 +101,9 @@ A.Message: """
   """
 ```
 
-The opening marker has no inline content. The closing marker occupies its own line, and its two leading ASCII spaces set the margin removed from each non-empty body line. With LF source endings, this value is `Hello, 😀`, one LF and two spaces followed by `second line`. Empty source lines are exempt from margin removal; non-empty lines with too little margin are errors. A zero-space closing margin is allowed when pasting text directly.
+The closing marker goes on its own line. Its leading spaces set the margin removed from non-empty body lines. The body decodes to `Hello, 😀`, a line break, and two spaces followed by `second line`.
 
-Use a pipe block for literal text, including paths, backslashes or quote characters:
+Use a pipe block when the body should stay literal:
 
 ```text
 A.Literal:
@@ -123,25 +113,13 @@ A.Literal:
 A.Next: value
 ```
 
-Only the physical line immediately after an empty header can start this block. It must begin with more ASCII spaces than the header, followed by `|`. Consecutive lines meeting that rule belong to the body. Their leading spaces and first pipe are removed; all remaining characters are preserved without escapes or trimming. `A.Next` ends the block and is read normally. Blank lines and comments are not skipped to find a pipe block. `A:|` is simply the single-line value `|`.
+The first pipe line must immediately follow the empty header and be indented more deeply. Each body line loses its indentation and first `|`; the remaining text is kept as written. `A.Next` is then read as a normal setting.
 
-Both forms preserve the original LF or CRLF between body lines. They exclude boundary line endings and add no terminal newline automatically. Add an empty body line before a triple-quoted closing marker, or add an empty final pipe, when a terminal newline is needed:
-
-```text
-A.WithNewline:
- |text
- |
-A.EmptyBlock:
- |
-```
-
-`A.WithNewline` is `text` followed by one source line ending. `A.EmptyBlock` is an explicit empty string, not unset. In a pipe block, spaces after the marker are content: ` |  text` retains two leading spaces. Multiline bodies neither create headings nor change their scope. Type annotations and assignment to a heading itself work with both forms.
-
-See [triple-quoted values](config-format.md#83-triple-quoted-multiline-values) and [pipe blocks](config-format.md#84-literal-pipe-blocks) for exact closing-marker and indentation rules.
+Neither block form adds a final line break automatically. See [triple-quoted values](config-format.md#83-triple-quoted-multiline-values) and [pipe blocks](config-format.md#84-literal-pipe-blocks) for exact indentation and line-ending rules.
 
 ## Distinguish unset from empty
 
-An empty right-hand side leaves a value unset unless its immediately following line starts a pipe block. An empty quoted string or empty multiline body specifies a value explicitly:
+An empty right-hand side leaves the value unset unless the next physical line starts a pipe block. An empty quoted value explicitly sets an empty string, and the word `null` is an ordinary string:
 
 ```text
 A.Missing:
@@ -149,21 +127,27 @@ A.Empty: ""
 A.NullText: null
 ```
 
-All three keys are present. `A.Missing` is unset, `A.Empty` is an explicit empty string, and `A.NullText` is the string `null`. When retrieval as a string is permitted, unset is equivalent to an empty string; its unset state remains available separately.
-
-An omitted key and a heading alone are different again: neither assigns a value. Your application's schema decides which keys are required and whether unset or empty values are acceptable. See [value interpretation](config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
+All three keys exist. When a string is requested and the declaration permits it, `A.Missing` is returned as an empty string; its unset state is still available. An omitted key or a heading alone has no value. Your application's schema decides which keys are required and whether unset or empty values are allowed. See [value interpretation](config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
 
 ## Add types when a consumer supports them
 
-A value line can include a type annotation between its key and colon:
+An optional type annotation goes between the key and colon:
 
 ```text
 A.Count(int):42
+A.Label:42
 ```
 
-This requests conversion according to a declared type expression. Type conversion follows syntax parsing and common string decoding; it is a separate processing stage. The meaning of `int` here comes from the Go sample's experimental profile. Standard type names and individual conversion rules remain undecided.
+Values are decoded as strings first. A declaration converts that occurrence to its declared type. Without a declaration, a consumer may request conversion when it reads the value:
 
-The [type annotation rules](config-format.md#6-type-annotations) define the syntax, while the [Go guide](../implementations/go/README.md#type-conversion-and-the-callers-configuration-schema) explains that sample's profile and retrieval behaviour.
+| Setting | Requested type | Result |
+|---|---|---|
+| `A.Count(int):42` | `int` | Use the declared `int` conversion |
+| `A.Count(int):42` | `string` | Type mismatch |
+| `A.Label:42` | `int` | Try converting the string when read; failure is a type mismatch |
+| `A.Label:42` | `string` | Return the string |
+
+Each occurrence has its own annotation. The names and behavior of standard types are still undecided; `int` and `string` here illustrate the rules and the Go sample's experimental profile. See [type annotation rules](config-format.md#6-type-annotations) and [the Go guide](../implementations/go/README.md#type-conversion-and-the-callers-configuration-schema).
 
 ## Try the Go sample
 
@@ -174,6 +158,6 @@ cd implementations/go
 go run ./cmd/configsample ../../examples/sample.txt
 ```
 
-The default mode prints JSON showing parsed entries, their unset state and decoded strings. It does not convert annotated values. Use the [Go sample guide](../implementations/go/README.md) for the experimental conversion mode, standard input and library API. The [example configuration](../examples/sample.txt) provides a larger input to explore.
+The default mode prints the parsed entries, their unset state and decoded strings. It does not convert annotated values. See the [Go sample guide](../implementations/go/README.md) for its conversion mode and library API, and explore the [example configuration](../examples/sample.txt).
 
 Return to the [documentation index](README.md) or the [project introduction](../README.md).

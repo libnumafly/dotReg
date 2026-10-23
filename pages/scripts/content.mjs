@@ -33,6 +33,12 @@ export const pages = [
     description: 'The dotReg reference specification, including established rules and undecided matters.',
   },
   {
+    source: 'docs/conformance.md',
+    slug: 'conformance',
+    title: 'Conformance checklist',
+    description: 'Check an implementation against the established dotReg format rules.',
+  },
+  {
     source: 'implementations/go/README.md',
     slug: 'implementations/go',
     title: 'Go sample implementation',

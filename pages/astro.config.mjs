@@ -29,6 +29,7 @@ export default defineConfig({
         ] },
         { label: 'The notation', items: [
           { label: 'Specification', slug: 'specification' },
+          { label: 'Conformance checklist', slug: 'conformance' },
           { label: 'Example configuration', slug: 'examples' },
         ] },
         { label: 'Implementations', items: [

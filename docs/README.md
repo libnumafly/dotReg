@@ -9,7 +9,8 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 | Document | Read it to… |
 |---|---|
 | [Getting started](getting-started.md) | Learn the required file declaration, value lines, repeated values, headings, strings and unset values through small examples |
-| [Configuration file format](config-format.md) | Consult the reference specification, including syntax, processing responsibilities and conformance checks |
+| [Configuration file format](config-format.md) | Consult the reference specification for syntax, processing stages and application responsibilities |
+| [Conformance checklist](conformance.md) | Check an implementation's parser against the established format rules |
 | [Undecided matters](config-format.md#12-undecided-matters) | Check which parts of the format remain open |
 | [Example configuration](../examples/sample.txt) | Explore repeated values, quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
 | [Go sample guide](../implementations/go/README.md) | Run the optional parser and CLI, use its API, or inspect its supported scope and provisional choices |
@@ -26,7 +27,7 @@ The Go implementation is a sample for trying the notation. Its public API and ex
 
 The [specification](config-format.md) defines the notation and separates syntax processing, common string decoding, type conversion and application-specific validation. The [Go guide](../implementations/go/README.md) describes one implementation of those stages and the temporary choices it makes where the format remains open.
 
-For a first read, follow [Getting started](getting-started.md). For a particular rule, the specification covers:
+For a first read, follow [Getting started](getting-started.md). For a particular rule, use the specification sections below. Implementers can also check their parser against the [conformance checklist](conformance.md):
 
 - [File properties and format version](config-format.md#11-file-property-declarations).
 - [Key paths and quoting](config-format.md#3-key-paths).
