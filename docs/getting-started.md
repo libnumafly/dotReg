@@ -4,6 +4,18 @@ dotReg describes settings as key paths and values. Each key and value header occ
 
 This guide introduces the notation. The [reference specification](config-format.md) defines the complete rules, and [section 12](config-format.md#12-undecided-matters) records what remains undecided.
 
+## Contents
+
+- [Start with file properties](#start-with-file-properties)
+- [Start with a full key](#start-with-a-full-key)
+- [Group related settings](#group-related-settings)
+- [Keep repeated values](#keep-repeated-values)
+- [Write strings naturally](#write-strings-naturally)
+- [Write multiline strings](#write-multiline-strings)
+- [Distinguish unset from empty](#distinguish-unset-from-empty)
+- [Add types when a consumer supports them](#add-types-when-a-consumer-supports-them)
+- [Try the Go sample](#try-the-go-sample)
+
 ## Start with file properties
 
 A complete file begins with the format declaration and a blank line:

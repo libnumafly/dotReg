@@ -2,6 +2,47 @@
 
 This document defines a configuration file notation for key paths containing one or more elements and single-line or explicitly delimited multiline values. Keys, headings and value headers occupy one physical line. Fully qualified keys are the basic form, with dots separating their elements. Headings, relative notation and indentation allow a shared prefix to be omitted.
 
+## Contents
+
+- [1. Scope and specification status](#1-scope-and-specification-status)
+  - [1.1 File property declarations](#11-file-property-declarations)
+- [2. Basic value lines](#2-basic-value-lines)
+  - [2.1 Equivalent notation using headings](#21-equivalent-notation-using-headings)
+- [3. Key paths](#3-key-paths)
+  - [3.1 Coexistence of value keys and descendant keys](#31-coexistence-of-value-keys-and-descendant-keys)
+  - [3.2 Quoted key elements and empty names](#32-quoted-key-elements-and-empty-names)
+  - [3.3 Key identity and element boundaries](#33-key-identity-and-element-boundaries)
+  - [3.4 Common escapes within quotes](#34-common-escapes-within-quotes)
+- [4. Line classification and separators](#4-line-classification-and-separators)
+- [5. Headings, relative notation and indentation](#5-headings-relative-notation-and-indentation)
+  - [5.1 Absolute and relative lines](#51-absolute-and-relative-lines)
+  - [5.2 Depth follows the number of written heading levels](#52-depth-follows-the-number-of-written-heading-levels)
+  - [5.3 Choosing the parent after reducing indentation](#53-choosing-the-parent-after-reducing-indentation)
+  - [5.4 Closing headings with an absolute line](#54-closing-headings-with-an-absolute-line)
+  - [5.5 Assignment to a heading itself](#55-assignment-to-a-heading-itself)
+- [6. Type annotations](#6-type-annotations)
+  - [6.1 Position and omission](#61-position-and-omission)
+  - [6.2 Whitespace for alignment](#62-whitespace-for-alignment)
+  - [6.3 Relative value lines and assignment to a heading itself](#63-relative-value-lines-and-assignment-to-a-heading-itself)
+  - [6.4 Distinguishing parentheses on the right-hand side](#64-distinguishing-parentheses-on-the-right-hand-side)
+  - [6.5 Validation and output of type expressions](#65-validation-and-output-of-type-expressions)
+- [7. Whitespace, blank lines and comments](#7-whitespace-blank-lines-and-comments)
+  - [7.1 Outer whitespace and whitespace within right-hand sides](#71-outer-whitespace-and-whitespace-within-right-hand-sides)
+  - [7.2 Blank lines and comment lines](#72-blank-lines-and-comment-lines)
+  - [7.3 Recommended formatting](#73-recommended-formatting)
+- [8. Preserving right-hand sides and interpreting values](#8-preserving-right-hand-sides-and-interpreting-values)
+  - [8.1 Type conversion and retrieval](#81-type-conversion-and-retrieval)
+  - [8.2 Double-quoted values and common string decoding](#82-double-quoted-values-and-common-string-decoding)
+  - [8.3 Triple-quoted multiline values](#83-triple-quoted-multiline-values)
+  - [8.4 Literal pipe blocks](#84-literal-pipe-blocks)
+- [9. Repeated values and read state](#9-repeated-values-and-read-state)
+- [10. Character encoding, line endings and length](#10-character-encoding-line-endings-and-length)
+- [11. Responsibilities of syntax processing and consuming applications](#11-responsibilities-of-syntax-processing-and-consuming-applications)
+  - [11.1 Rules defined by consuming applications](#111-rules-defined-by-consuming-applications)
+  - [11.2 Syntax results and failure contracts](#112-syntax-results-and-failure-contracts)
+- [12. Undecided matters](#12-undecided-matters)
+- [13. Conformance checking](#13-conformance-checking)
+
 ## 1. Scope and specification status
 
 Resolution produces a flat space of fully qualified keys and their ordered value occurrences. Every occurrence is retained in source order, including repeated identical values; later occurrences do not overwrite earlier ones. An empty right-hand side means that the key is present and that occurrence is unset unless the immediately following physical line starts a pipe block as defined in section 8.4. Explicit multiline blocks are set values, even when their bodies are empty. Every set value is initially treated as a string. Syntax parsing preserves the undecoded right-hand side or block body and its value form, and common string decoding takes place before it is delivered as a value. Type conversion according to a type expression declared in advance or requested at retrieval is a separate, subsequent stage, applied independently to each occurrence. When retrieval as a string is permitted, an unset occurrence is treated as equivalent to an empty string. General syntax processing and string decoding are separate from value type conversion and the application's configuration schema.

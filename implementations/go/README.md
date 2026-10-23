@@ -6,6 +6,18 @@ This is a sample Go implementation of [config-format.md](../../docs/config-forma
 
 Standard type names and the public API remain undecided. The Go package is `dotreg`; the module path is `github.com/libnumafly/dotReg/implementations/go`. The implementation makes the provisional choices described below for parts of the syntax that remain undecided.
 
+## Contents
+
+- [File properties](#file-properties)
+- [Running the sample](#running-the-sample)
+- [Using the library](#using-the-library)
+- [Single-line strings](#single-line-strings)
+- [Multiline values](#multiline-values)
+- [Type conversion and the caller's configuration schema](#type-conversion-and-the-callers-configuration-schema)
+- [Supported rules and provisional choices](#supported-rules-and-provisional-choices)
+- [Verification](#verification)
+- [Licence](#licence)
+
 ## File properties
 
 Every parsed file or standard-input stream must start with a declaration region and its terminating blank line. Currently the only supported declaration is `@dotReg 1`:

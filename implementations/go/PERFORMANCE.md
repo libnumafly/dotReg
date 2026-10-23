@@ -11,6 +11,13 @@ working-tree snapshot taken immediately before the refactor, including both
 multiline forms. It does not use the repository's older Git HEAD as the baseline.
 The notation, public API and accepted/rejected input rules are unchanged.
 
+## Contents
+
+- [Measurement method](#measurement-method)
+- [Results](#results)
+- [Implementation changes](#implementation-changes)
+- [Compatibility verification](#compatibility-verification)
+
 ## Measurement method
 
 - Windows/amd64, Intel Core i7-1370P, Go 1.27.0.
