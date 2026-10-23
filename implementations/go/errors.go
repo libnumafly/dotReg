@@ -9,8 +9,8 @@ const (
 	ErrSyntax      Code = "syntax"
 	ErrUnsupported Code = "unsupported"
 	ErrInput       Code = "input"
-	// ErrDuplicate is retained for API compatibility. Parse and Build preserve
-	// repeated values and no longer return this code.
+	// ErrDuplicate reports repeated property declarations. Repeated value keys
+	// remain valid and do not produce this code.
 	ErrDuplicate      Code = "duplicate"
 	ErrString         Code = "string"
 	ErrMultipleValues Code = "multiple_values"
@@ -36,7 +36,7 @@ func (e *Error) Error() string {
 	case ErrInput:
 		message = "invalid input or input read failed"
 	case ErrDuplicate:
-		message = "duplicate value key"
+		message = "duplicate property declaration"
 	case ErrString:
 		message = "invalid quoted string"
 	case ErrMultipleValues:

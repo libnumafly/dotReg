@@ -1,9 +1,10 @@
 # Parser refactor measurements
 
-These are historical measurements from before support for repeated value keys.
-The measured implementation rejected repeated keys; the current implementation
-retains every occurrence. The figures below are not measurements of the current
-multiple-value implementation.
+These are historical measurements from before support for repeated value keys
+and mandatory file property declarations. The measured implementation rejected
+repeated keys and had no declaration region; the current implementation retains
+every occurrence and requires file properties. The figures below are not
+measurements of the current implementation.
 
 This records the Go parser refactor on 2026-10-23. The comparison uses an exact
 working-tree snapshot taken immediately before the refactor, including both

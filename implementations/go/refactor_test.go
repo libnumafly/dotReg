@@ -2,6 +2,7 @@ package dotreg
 
 import (
 	"errors"
+	"io"
 	"reflect"
 	"strings"
 	"testing"
@@ -26,15 +27,15 @@ func TestRefactorHeaderErrorPrecedence(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			visits := 0
-			err := ParseEach(strings.NewReader(test.source), func(Entry) error {
+			err := ParseEach(strings.NewReader(parserDocument(test.source)), func(Entry) error {
 				visits++
 				return nil
 			})
-			parserRequireCode(t, err, test.code, test.line)
+			parserRequireCode(t, err, test.code, test.line+2)
 			if visits != test.visits || strings.Contains(err.Error(), "private") {
 				t.Fatalf("visits=%d, error=%v; want %d visits without value text", visits, err, test.visits)
 			}
-			if entries, err := Parse(strings.NewReader(test.source)); entries != nil || err == nil {
+			if entries, err := Parse(strings.NewReader(parserDocument(test.source))); entries != nil || err == nil {
 				t.Fatal("failed collection returned a partial result")
 			}
 		})
@@ -55,15 +56,15 @@ func TestRefactorRepeatedKeysPreserveLaterFailurePriority(t *testing.T) {
 	} {
 		t.Run(test.source, func(t *testing.T) {
 			var got []Entry
-			err := ParseEach(strings.NewReader(test.source), func(entry Entry) error {
+			err := ParseEach(strings.NewReader(parserDocument(test.source)), func(entry Entry) error {
 				got = append(got, entry)
 				return nil
 			})
-			parserRequireCode(t, err, test.code, test.line)
+			parserRequireCode(t, err, test.code, test.line+2)
 			if len(got) != test.visits || got[0].Raw != "red" {
 				t.Errorf("valid occurrences before failure=%#v", got)
 			}
-			if entries, err := Parse(strings.NewReader(test.source)); err == nil || entries != nil {
+			if entries, err := Parse(strings.NewReader(parserDocument(test.source))); err == nil || entries != nil {
 				t.Fatalf("failed collection returned partial occurrences: %#v, %v", entries, err)
 			}
 		})
@@ -91,9 +92,9 @@ func TestRefactorPipeLookaheadDefersLongPartialReadFailure(t *testing.T) {
 	for _, stopAtCurrent := range []bool{true, false} {
 		reader := &refactorTailErrorReader{data: source, err: errors.New(private)}
 		visits := 0
-		err := ParseEach(reader, func(entry Entry) error {
+		err := ParseEach(io.MultiReader(strings.NewReader(parserPreamble), reader), func(entry Entry) error {
 			visits++
-			if entry.Line != 1 || entry.Form != PipeBlock || entry.Raw != "literal" || entry.Unset {
+			if entry.Line != 3 || entry.Form != PipeBlock || entry.Raw != "literal" || entry.Unset {
 				t.Fatalf("lookahead altered the complete pipe entry: %#v", entry)
 			}
 			if stopAtCurrent {
@@ -106,7 +107,7 @@ func TestRefactorPipeLookaheadDefersLongPartialReadFailure(t *testing.T) {
 				t.Fatalf("peeked failure preempted callback: %v", err)
 			}
 		} else {
-			parserRequireCode(t, err, ErrInput, 3)
+			parserRequireCode(t, err, ErrInput, 5)
 			if strings.Contains(err.Error(), private) || strings.Contains(err.Error(), "private-value") {
 				t.Fatal("read diagnostic leaked source or underlying error")
 			}
@@ -115,8 +116,8 @@ func TestRefactorPipeLookaheadDefersLongPartialReadFailure(t *testing.T) {
 			t.Fatalf("received %d callbacks, want one complete pipe entry", visits)
 		}
 	}
-	entries, err := Parse(&refactorTailErrorReader{data: source, err: errors.New(private)})
-	parserRequireCode(t, err, ErrInput, 3)
+	entries, err := Parse(io.MultiReader(strings.NewReader(parserPreamble), &refactorTailErrorReader{data: source, err: errors.New(private)}))
+	parserRequireCode(t, err, ErrInput, 5)
 	if entries != nil {
 		t.Fatal("long partial read failure returned partial entries")
 	}
@@ -135,11 +136,11 @@ func TestRefactorTripleQuoteClosingCandidates(t *testing.T) {
 	for _, test := range tests {
 		// A tab is allowed after the actual closing marker, never as margin.
 		source := "A: \"\"\"\r\n  " + test.raw + "\r\n  \"\"\"\t \nB:next"
-		entries, err := Parse(strings.NewReader(source))
+		entries, err := Parse(strings.NewReader(parserDocument(source)))
 		if err != nil || len(entries) != 2 {
 			t.Fatalf("raw %q: entries=%#v, error=%v", test.raw, entries, err)
 		}
-		if entries[0].Raw != test.raw || entries[0].Form != TripleQuoted || entries[1].Line != 4 {
+		if entries[0].Raw != test.raw || entries[0].Form != TripleQuoted || entries[1].Line != 6 {
 			t.Fatalf("closing-candidate structure changed: %#v", entries)
 		}
 		decoded, err := DecodeString(entries[0])
@@ -155,7 +156,7 @@ func TestRefactorVisitorEntriesSurviveLaterInput(t *testing.T) {
 		source += " ." + strings.Repeat("K", i+1) + ":" + strings.Repeat(string(rune('a'+i)), 5000) + "\n"
 	}
 	var retained, snapshots []Entry
-	err := ParseEach(strings.NewReader(source), func(entry Entry) error {
+	err := ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {
 		retained = append(retained, entry)
 		snapshot := entry
 		snapshot.Raw = strings.Clone(entry.Raw)

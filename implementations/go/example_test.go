@@ -10,7 +10,7 @@ import (
 
 func Example() {
 	entries, err := dotreg.Parse(strings.NewReader(
-		"A.Code(string):001\nA.Count:42\nA.Missing:\nA.Empty:\"\"\n",
+		"@dotReg 1\n\nA.Code(string):001\nA.Count:42\nA.Missing:\nA.Empty:\"\"\n",
 	))
 	if err != nil {
 		panic(err)
@@ -52,7 +52,7 @@ func Example() {
 
 func ExampleConfig_GetAll() {
 	entries, err := dotreg.Parse(strings.NewReader(
-		"A.Tag:red\nA.Tag:green\nA.Tag:red\n",
+		"@dotReg 1\n\nA.Tag:red\nA.Tag:green\nA.Tag:red\n",
 	))
 	if err != nil {
 		panic(err)
@@ -85,5 +85,5 @@ func ExampleConfig_GetAll() {
 	// [red green red]
 	// [false false false]
 	// green
-	// multiple_values 2
+	// multiple_values 4
 }

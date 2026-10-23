@@ -8,7 +8,7 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 
 | Document | Read it to… |
 |---|---|
-| [Getting started](getting-started.md) | Learn value lines, repeated values, headings, quoted and multiline strings, and unset values through small examples |
+| [Getting started](getting-started.md) | Learn the required file declaration, value lines, repeated values, headings, strings and unset values through small examples |
 | [Configuration file format](config-format.md) | Consult the reference specification, including syntax, processing responsibilities and conformance checks |
 | [Undecided matters](config-format.md#12-undecided-matters) | Check which parts of the format remain open |
 | [Example configuration](../examples/sample.txt) | Explore repeated values, quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
@@ -18,7 +18,7 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 
 **The notation is still being developed.** The specification distinguishes established rules from undecided matters; it is the reference for the format. The getting started guide introduces those rules without replacing them.
 
-The format version, dedicated file extension and standard type names remain undecided. See [section 12 of the specification](config-format.md#12-undecided-matters) for the full list.
+The current format version is declared by the mandatory `@dotReg 1` property region and blank separator. Future version policy, additional properties, a dedicated file extension and standard type names remain undecided. See [file properties](config-format.md#11-file-property-declarations) and [section 12 of the specification](config-format.md#12-undecided-matters).
 
 The Go implementation is a sample for trying the notation. Its public API and experimental type profile are provisional. In particular, the `string`, `int` and `bool` annotations in the example configuration do not establish standard type names or conversion rules.
 
@@ -28,6 +28,7 @@ The [specification](config-format.md) defines the notation and separates syntax 
 
 For a first read, follow [Getting started](getting-started.md). For a particular rule, the specification covers:
 
+- [File properties and format version](config-format.md#11-file-property-declarations).
 - [Key paths and quoting](config-format.md#3-key-paths).
 - [Headings, relative notation and indentation](config-format.md#5-headings-relative-notation-and-indentation).
 - [Type annotations](config-format.md#6-type-annotations).

@@ -5,6 +5,8 @@
 dotReg is a line-oriented configuration notation. Write full keys directly, or group them beneath a shared heading. Values start as text; your application decides how to interpret them.
 
 ```text
+@dotReg 1
+
 A.
  .Code:001
  .Message: "Hello, dotReg"
@@ -13,6 +15,8 @@ A.
 ```
 
 The grouped entries resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. The code `001` stays text, with its leading zeroes intact.
+
+Every file starts with the exact declaration `@dotReg 1` and a required blank separator. Declarations are file properties, separate from settings. The shorter notation examples below show body fragments; prepend the same declaration and blank line when parsing them. See [file properties](docs/config-format.md#11-file-property-declarations) for validation rules.
 
 For a single-line value, only an initial double quote after outer ASCII spaces and tabs are removed selects quoted syntax and escapes. Other values are entirely literal: `A.Message: say "hello"` keeps its quotes, and `A.Path: C:\temp\new` keeps its backslashes. Quotes encountered later never switch modes.
 

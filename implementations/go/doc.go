@@ -1,6 +1,10 @@
 // Package dotreg implements an experimental parser for the configuration
 // notation described in ../../docs/config-format.md.
 //
+// Input starts with the required @dotReg 1 property declaration and a blank
+// separator. Declarations produce no entries; entry line numbers still count
+// physical lines from the beginning of the file.
+//
 // Parse and ParseEach resolve key paths and preserve raw right-hand sides,
 // including multiline bodies with their syntax margins removed. Entry.Form
 // distinguishes escaped triple-quoted bodies from literal pipe blocks.

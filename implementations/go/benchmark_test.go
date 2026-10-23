@@ -16,7 +16,7 @@ var (
 // the 512-value fixtures include headings, declarations and untyped values.
 func benchmarkSettings(quoted, typed bool) string {
 	var out strings.Builder
-	out.WriteString("A.\n")
+	out.WriteString("@dotReg 1\n\nA.\n")
 	for group := 0; group < 8; group++ {
 		if quoted {
 			fmt.Fprintf(&out, " .\"Group\\.%02d\".\n", group)
@@ -55,6 +55,7 @@ func benchmarkBody(escaped bool) string {
 
 func benchmarkBlock(body string, form ValueForm) string {
 	var out strings.Builder
+	out.WriteString("@dotReg 1\n\n")
 	if form == TripleQuoted {
 		out.WriteString("A: \"\"\"\n")
 	} else {
@@ -86,7 +87,7 @@ func BenchmarkParseEach(b *testing.B) {
 	}{
 		{"BareMixed512", benchmarkSettings(false, true)},
 		{"QuotedMixed512", benchmarkSettings(true, true)},
-		{"LongRaw1MiB", "A: " + strings.Repeat("x", 1<<20) + "\n"},
+		{"LongRaw1MiB", "@dotReg 1\n\nA: " + strings.Repeat("x", 1<<20) + "\n"},
 		{"TriplePlain32KiB", benchmarkBlock(benchmarkBody(false), TripleQuoted)},
 		{"TripleEscaped32KiB", benchmarkBlock(benchmarkBody(true), TripleQuoted)},
 		{"PipeLiteral32KiB", benchmarkBlock(benchmarkBody(true), PipeBlock)},
@@ -169,7 +170,7 @@ func BenchmarkDecodeTriple32KiB(b *testing.B) {
 		if escaped {
 			name = "Escaped"
 		}
-		entry := Entry{Line: 1, Kind: Value, Form: TripleQuoted, Raw: benchmarkBody(escaped)}
+		entry := Entry{Line: 3, Kind: Value, Form: TripleQuoted, Raw: benchmarkBody(escaped)}
 		b.Run(name, func(b *testing.B) {
 			if _, err := DecodeString(entry); err != nil {
 				b.Fatal(err)

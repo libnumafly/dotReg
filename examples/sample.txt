@@ -1,3 +1,5 @@
+@dotReg 1
+
 # Sample: string / int / bool are type names from the demo profile.
 A.
  .Code(string):001

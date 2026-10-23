@@ -4,6 +4,20 @@ dotReg describes settings as key paths and values. Each key and value header occ
 
 This guide introduces the notation. The [reference specification](config-format.md) defines the complete rules, and [section 12](config-format.md#12-undecided-matters) records what remains undecided.
 
+## Start with file properties
+
+A complete file begins with the format declaration and a blank line:
+
+```text
+@dotReg 1
+
+A.Code:001
+```
+
+Both the declaration and the blank separator are required. The declaration starts in column one; `@dotReg` is case-sensitive and only version `1` is currently supported. Separate the property and value with one or more ASCII spaces or tabs; trailing ASCII spaces or tabs are allowed. Comments and settings cannot precede the separator. Unknown properties, unsupported versions and repeated declarations are errors. One initial UTF-8 BOM is allowed.
+
+The declaration produces no setting or heading. `A.Code` above is on physical line 3. The shorter examples below are body fragments and omit the declaration and blank separator; add them when trying a fragment with a parser. See [file property declarations](config-format.md#11-file-property-declarations) for the full rules.
+
 ## Start with a full key
 
 A colon separates a key from its value. Dots separate the elements of a key path:
@@ -25,7 +39,7 @@ A.
  .Count:42
 ```
 
-This is an alternative input to the first example: the resolved keys and values are the same. Try the examples separately when comparing their notation; combining them records two occurrences of each key and retains both values.
+This is an alternative input to the full-key example in the previous section: the resolved keys and values are the same. Try the examples separately when comparing their notation; combining them records two occurrences of each key and retains both values.
 
 Use one additional **ASCII space** for each written heading level. Tabs cannot replace these spaces. Indentation follows the headings you write, rather than the number of dot-separated key elements:
 

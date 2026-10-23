@@ -10,10 +10,10 @@ import (
 func TestUnicodeSequencesArePreservedThroughLookup(t *testing.T) {
 	const composed = "\u304c"
 	const decomposed = "\u304b\u3099"
-	entries, err := Parse(strings.NewReader(
+	entries, err := Parse(strings.NewReader(parserDocument(
 		composed + ": " + decomposed + "\n" +
 			decomposed + ": " + composed + "\n",
-	))
+	)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func TestDecodedUnicodeKeysAndValuesReachProfileWithoutNormalization(t *testing.
 		"\"A\\u002eB\": dot in one element\n" +
 		"\"line\\nkey\": \"\\b\\f\\r\\t\\/\\u{0}\"\n" +
 		"\"\\u{1F600}\": \\uD83D\\uDE00\n"
-	entries, err := Parse(strings.NewReader(source))
+	entries, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,7 +89,7 @@ func TestMultilineFormsReachProfileWithTheirOwnDecodingRules(t *testing.T) {
 		"EmptyTriple: \"\"\"\n\"\"\"\n" +
 		"EmptyPipe:\n |\n" +
 		"Unset:\n"
-	entries, err := Parse(strings.NewReader(source))
+	entries, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestMultilineDecodingPrecedesDeclaredTypeConversion(t *testing.T) {
 		"A(int): \"\"\"\n00\\u0031\n\"\"\"",
 		"A(int):\n |001",
 	} {
-		entries, err := Parse(strings.NewReader(source))
+		entries, err := Parse(strings.NewReader(parserDocument(source)))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -137,7 +137,7 @@ func TestMultilineDecodingPrecedesDeclaredTypeConversion(t *testing.T) {
 			t.Errorf("multiline declared int = %#v, %v", value, err)
 		}
 	}
-	entries, err := Parse(strings.NewReader("Good: first\nA(int):\n |00\\u0031"))
+	entries, err := Parse(strings.NewReader(parserDocument("Good: first\nA(int):\n |00\\u0031")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,11 +150,11 @@ func TestMultilineDecodingPrecedesDeclaredTypeConversion(t *testing.T) {
 
 func TestEscapedTripleClosingMarkerIsLiteralThroughLookup(t *testing.T) {
 	const source = "A.\n .B: \"\"\"\n  \\\"\"\"\n  \"\"\"\n .C: next"
-	entries, err := Parse(strings.NewReader(source))
+	entries, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) != 3 || entries[1].Form != TripleQuoted || entries[1].Raw != "\\\"\"\"" || entries[1].Line != 2 || entries[2].Line != 5 {
+	if len(entries) != 3 || entries[1].Form != TripleQuoted || entries[1].Raw != "\\\"\"\"" || entries[1].Line != 4 || entries[2].Line != 7 {
 		t.Fatalf("escaped closing marker was treated as structure: %#v", entries)
 	}
 	cfg, err := Build(entries, DemoProfile())
@@ -177,9 +177,9 @@ func TestEscapedTripleClosingMarkerIsLiteralThroughLookup(t *testing.T) {
 
 func TestParsedOpaqueTypeIsInterpretedOnlyByProfile(t *testing.T) {
 	const typeName = "map(string,list(int))"
-	entries, err := Parse(strings.NewReader(
+	entries, err := Parse(strings.NewReader(parserDocument(
 		"\"A:B (C)#\t\"(" + typeName + "):\" 001 \"\n",
-	))
+	)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,9 +210,9 @@ func TestParsedOpaqueTypeIsInterpretedOnlyByProfile(t *testing.T) {
 }
 
 func TestQuotedControlCharactersRetainKeyBoundariesThroughLookup(t *testing.T) {
-	entries, err := Parse(strings.NewReader(
+	entries, err := Parse(strings.NewReader(parserDocument(
 		"\"A\x00B\": one\n\"A\".\"B\": two\n\"A\x00\".B: three\n",
-	))
+	)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -454,9 +454,9 @@ func TestRepeatedSettingsPreserveOrderEqualValuesAndUnsetStates(t *testing.T) {
 }
 
 func TestRepeatedParsedAliasesRetainEachOccurrenceAndKeyBoundary(t *testing.T) {
-	entries, err := Parse(strings.NewReader(
+	entries, err := Parse(strings.NewReader(parserDocument(
 		"\"A.B\": first\n\"\\u0041.B\": second\nA.B: separate\nA.\n .B: relative",
-	))
+	)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -494,7 +494,7 @@ func TestBareInternalQuotesRemainLiteralThroughTypedRepeatedRetrieval(t *testing
 		source.WriteString(value.(string))
 		source.WriteByte('\n')
 	}
-	entries, err := Parse(strings.NewReader(source.String()))
+	entries, err := Parse(strings.NewReader(parserDocument(source.String())))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -524,7 +524,7 @@ func TestBareInternalQuotesRemainLiteralThroughTypedRepeatedRetrieval(t *testing
 }
 
 func TestBareInternalQuoteFailsOnlyWhenRequestedConversionCannotInterpretIt(t *testing.T) {
-	entries, err := Parse(strings.NewReader("A:001\nA: raw\"001"))
+	entries, err := Parse(strings.NewReader(parserDocument("A:001\nA: raw\"001")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -533,7 +533,7 @@ func TestBareInternalQuoteFailsOnlyWhenRequestedConversionCannotInterpretIt(t *t
 		t.Fatalf("literal quote failed string decoding: %v", err)
 	}
 	values, err := cfg.GetAll([]string{"A"}, "int")
-	assertProfileErrorLine(t, err, ErrTypeMismatch, 2)
+	assertProfileErrorLine(t, err, ErrTypeMismatch, 4)
 	if values != nil {
 		t.Errorf("failed retrieval returned partial values: %#v", values)
 	}

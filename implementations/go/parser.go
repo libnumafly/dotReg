@@ -42,7 +42,8 @@ type Entry struct {
 	Form    ValueForm `json:"form,omitempty"`
 }
 
-// Parse collects syntax results. It returns no partial result on failure.
+// Parse validates file properties and collects body entries without partial
+// results on failure.
 // Call DecodeString or Build before delivering settings to an application.
 func Parse(r io.Reader) ([]Entry, error) {
 	entries := make([]Entry, 0)
@@ -57,6 +58,7 @@ func Parse(r io.Reader) ([]Entry, error) {
 }
 
 // ParseEach visits headings and every value occurrence in source order.
+// Required file properties and their blank separator are checked first.
 // Multiline bodies are consumed before their value is visited. A visitor error
 // is returned unchanged, before validating or parsing the next logical entry.
 // The reader may buffer bytes ahead. Each call starts with fresh scopes.
@@ -65,6 +67,11 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 		return problem(0, ErrInput)
 	}
 	lines := sourceLines{reader: bufio.NewReader(r), nextLine: 1}
+	if eof, err := lines.properties(); err != nil {
+		return err
+	} else if eof {
+		return nil
+	}
 	var scopes []*pathNode
 	for {
 		physical := lines.next()
@@ -209,6 +216,47 @@ func (line sourceLine) validate() error {
 		return problem(line.number, ErrSyntax)
 	}
 	return nil
+}
+
+// properties consumes the required declaration region and its blank separator.
+// It does not emit entries or inspect the body. Only @dotReg 1 is supported.
+func (lines *sourceLines) properties() (bool, error) {
+	declared := false
+	for {
+		line := lines.next()
+		if err := line.validate(); err != nil {
+			return false, err
+		}
+		text := strings.TrimRight(line.text, " \t")
+		if text == "" {
+			// An empty read at EOF is not a physical blank separator line.
+			if !declared || (line.text == "" && line.ending == "") {
+				return false, problem(line.number, ErrSyntax)
+			}
+			return line.eof, nil
+		}
+		separator := strings.IndexAny(text, " \t")
+		if separator <= 0 || text[0] != '@' {
+			return false, problem(line.number, ErrSyntax)
+		}
+		name, value := text[:separator], strings.TrimLeft(text[separator:], " \t")
+		if value == "" {
+			return false, problem(line.number, ErrSyntax)
+		}
+		if name != "@dotReg" {
+			return false, problem(line.number, ErrUnsupported)
+		}
+		if declared {
+			return false, problem(line.number, ErrDuplicate)
+		}
+		if value != "1" {
+			return false, problem(line.number, ErrUnsupported)
+		}
+		declared = true
+		if line.eof {
+			return false, problem(line.number+1, ErrSyntax)
+		}
+	}
 }
 
 // valueBody completes a value before notification and returns its EOF state.

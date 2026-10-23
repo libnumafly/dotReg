@@ -8,6 +8,7 @@ Resolution produces a flat space of fully qualified keys and their ordered value
 
 | Area | Status |
 |-----------------------|--------------------------------------|
+| File properties and format version | A declaration region and its terminating blank line are required. Version 1 is declared as `@dotReg 1`; section 1.1 defines the rules |
 | Value keys containing one or more elements, headings and relative notation | Defined in this document |
 | Repeated value keys | All occurrences, including identical repeated values, are retained in source order without overwriting or deduplication |
 | Prohibited characters in key elements, quoting, empty names and the unset state of an empty right-hand side | Defined in this document |
@@ -18,9 +19,31 @@ Resolution produces a flat space of fully qualified keys and their ordered value
 | Type conversion and retrieval requests | This document defines the conversion procedure with and without a declaration, and type expression mismatch errors at retrieval |
 | Whitespace within type expressions and compound type notation | Internal whitespace is prohibited. Symbols that can express compound types and nested parentheses are not prohibited outright. The type conversion layer defines their meaning |
 | Type names, remaining details of type expression grammar and individual conversion rules | Undecided. The type names and compound types in this document are illustrative examples |
-| Format-specific version and dedicated file extension | Undecided |
+| Future version policy, additional properties and dedicated file extension | Undecided; the current version declaration is defined in section 1.1 |
 
 This document is the reference specification for this project's file format. Section 12 lists the undecided matters. A sample Go implementation provides a syntax parser, common string decoding and type conversion through an illustrative profile. See [the Go sample guide](../implementations/go/README.md) for how to run it and its supported scope. The sample's provisional choices are distinct from the format rules established in this document.
+
+### 1.1 File property declarations
+
+Every file starts with a property-declaration region, ending at the first physical blank line. Both the declaration region and that separating blank line are mandatory. Currently the only supported declaration is the exact, case-sensitive property `@dotReg` with the value `1`.
+
+The following is a complete file. Its first body entry is on physical line 3.
+
+```text
+@dotReg 1
+
+A.Code:001
+```
+
+A declaration starts with `@` in column one. Separate its property name from its value with one or more ASCII spaces or horizontal tabs. Trailing ASCII spaces and tabs are allowed. There is no quoting or escape interpretation in declarations; `@dotReg` and `1` must be written literally. A blank separator contains no characters other than optional ASCII spaces or tabs. LF and CRLF follow section 10, and one initial UTF-8 BOM is allowed before the first declaration.
+
+The region accepts declarations only. Leading blank lines, comments before or within the region, indentation before `@`, missing names or values, and ordinary settings before the separator are not accepted. A property cannot be declared twice, including an identical repetition of `@dotReg 1`. Unknown properties and unsupported version values are rejected; they are not silently ignored. Future property names and version policies are not defined by this document.
+
+An empty file is invalid. In escaped notation, `@dotReg 1\n` followed by EOF lacks the required blank separator; `@dotReg 1\n\n` is a valid file with an empty body. The newline ending the declaration alone does not supply an additional blank line.
+
+After the separator, ordinary body syntax applies. For example, `@Name: value` is an ordinary key named `@Name`, and `@dotReg: 1` is also a body key rather than a declaration. A standalone `@dotReg 1` in the body is a syntax error. Declaration-looking text inside an already open multiline body is body data. Property declarations and their separating blank line do not produce entries or headings, but they count towards physical line numbers. The format version is separate from an application-defined configuration-schema version.
+
+Unless explicitly identified as complete files, the notation examples below are body fragments and omit the required declaration region and separator. Prefix a fragment with `@dotReg 1` and a blank line before submitting it to a parser.
 
 ## 2. Basic value lines
 
@@ -240,7 +263,7 @@ Accepted escape notation is limited to the basic forms and the two Unicode forms
 
 ## 4. Line classification and separators
 
-Outside multiline bodies, lines other than blank lines and comment lines are classified after processing indentation and outer trailing whitespace. A value header can switch processing to one of the multiline forms in sections 8.3 and 8.4; body lines are not classified as headings, value lines or comments.
+Within the file body after the declaration separator, lines outside multiline values other than blank lines and comment lines are classified after processing indentation and outer trailing whitespace. A value header can switch processing to one of the multiline forms in sections 8.3 and 8.4; multiline body lines are not classified as headings, value lines or comments.
 
 | Condition | Classification |
 |----------------|-----------------------|
@@ -562,7 +585,7 @@ Unicode whitespace other than ASCII spaces and tabs, such as an ideographic spac
 
 ### 7.2 Blank lines and comment lines
 
-Outside multiline bodies, after removing ASCII spaces and tabs from both ends of a line, an empty result is skipped as a blank line, and a result beginning with `#` is skipped as a comment line. Blank lines and comment lines do not change the current headings. Within a triple-quoted body, these lines are content; within a pipe block, only consecutive marked lines belong to the body. Blank lines and comments are not skipped when checking whether an empty header is immediately followed by a pipe block.
+Within the file body and outside multiline values, after removing ASCII spaces and tabs from both ends of a line, an empty result is skipped as a blank line, and a result beginning with `#` is skipped as a comment line. These body rules do not allow comments in the declaration region; its first blank line is the required separator under section 1.1. Body blank lines and comment lines do not change the current headings. Within a triple-quoted body, these lines are content; within a pipe block, only consecutive marked lines belong to the body. Blank lines and comments are not skipped when checking whether an empty header is immediately followed by a pipe block.
 
 ```text
 A.
@@ -849,7 +872,7 @@ An implementation or consuming application may impose resource constraints accor
 
 | Layer | Responsibilities |
 |-----------------|------------------------------------------------------------------------------------------------|
-| General syntax processing | Processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; preserving every value occurrence, line number and source order without overwriting or deduplication; separating keys and type expressions; recognising value forms; removing block markers and margins while retaining undecoded bodies and their internal source line endings; identifying each occurrence's unset state |
+| General syntax processing | Validating required file properties and their separator before body processing; processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; preserving every value occurrence, line number and source order without overwriting or deduplication; separating keys and type expressions; recognising value forms; removing block markers and margins while retaining undecoded bodies and their internal source line endings; identifying each occurrence's unset state |
 | Common string decoding | Removing ordinary surrounding quotes before delivering a value; decoding the basic and Unicode escapes in section 3.4 in ordinary quoted values and triple-quoted bodies; preserving unquoted single-line values and pipe bodies literally under their whitespace rules; not trimming again after decoding; distinguishing unset from an explicit empty string |
 | Type conversion and retrieval | Retaining values with strings as the basis; converting only to the declared type expression; matching the requested type expression at retrieval; converting at retrieval when there is no declaration; reporting type expression mismatch errors; interpreting unset as equivalent to an empty string when string retrieval is permitted |
 | Value decoders and profiles | Assigning meaning to type expressions and defining individual conversion rules for numbers, booleans, enums, lists and other types. Their input is the result of common string decoding |
@@ -880,7 +903,7 @@ Before configuration values are delivered, common string decoding according to t
 
 An incremental notification interface delivers headings and complete values in source order and receives the result of each recipient's processing before parsing or delivering the next entry. Multiline bodies are collected before their value is notified. Determining whether an empty header starts a pipe block, or whether that block has ended, can require inspecting one following physical line; if it is not body content, retain it for normal parsing after the current notification succeeds. If a recipient returns an error, return that error immediately and unchanged, without parsing or delivering later entries. Physical-line lookahead for block boundaries and byte-level read-ahead from the underlying input are permitted. Changes to external state already made by a recipient are not rolled back.
 
-An interface that collects and returns results returns a failure, without partial parse results, if processing fails partway through. Repeated keys are delivered and collected as separate occurrences in source order, including repeated identical values. Empty input succeeds with zero results. An error is returned if a required input source or notification recipient has not been supplied.
+An interface that collects and returns results returns a failure, without partial parse results, if processing fails partway through. Repeated keys are delivered and collected as separate occurrences in source order, including repeated identical values. A valid declaration region and separator followed by an empty body succeeds with zero results; empty input or a missing declaration/separator fails. Declarations generate no entry notifications, and entry line numbers count all source lines from the beginning of the file. An error is returned if a required input source or notification recipient has not been supplied.
 
 Syntax errors include line numbers, keys and causes as required, but do not include right-hand sides or error strings from underlying input processing. The consuming application is responsible for the safety of diagnostics independently returned by notification recipients.
 
@@ -890,7 +913,7 @@ This document does not settle the following matters.
 
 | Item | Undecided details |
 |-------------|--------------------------------------------------------------------|
-| Format version and file extension | Numbering scheme, version declaration method and dedicated file extension |
+| Future versions, properties and file extension | Future version numbering and compatibility policy, additional properties and dedicated file extension. The mandatory declaration region, blank separator and exact current declaration `@dotReg 1` are established in section 1.1 |
 | Type names | Standard permitted type names, aliases and case sensitivity |
 | Remaining details of type expression grammar | Empty type expressions and the concrete grammar for quotes and escapes within type expressions. The prohibition on internal whitespace, and the decision not to prohibit symbols and nested parentheses for compound types outright, are established. The type conversion layer defines the meaning and validity of each type expression |
 | Remaining whitespace rules for type annotations | Alignment tabs between the key and the type expression, or between the closing parenthesis and the colon |
@@ -911,6 +934,7 @@ Implementation conformance is checked against the rules defined in this document
 
 | Aspect | Checks |
 |-----------|-----------------------------------------------------------------------------------------------------------------|
+| File declarations | Required leading declaration region and blank separator; exact `@dotReg 1`, ASCII SP/HT separation and trailing whitespace, initial BOM, rejection of missing/malformed/duplicate/unknown declarations and unsupported versions, no comments in the region, valid empty body, no declaration entries, physical line numbers including the region, ordinary `@Name` body keys and declaration-looking block data |
 | Key paths | Prohibited characters, including backslashes, and the non-empty requirement for unquoted elements; Japanese, underscores, hyphens, keys and headings beginning with digits or consisting only of digits; rejection of consecutive unquoted dots, empty left-hand sides and omitted final elements; case sensitivity; preservation of elements with leading zeroes |
 | Quoted key elements | Allowing any valid UTF-8 string in principle, without a blanket rejection of whitespace, tabs, syntax symbols or control characters; empty names written as `""`; the requirement for at least one element; quotes in first, intermediate and last positions; application to fully qualified keys, relative keys and headings; distinction between the parent itself and a child with an empty name; preservation of element boundaries; rejection of quoted text spanning physical line breaks |
 | Escapes in key elements | Acceptance of the basic and Unicode escapes in section 3.4 within quotes; identity of `"A\.B"` and `"A.B"`; rejection of `A\.B` with a backslash outside quotes; recognition of separators, heading terminators, leading relative dots and assignments to headings themselves outside quotes; no reinterpretation of decoded characters as syntax symbols |

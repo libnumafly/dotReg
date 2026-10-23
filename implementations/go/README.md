@@ -6,6 +6,24 @@ This is a sample Go implementation of [config-format.md](../../docs/config-forma
 
 Standard type names and the public API remain undecided. The Go package is `dotreg`; the module path is `github.com/libnumafly/dotReg/implementations/go`. The implementation makes the provisional choices described below for parts of the syntax that remain undecided.
 
+## File properties
+
+Every parsed file or standard-input stream must start with a declaration region and its terminating blank line. Currently the only supported declaration is `@dotReg 1`:
+
+```text
+@dotReg 1
+
+A.Code:001
+```
+
+Declarations begin in column one. Separate the exact property name `@dotReg` and the exact version value `1` with one or more ASCII spaces or horizontal tabs; trailing ASCII spaces or tabs are allowed. No quotes or escapes are interpreted. The first blank line, containing at most ASCII spaces and tabs, ends the region. Comments, settings and indentation are not accepted before it. One initial UTF-8 BOM is allowed.
+
+The declaration and blank separator are mandatory, and a property cannot repeat. Missing or malformed declarations and a missing separator produce `ErrSyntax`; a repeated property produces `ErrDuplicate`; unknown properties or unsupported versions produce `ErrUnsupported`. `@dotReg 1\n` alone is incomplete, while `@dotReg 1\n\n` is a valid empty-body file. A genuinely empty file is invalid.
+
+Declarations produce no `Entry` or callback. They count towards physical line numbers, so the first setting in the complete example is line 3. After the separator, `@Name: value` is an ordinary key, a standalone `@dotReg 1` is invalid body syntax, and declaration-looking text in a multiline body remains data. This format version is separate from an application schema version.
+
+Unless labelled as complete files, the short notation examples later in this guide are body fragments; prepend the declaration and blank separator when parsing them. See [file property declarations](../../docs/config-format.md#11-file-property-declarations).
+
 ## Running the sample
 
 Use Go 1.22 or later. From `implementations/go`, run:
@@ -35,7 +53,7 @@ Omit the filename or pass `-` to read standard input. File input reads UTF-8 byt
 For example, in PowerShell:
 
 ```powershell
-'A.Count(int):42' | go run ./cmd/configsample -mode demo -
+"@dotReg 1`n`nA.Count(int):42" | go run ./cmd/configsample -mode demo -
 ```
 
 For input containing non-ASCII characters, passing a UTF-8 file avoids dependence on the shell's pipe encoding.
@@ -64,13 +82,13 @@ The `raw` mode can retain an unterminated ordinary quote in a single-line value 
 | `Config.IsUnset([]string) (bool, error)` | Query the unset state of exactly one occurrence; report `ErrMultipleValues` if there is more than one |
 | `Config.IsUnsetAll([]string) ([]bool, error)` | Query every occurrence's unset state in source order without retrieving or converting values |
 
-`Entry` has `Line`, `Kind`, `Path`, `Raw`, `Unset`, `Type`, `HasType` and `Form` fields. `Line` identifies the heading or value header, including for a multiline body. `Kind` is either `Heading` or `Value`. A heading alone does not create a value. `Form` is a `ValueForm`: its zero value denotes ordinary single-line handling, `TripleQuoted` is `"triple_quoted"` and `PipeBlock` is `"pipe"`. Preserve `Form` along with `Raw` when retaining or constructing entries; block contents alone must not be inspected to guess the value syntax. For blocks, `Raw` is already stripped of structural markers and margin, and `Unset` is always false, even for an empty body. `Text` holds the decoded `Value string` and `Unset bool`.
+`Entry` has `Line`, `Kind`, `Path`, `Raw`, `Unset`, `Type`, `HasType` and `Form` fields. `Line` identifies the heading or value header, including for a multiline body, counted from the beginning of the file including declarations and the separator. Those declarations do not create entries. `Kind` is either `Heading` or `Value`. A heading alone does not create a value. `Form` is a `ValueForm`: its zero value denotes ordinary single-line handling, `TripleQuoted` is `"triple_quoted"` and `PipeBlock` is `"pipe"`. Preserve `Form` along with `Raw` when retaining or constructing entries; block contents alone must not be inspected to guess the value syntax. For blocks, `Raw` is already stripped of structural markers and margin, and `Unset` is always false, even for an empty body. `Text` holds the decoded `Value string` and `Unset bool`.
 
 The following fragment demonstrates retrieval. See [example_test.go](example_test.go) for executable examples that include error handling.
 
 ```go
 entries, err := dotreg.Parse(strings.NewReader(
-    "A.Code(string):001\nA.Count:42\nA.Missing:\nA.Empty:\"\"\n",
+    "@dotReg 1\n\nA.Code(string):001\nA.Count:42\nA.Missing:\nA.Empty:\"\"\n",
 ))
 if err != nil {
     return err
@@ -190,7 +208,7 @@ Custom types can be added through a `Profile`. Known keys, required settings, de
 
 ## Supported rules and provisional choices
 
-The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, single-line values selected as quoted by their first trimmed character, and triple-quoted bodies. Later quotes and backslashes in literal single-line values, and all pipe-body text, are retained; backslashes in unquoted key elements are rejected.
+The implementation covers the required declaration region and blank separator, fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, single-line values selected as quoted by their first trimmed character, and triple-quoted bodies. Later quotes and backslashes in literal single-line values, and all pipe-body text, are retained; backslashes in unquoted key elements are rejected.
 
 Quoted key elements generally allow spaces, tabs, syntax characters such as `: ( ) #`, and control characters. Key elements and ordinary quoted values cannot span physical lines; triple-quoted and pipe bodies use the explicit multiline rules above. Represent a quote or a backslash in an ordinary quoted string with `\"` or `\\`; decoded characters are not reinterpreted as syntax. A newline can also be represented as character data with `\n` or a Unicode escape in quoted text. The range of characters representable by escapes is generally unrestricted, but undefined escape forms remain errors.
 
@@ -243,7 +261,7 @@ go vet ./...
 go build ./...
 ```
 
-The tests cover accepted and rejected input, heading state, key-element boundaries, first-character selection of literal or quoted single-line values, literal later quotes and backslashes, basic and Unicode escapes, rejection of unknown quoted escapes and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
+The tests cover required declarations and their blank separator, malformed, repeated and unsupported declarations, physical line numbers, accepted and rejected body input, heading state, key-element boundaries, first-character selection of literal or quoted single-line values, literal later quotes and backslashes, basic and Unicode escapes, rejection of unknown quoted escapes and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
 
 Reproducible benchmarks and the local refactor measurements are described in
 [PERFORMANCE.md](PERFORMANCE.md), including allocation counts and trade-offs.

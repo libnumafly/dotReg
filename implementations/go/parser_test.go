@@ -8,12 +8,21 @@ import (
 	"testing"
 )
 
+const parserPreamble = "@dotReg 1\n\n"
+
+func parserDocument(source string) string {
+	if strings.HasPrefix(source, "\ufeff") {
+		return "\ufeff" + parserPreamble + strings.TrimPrefix(source, "\ufeff")
+	}
+	return parserPreamble + source
+}
+
 func parserValue(line int, path []string, raw string) Entry {
-	return Entry{Line: line, Kind: Value, Path: path, Raw: raw, Unset: raw == ""}
+	return Entry{Line: line + 2, Kind: Value, Path: path, Raw: raw, Unset: raw == ""}
 }
 
 func parserHeading(line int, path ...string) Entry {
-	return Entry{Line: line, Kind: Heading, Path: path}
+	return Entry{Line: line + 2, Kind: Heading, Path: path}
 }
 
 func parserRequireCode(t *testing.T, err error, code Code, line int) {
@@ -194,7 +203,7 @@ func TestParseAccepted(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(test.source))
+			got, err := Parse(strings.NewReader(parserDocument(test.source)))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -207,7 +216,7 @@ func TestParseAccepted(t *testing.T) {
 
 func TestParseEmpty(t *testing.T) {
 	for _, source := range []string{"", "\ufeff", "\n\r\n", " \t\n\t# comment\n"} {
-		got, err := Parse(strings.NewReader(source))
+		got, err := Parse(strings.NewReader(parserDocument(source)))
 		if err != nil || len(got) != 0 {
 			t.Errorf("Parse(%q) = %#v, %v; want zero entries and success", source, got, err)
 		}
@@ -221,7 +230,7 @@ func TestParseTypeAnnotationPlacement(t *testing.T) {
 		"A.Code     (string):     001",
 		"A.Code     (string)     :     001",
 	} {
-		got, err := Parse(strings.NewReader(source))
+		got, err := Parse(strings.NewReader(parserDocument(source)))
 		if err != nil {
 			t.Fatalf("Parse(%q): %v", source, err)
 		}
@@ -231,7 +240,7 @@ func TestParseTypeAnnotationPlacement(t *testing.T) {
 			t.Errorf("Parse(%q) = %#v, want %#v", source, got, want)
 		}
 	}
-	got, err := Parse(strings.NewReader("A.B.\n .(Custom_1):\n .\"C.D\"(Other): value\nX: (string) 001\n"))
+	got, err := Parse(strings.NewReader(parserDocument("A.B.\n .(Custom_1):\n .\"C.D\"(Other): value\nX: (string) 001\n")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -248,7 +257,7 @@ func TestParseTypeAnnotationPlacement(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("entries = %#v, want %#v", got, want)
 	}
-	got, err = Parse(strings.NewReader("A.\n .(int):"))
+	got, err = Parse(strings.NewReader(parserDocument("A.\n .(int):")))
 	if err != nil {
 		t.Fatalf("typed self assignment: %v", err)
 	}
@@ -265,7 +274,7 @@ func TestParseOpaqueTypeExpressions(t *testing.T) {
 		"T:U", "map(T:U,list(V))", "List[string]", "1", "_",
 	} {
 		t.Run(expression, func(t *testing.T) {
-			got, err := Parse(strings.NewReader("A(" + expression + "): first:second # literal"))
+			got, err := Parse(strings.NewReader(parserDocument("A(" + expression + "): first:second # literal")))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -284,7 +293,7 @@ func TestParseQuotedKeyAllowsWhitespaceSyntaxAndControls(t *testing.T) {
 		"\u00a0A\u3000", "\u0085", "#", "()", ":",
 	} {
 		t.Run(name, func(t *testing.T) {
-			got, err := Parse(strings.NewReader("\"" + name + "\": value"))
+			got, err := Parse(strings.NewReader(parserDocument("\"" + name + "\": value")))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -299,7 +308,7 @@ func TestParseQuotedKeyAllowsWhitespaceSyntaxAndControls(t *testing.T) {
 func TestParseControlCharactersDoNotCollapseKeyBoundaries(t *testing.T) {
 	// A NUL-delimited key representation would incorrectly merge these paths.
 	source := "\"A\x00\".B: first\nA.\"\x00B\": second\n"
-	got, err := Parse(strings.NewReader(source))
+	got, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -318,7 +327,7 @@ func TestParseEscapedKeyCharactersAreNotReinterpretedAsSyntax(t *testing.T) {
 		"\"line\\n\\r\\t\\b\\f\\/\": third\n" +
 		"\"\\u{1F600}.A\": fourth\n" +
 		"\"\\uD83D\\uDE00\".A: fifth\n"
-	got, err := Parse(strings.NewReader(source))
+	got, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -343,12 +352,12 @@ func TestParseUnicodeEscapeAliasesPreserveRepeatedKeys(t *testing.T) {
 		"\"line\\nkey\": first\n\"line\\u000akey\": second",
 	} {
 		t.Run(source, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(source))
+			got, err := Parse(strings.NewReader(parserDocument(source)))
 			if err != nil || len(got) != 2 {
 				t.Fatalf("repeated escaped key: entries=%#v, error=%v", got, err)
 			}
 			if !reflect.DeepEqual(got[0].Path, got[1].Path) ||
-				got[0].Line != 1 || got[1].Line != 2 ||
+				got[0].Line != 3 || got[1].Line != 4 ||
 				got[0].Raw != "first" || got[1].Raw != "second" {
 				t.Errorf("escaped aliases lost identity or order: %#v", got)
 			}
@@ -357,22 +366,22 @@ func TestParseUnicodeEscapeAliasesPreserveRepeatedKeys(t *testing.T) {
 }
 
 func TestParseEscapedNewlineDoesNotCreatePhysicalLines(t *testing.T) {
-	got, err := Parse(strings.NewReader("\"line\\nkey\": value\nB: second"))
+	got, err := Parse(strings.NewReader(parserDocument("\"line\\nkey\": value\nB: second")))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(got) != 2 || got[0].Line != 1 || got[0].Path[0] != "line\nkey" || got[1].Line != 2 {
+	if len(got) != 2 || got[0].Line != 3 || got[0].Path[0] != "line\nkey" || got[1].Line != 4 {
 		t.Errorf("escaped newline changed physical line counting: %#v", got)
 	}
-	got, err = Parse(strings.NewReader("\"line\nkey\": value"))
-	parserRequireCode(t, err, ErrSyntax, 1)
+	got, err = Parse(strings.NewReader(parserDocument("\"line\nkey\": value")))
+	parserRequireCode(t, err, ErrSyntax, 3)
 	if got != nil {
 		t.Error("physical newline inside key returned partial results")
 	}
 }
 
 func parserBlockValue(line int, path []string, raw string, form ValueForm) Entry {
-	return Entry{Line: line, Kind: Value, Path: path, Raw: raw, Form: form}
+	return Entry{Line: line + 2, Kind: Value, Path: path, Raw: raw, Form: form}
 }
 
 func TestParseMultilineValues(t *testing.T) {
@@ -511,7 +520,7 @@ func TestParseMultilineValues(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(test.source))
+			got, err := Parse(strings.NewReader(parserDocument(test.source)))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -523,7 +532,7 @@ func TestParseMultilineValues(t *testing.T) {
 }
 
 func TestParseTypedMultilineSelfAndChild(t *testing.T) {
-	got, err := Parse(strings.NewReader("A.\n .(string): \"\"\"\n   first\n   \"\"\"\n .B(string):\n  |second"))
+	got, err := Parse(strings.NewReader(parserDocument("A.\n .(string): \"\"\"\n   first\n   \"\"\"\n .B(string):\n  |second")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -551,7 +560,7 @@ func TestParseRejectsInvalidMultilineStructure(t *testing.T) {
 		"A.\n .B:\n  |value\n  .C: values do not create scope",
 	} {
 		t.Run(source, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(source))
+			got, err := Parse(strings.NewReader(parserDocument(source)))
 			parserRequireCode(t, err, ErrSyntax, 0)
 			if got != nil {
 				t.Error("invalid multiline structure returned partial results")
@@ -566,7 +575,7 @@ func TestParseMultilineRepeatedValuesAreNotifiedInOrder(t *testing.T) {
 		"A:\n |first\nA: second",
 	} {
 		var got []Entry
-		err := ParseEach(strings.NewReader(source), func(entry Entry) error {
+		err := ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {
 			got = append(got, entry)
 			return nil
 		})
@@ -592,12 +601,12 @@ func TestParseRepeatedValuesPreserveAllOccurrences(t *testing.T) {
 		parserValue(6, []string{"A"}, `""`),
 		parserValue(7, []string{"A"}, ""),
 	}
-	got, err := Parse(strings.NewReader(source))
+	got, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil || !reflect.DeepEqual(got, want) {
 		t.Fatalf("collected occurrences=%#v, error=%v; want %#v", got, err, want)
 	}
 	var visited []Entry
-	err = ParseEach(strings.NewReader(source), func(entry Entry) error {
+	err = ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {
 		visited = append(visited, entry)
 		return nil
 	})
@@ -620,7 +629,7 @@ func TestParseRepeatedValuesRetainTheirFormsAndTypes(t *testing.T) {
 		parserBlockValue(8, []string{"A"}, "", TripleQuoted),
 		parserBlockValue(10, []string{"A"}, "", PipeBlock),
 	}
-	got, err := Parse(strings.NewReader(source))
+	got, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil || !reflect.DeepEqual(got, want) {
 		t.Errorf("repeated forms/types=%#v, error=%v; want %#v", got, err, want)
 	}
@@ -634,7 +643,7 @@ func TestParseRepeatedValueCallbackCanStopBeforeLaterErrors(t *testing.T) {
 		t.Run(source, func(t *testing.T) {
 			stop := errors.New("stop after the second occurrence")
 			var got []Entry
-			err := ParseEach(strings.NewReader(source), func(entry Entry) error {
+			err := ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {
 				got = append(got, entry)
 				if len(got) == 2 {
 					return stop
@@ -653,7 +662,7 @@ func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
 		t.Run(source, func(t *testing.T) {
 			sentinel := errors.New("callback wins over peeked invalid UTF-8")
 			count := 0
-			err := ParseEach(strings.NewReader(source), func(Entry) error {
+			err := ParseEach(strings.NewReader(parserDocument(source)), func(Entry) error {
 				count++
 				return sentinel
 			})
@@ -661,7 +670,7 @@ func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
 				t.Errorf("peek preempted callback: error=%v count=%d", err, count)
 			}
 			count = 0
-			err = ParseEach(strings.NewReader(source), func(Entry) error {
+			err = ParseEach(strings.NewReader(parserDocument(source)), func(Entry) error {
 				count++
 				return nil
 			})
@@ -675,7 +684,7 @@ func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
 		sentinel := errors.New("callback wins over peeked input error")
 		reader := &parserFailReader{data: []byte("A:\n"), err: errors.New("private read failure")}
 		count := 0
-		err := ParseEach(reader, func(entry Entry) error {
+		err := ParseEach(io.MultiReader(strings.NewReader(parserPreamble), reader), func(entry Entry) error {
 			count++
 			if !entry.Unset {
 				t.Errorf("expected current entry to remain unset: %#v", entry)
@@ -687,7 +696,7 @@ func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
 		}
 		reader = &parserFailReader{data: []byte("A:\n"), err: errors.New("private read failure")}
 		count = 0
-		err = ParseEach(reader, func(Entry) error { count++; return nil })
+		err = ParseEach(io.MultiReader(strings.NewReader(parserPreamble), reader), func(Entry) error { count++; return nil })
 		parserRequireCode(t, err, ErrInput, 0)
 		if count != 1 {
 			t.Errorf("input error discarded current unset callback: %d", count)
@@ -697,11 +706,11 @@ func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
 
 func TestParsePipeLookaheadReplaysSameIndentLine(t *testing.T) {
 	var got []Entry
-	err := ParseEach(strings.NewReader("A.\n .B:\n |:x"), func(entry Entry) error {
+	err := ParseEach(strings.NewReader(parserDocument("A.\n .B:\n |:x")), func(entry Entry) error {
 		got = append(got, entry)
 		return nil
 	})
-	parserRequireCode(t, err, ErrSyntax, 3)
+	parserRequireCode(t, err, ErrSyntax, 5)
 	// The pipe is not deeper than the header. It must be replayed as an ordinary
 	// line, whose indentation is invalid without the relative leading dot.
 	want := []Entry{
@@ -723,7 +732,7 @@ func TestParsePreservesRawBeforeStringDecoding(t *testing.T) {
 		"internal\tspace", "\x00value\x7f",
 		"\"\\uD800\"", "\"\\u{110000}\"", "\\u{1F600}", "\\n",
 	} {
-		got, err := Parse(strings.NewReader("A: \t" + raw + " \t"))
+		got, err := Parse(strings.NewReader(parserDocument("A: \t" + raw + " \t")))
 		if err != nil {
 			t.Fatalf("raw %q: %v", raw, err)
 		}
@@ -743,7 +752,7 @@ func TestParseRightHandQuotesDoNotAffectQuotedKeyOrType(t *testing.T) {
 			header += "(" + expression + ")"
 			want.Type, want.HasType = expression, true
 		}
-		got, err := Parse(strings.NewReader(header + ": \t" + raw + " \t"))
+		got, err := Parse(strings.NewReader(parserDocument(header + ": \t" + raw + " \t")))
 		if err != nil || !reflect.DeepEqual(got, []Entry{want}) {
 			t.Errorf("RHS quote leaked into header parsing: entries=%#v, error=%v; want %#v", got, err, want)
 		}
@@ -811,8 +820,8 @@ func TestParseRejectsMalformedSyntax(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(test.source))
-			parserRequireCode(t, err, ErrSyntax, test.line)
+			got, err := Parse(strings.NewReader(parserDocument(test.source)))
+			parserRequireCode(t, err, ErrSyntax, test.line+2)
 			if got != nil {
 				t.Errorf("failure returned partial entries: %#v", got)
 			}
@@ -828,8 +837,8 @@ func TestParseReportsUndecidedGrammarAsUnsupported(t *testing.T) {
 		"A\t(T): x", "A(T)\t: x",
 	} {
 		t.Run(source, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(source))
-			parserRequireCode(t, err, ErrUnsupported, 1)
+			got, err := Parse(strings.NewReader(parserDocument(source)))
+			parserRequireCode(t, err, ErrUnsupported, 3)
 			if got != nil {
 				t.Errorf("failure returned entries: %#v", got)
 			}
@@ -850,7 +859,7 @@ func TestParseRepeatedKeyIdentity(t *testing.T) {
 		"\"A\x00B\": first\n\"A\x00B\": second",
 	} {
 		t.Run(source, func(t *testing.T) {
-			got, err := Parse(strings.NewReader(source))
+			got, err := Parse(strings.NewReader(parserDocument(source)))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -865,7 +874,7 @@ func TestParseRepeatedKeyIdentity(t *testing.T) {
 			}
 			if !reflect.DeepEqual(values[0].Path, values[1].Path) ||
 				values[0].Raw != "first" || values[1].Raw != "second" ||
-				values[0].Line != 1 || values[1].Line != strings.Count(source, "\n")+1 {
+				values[0].Line != 3 || values[1].Line != strings.Count(source, "\n")+3 {
 				t.Errorf("repeated key lost identity or source order: %#v", got)
 			}
 		})
@@ -876,7 +885,7 @@ func TestParseEachCallbackContracts(t *testing.T) {
 	t.Run("source order includes headings", func(t *testing.T) {
 		source := "\n# comment\nA.\n .B: first\n .C.\n  .: second\n"
 		var got []Entry
-		err := ParseEach(strings.NewReader(source), func(entry Entry) error {
+		err := ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {
 			got = append(got, entry)
 			return nil
 		})
@@ -893,7 +902,7 @@ func TestParseEachCallbackContracts(t *testing.T) {
 	t.Run("callback error identity and immediate stop", func(t *testing.T) {
 		sentinel := errors.New("callback sentinel")
 		count := 0
-		err := ParseEach(strings.NewReader("A: first\nthis is invalid\n"), func(Entry) error {
+		err := ParseEach(strings.NewReader(parserDocument("A: first\nthis is invalid\n")), func(Entry) error {
 			count++
 			return sentinel
 		})
@@ -903,7 +912,7 @@ func TestParseEachCallbackContracts(t *testing.T) {
 	})
 	t.Run("repeated values are delivered in source order", func(t *testing.T) {
 		var got []Entry
-		err := ParseEach(strings.NewReader("A: first\nA: second\nB: third\n"), func(entry Entry) error {
+		err := ParseEach(strings.NewReader(parserDocument("A: first\nA: second\nB: third\n")), func(entry Entry) error {
 			got = append(got, entry)
 			return nil
 		})
@@ -918,7 +927,7 @@ func TestParseEachCallbackContracts(t *testing.T) {
 	})
 	t.Run("callback cannot mutate scope or later repeated paths", func(t *testing.T) {
 		var paths [][]string
-		err := ParseEach(strings.NewReader("A.\n .B: first\nA.B: second\n"), func(entry Entry) error {
+		err := ParseEach(strings.NewReader(parserDocument("A.\n .B: first\nA.B: second\n")), func(entry Entry) error {
 			paths = append(paths, append([]string(nil), entry.Path...))
 			entry.Path[0] = "changed"
 			return nil
@@ -953,13 +962,13 @@ func TestParseInputFailureAndDiagnosticPrivacy(t *testing.T) {
 		}
 	})
 	t.Run("missing callback", func(t *testing.T) {
-		err := ParseEach(strings.NewReader("A: x"), nil)
+		err := ParseEach(strings.NewReader(parserDocument("A: x")), nil)
 		parserRequireCode(t, err, ErrInput, 0)
 	})
 	t.Run("reader error is sanitized and results discarded", func(t *testing.T) {
 		secret := "private input error containing token"
 		reader := &parserFailReader{data: []byte("A: value\n"), err: errors.New(secret)}
-		got, err := Parse(reader)
+		got, err := Parse(io.MultiReader(strings.NewReader(parserPreamble), reader))
 		parserRequireCode(t, err, ErrInput, 0)
 		if got != nil {
 			t.Errorf("read failure returned partial entries: %#v", got)
@@ -970,14 +979,14 @@ func TestParseInputFailureAndDiagnosticPrivacy(t *testing.T) {
 	})
 	t.Run("syntax error does not contain rhs", func(t *testing.T) {
 		secret := "private RHS token"
-		_, err := Parse(strings.NewReader("A..B: " + secret))
-		parserRequireCode(t, err, ErrSyntax, 1)
+		_, err := Parse(strings.NewReader(parserDocument("A..B: " + secret)))
+		parserRequireCode(t, err, ErrSyntax, 3)
 		if strings.Contains(err.Error(), secret) {
 			t.Errorf("diagnostic leaked rhs: %v", err)
 		}
 	})
 	t.Run("reader data with EOF is consumed", func(t *testing.T) {
-		got, err := Parse(&parserDataEOFReader{})
+		got, err := Parse(io.MultiReader(strings.NewReader(parserPreamble), &parserDataEOFReader{}))
 		if err != nil || len(got) != 1 || got[0].Raw != "value" {
 			t.Errorf("data+EOF parse = %#v, %v", got, err)
 		}
@@ -1014,7 +1023,7 @@ func TestParseLongPhysicalLines(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			for _, ending := range []string{"", "\n", "\r\n"} {
 				for _, prefix := range []string{"", "\ufeff"} {
-					got, err := Parse(strings.NewReader(prefix + test.source + ending))
+					got, err := Parse(strings.NewReader(parserDocument(prefix + test.source + ending)))
 					if err != nil {
 						t.Fatalf("long line, prefix=%q ending=%q: %v", prefix, ending, err)
 					}
@@ -1029,7 +1038,7 @@ func TestParseLongPhysicalLines(t *testing.T) {
 		})
 	}
 	source := "\ufeffA.\r\n .B:" + strings.Repeat("x", sampleBytes) + "\r\n"
-	if _, err := Parse(strings.NewReader(source)); err != nil {
+	if _, err := Parse(strings.NewReader(parserDocument(source))); err != nil {
 		t.Fatalf("long relative value line: %v", err)
 	}
 }
@@ -1043,7 +1052,7 @@ func TestParseLongExpandedPaths(t *testing.T) {
 			suffix = "."
 		}
 		source := "\ufeff" + parent + ".\r\n .\"" + child + "\"" + suffix + "\r\n"
-		got, err := Parse(strings.NewReader(source))
+		got, err := Parse(strings.NewReader(parserDocument(source)))
 		if err != nil {
 			t.Fatalf("long expanded path, heading=%v: %v", heading, err)
 		}
@@ -1057,7 +1066,7 @@ func TestParseLongExpandedPaths(t *testing.T) {
 func TestParseHasNoIndependentDepthLimit(t *testing.T) {
 	// Deep compound paths are parsed without a format-defined depth cap.
 	source := strings.Repeat("A.", 4095) + "A: value"
-	got, err := Parse(strings.NewReader(source))
+	got, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1069,7 +1078,7 @@ func TestParseHasNoIndependentDepthLimit(t *testing.T) {
 func TestParseHasNoWholeFileByteLimit(t *testing.T) {
 	// File size is independent of the sizes of its individual physical lines.
 	source := "A:" + strings.Repeat("x", 40000) + "\nB:" + strings.Repeat("y", 40000)
-	got, err := Parse(strings.NewReader(source))
+	got, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil || len(got) != 2 {
 		t.Errorf("large file returned %d entries, %v; want two entries and success", len(got), err)
 	}
@@ -1077,12 +1086,12 @@ func TestParseHasNoWholeFileByteLimit(t *testing.T) {
 
 func TestParseStateIsPerCall(t *testing.T) {
 	for range 2 {
-		if _, err := Parse(strings.NewReader("A.\n .B: value")); err != nil {
+		if _, err := Parse(strings.NewReader(parserDocument("A.\n .B: value"))); err != nil {
 			t.Fatalf("repeated parse failed: %v", err)
 		}
 	}
-	_, err := Parse(strings.NewReader(" .C: value"))
-	parserRequireCode(t, err, ErrSyntax, 1)
+	_, err := Parse(strings.NewReader(parserDocument(" .C: value")))
+	parserRequireCode(t, err, ErrSyntax, 3)
 }
 
 func FuzzSampleParserNoPanic(f *testing.F) {
@@ -1097,6 +1106,12 @@ func FuzzSampleParserNoPanic(f *testing.F) {
 		"A:\n |literal \\q\n |\nB: value",
 		"A:red\nA:green\nA:red\nA:\nA:\"\"",
 		"A: \"\"\"\n body\n  \"\"\"", "A:\n |body\nB: \xff",
+	} {
+		f.Add(parserDocument(source))
+	}
+	for _, source := range []string{
+		"", "A:001", "@dotReg", "@dotReg 1", "@dotReg 1\n",
+		"@dotReg 2\n\n", "@dotReg 1\n@dotReg 1\n\n", "@unknown value\n\n",
 	} {
 		f.Add(source)
 	}

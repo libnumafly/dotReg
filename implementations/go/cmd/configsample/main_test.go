@@ -13,6 +13,13 @@ import (
 	"github.com/libnumafly/dotReg/implementations/go"
 )
 
+func cliDocument(source string) string {
+	if strings.HasPrefix(source, "\ufeff") {
+		return "\ufeff@dotReg 1\n\n" + strings.TrimPrefix(source, "\ufeff")
+	}
+	return "@dotReg 1\n\n" + source
+}
+
 func decodeCLIOutput(t *testing.T, data []byte) []map[string]any {
 	t.Helper()
 	var entries []map[string]any
@@ -36,12 +43,118 @@ func requireCLIErrorCode(t *testing.T, err error, code dotreg.Code) {
 	}
 }
 
+func TestRunRequiredPropertiesHeaderIsCheckedInEveryMode(t *testing.T) {
+	tests := []struct {
+		name   string
+		source string
+		empty  bool
+	}{
+		{"LF", "@dotReg 1\n\nA: value", false},
+		{"CRLF with BOM", "\ufeff@dotReg 1\r\n\r\nA: value", false},
+		{"properties only", "@dotReg 1\n\n", true},
+	}
+	for _, test := range tests {
+		for _, mode := range []string{"raw", "strings", "demo"} {
+			t.Run(test.name+"/"+mode, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				// Pass the complete document through the production run path.
+				err := run([]string{"-mode", mode}, strings.NewReader(test.source), &stdout, &stderr)
+				if err != nil || stderr.Len() != 0 {
+					t.Fatalf("properties header: %v; stderr=%q", err, stderr.String())
+				}
+				got := decodeCLIOutput(t, stdout.Bytes())
+				if test.empty {
+					if len(got) != 0 {
+						t.Errorf("properties generated entries: %#v", got)
+					}
+					return
+				}
+				if len(got) != 1 || got[0]["line"] != json.Number("3") || got[0]["raw"] != "value" {
+					t.Fatalf("properties changed entries or physical lines: %#v", got)
+				}
+				path, ok := got[0]["path"].([]any)
+				if !ok || len(path) != 1 || path[0] != "A" {
+					t.Errorf("header was exposed as a key: %#v", got)
+				}
+			})
+		}
+	}
+}
+
+func TestRunRejectsInvalidPropertiesWithoutPartialJSON(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		source string
+		code   dotreg.Code
+	}{
+		{"empty input", "", dotreg.ErrSyntax},
+		{"missing declaration", "A: value", dotreg.ErrSyntax},
+		{"initial blank without declaration", "\nA: value", dotreg.ErrSyntax},
+		{"declaration without blank", "@dotReg 1", dotreg.ErrSyntax},
+		{"line ending is not separator blank", "@dotReg 1\n", dotreg.ErrSyntax},
+		{"body before separator blank", "@dotReg 1\nA: value", dotreg.ErrSyntax},
+		{"comment before separator blank", "@dotReg 1\n# private-property-value\n\nA: value", dotreg.ErrSyntax},
+		{"unknown property", "@Unknown private-property-value\n@dotReg 1\n\nA: value", dotreg.ErrUnsupported},
+		{"property names are case sensitive", "@dotreg 1\n\nA: value", dotreg.ErrUnsupported},
+		{"unsupported version", "@dotReg private-property-value\n\nA: value", dotreg.ErrUnsupported},
+		{"duplicate declaration", "@dotReg 1\n@dotReg 1\n\nA: value", dotreg.ErrDuplicate},
+		{"declaration has no value", "@dotReg\n\nA: value", dotreg.ErrSyntax},
+		{"declaration in body", "@dotReg 1\n\nA: first\n@dotReg 1", dotreg.ErrSyntax},
+	} {
+		for _, mode := range []string{"raw", "strings", "demo"} {
+			t.Run(test.name+"/"+mode, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				err := run([]string{"-mode", mode}, strings.NewReader(test.source), &stdout, &stderr)
+				requireCLIErrorCode(t, err, test.code)
+				if stdout.Len() != 0 {
+					t.Errorf("invalid properties emitted partial output: %q", stdout.String())
+				}
+				if strings.Contains(err.Error()+stderr.String(), "private-property-value") {
+					t.Errorf("property diagnostic exposed its value: %v; stderr=%q", err, stderr.String())
+				}
+			})
+		}
+	}
+}
+
+func TestRunPropertiesNotationInBodyIsOrdinaryData(t *testing.T) {
+	const source = "@dotReg 1\n\n@Name:value\nLiteral: @dotReg 1\n" +
+		"Triple: \"\"\"\n@dotReg 1\n\"\"\"\nPipe:\n |@dotReg 1"
+	wantNames := []string{"@Name", "Literal", "Triple", "Pipe"}
+	wantLines := []json.Number{"3", "4", "5", "8"}
+	wantValues := []string{"value", "@dotReg 1", "@dotReg 1", "@dotReg 1"}
+	for _, mode := range []string{"raw", "strings", "demo"} {
+		t.Run(mode, func(t *testing.T) {
+			var stdout, stderr bytes.Buffer
+			if err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr); err != nil {
+				t.Fatal(err)
+			}
+			got := decodeCLIOutput(t, stdout.Bytes())
+			if len(got) != len(wantNames) {
+				t.Fatalf("properties-like body entry count = %d, want %d", len(got), len(wantNames))
+			}
+			for i, entry := range got {
+				path, ok := entry["path"].([]any)
+				if !ok || len(path) != 1 || path[0] != wantNames[i] || entry["line"] != wantLines[i] || entry["raw"] != wantValues[i] {
+					t.Errorf("body entry %d was reinterpreted as a property: %#v", i, entry)
+				}
+				if mode == "strings" && entry["decoded"] != wantValues[i] {
+					t.Errorf("body text changed during decoding: %#v", entry)
+				}
+				if mode == "demo" && entry["value"] != wantValues[i] {
+					t.Errorf("body text changed during conversion: %#v", entry)
+				}
+			}
+		})
+	}
+}
+
 func TestRunOutputLayers(t *testing.T) {
 	const source = "A:001\nB(int):001\nC: \"  spaced  \"\n"
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+			err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(source)), &stdout, &stderr)
 			if err != nil || stderr.Len() != 0 {
 				t.Fatalf("run: %v; stderr=%q", err, stderr.String())
 			}
@@ -88,7 +201,7 @@ func TestRunOpaqueTypeAndControlKeyRemainIndependentOfProfile(t *testing.T) {
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+			err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(source)), &stdout, &stderr)
 			if mode == "demo" {
 				requireCLIErrorCode(t, err, dotreg.ErrTypeConversion)
 				if stdout.Len() != 0 {
@@ -123,7 +236,7 @@ func TestRunRawRetainsInvalidQuotedValue(t *testing.T) {
 			t.Run(mode+"/"+raw, func(t *testing.T) {
 				var stdout, stderr bytes.Buffer
 				source := "A: first\nA: \t" + raw + " \t"
-				err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+				err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(source)), &stdout, &stderr)
 				if mode == "raw" {
 					if err != nil {
 						t.Fatal(err)
@@ -136,7 +249,7 @@ func TestRunRawRetainsInvalidQuotedValue(t *testing.T) {
 				}
 				requireCLIErrorCode(t, err, dotreg.ErrString)
 				var diagnostic *dotreg.Error
-				if !errors.As(err, &diagnostic) || diagnostic.Line != 2 {
+				if !errors.As(err, &diagnostic) || diagnostic.Line != 4 {
 					t.Errorf("quoted-value failure has the wrong line: %v", err)
 				}
 				if stdout.Len() != 0 {
@@ -168,7 +281,7 @@ func TestRunNonLeadingQuotesAndBackslashesRemainLiteral(t *testing.T) {
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			if err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr); err != nil {
+			if err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(source)), &stdout, &stderr); err != nil {
 				t.Fatal(err)
 			}
 			got := decodeCLIOutput(t, stdout.Bytes())
@@ -212,7 +325,7 @@ func TestRunUnicodeAndControlEscapesPreserveRawAndDecodeForJSON(t *testing.T) {
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+			err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(source)), &stdout, &stderr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -249,7 +362,7 @@ func TestRunMultilineFormsKeepRawAndDecodeByForm(t *testing.T) {
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+			err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(source)), &stdout, &stderr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -285,7 +398,7 @@ func TestRunInvalidSurrogateDoesNotEmitPartialJSON(t *testing.T) {
 		for _, mode := range []string{"raw", "strings", "demo"} {
 			t.Run(mode+raw, func(t *testing.T) {
 				var stdout, stderr bytes.Buffer
-				err := run([]string{"-mode", mode}, strings.NewReader("A: first\nB: "+raw), &stdout, &stderr)
+				err := run([]string{"-mode", mode}, strings.NewReader(cliDocument("A: first\nB: "+raw)), &stdout, &stderr)
 				if mode == "raw" {
 					if err != nil {
 						t.Fatal(err)
@@ -309,7 +422,7 @@ func TestRunUnsetAndExplicitEmptyRemainDistinct(t *testing.T) {
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", mode}, strings.NewReader("A:\nB: \"\"\n"), &stdout, &stderr)
+			err := run([]string{"-mode", mode}, strings.NewReader(cliDocument("A:\nB: \"\"\n")), &stdout, &stderr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -371,7 +484,7 @@ func TestRunRepeatedValuesKeepEachOccurrence(t *testing.T) {
 		for _, mode := range []string{"raw", "strings", "demo"} {
 			t.Run(test.name+"/"+mode, func(t *testing.T) {
 				var stdout, stderr bytes.Buffer
-				if err := run([]string{"-mode", mode}, strings.NewReader(test.source), &stdout, &stderr); err != nil {
+				if err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(test.source)), &stdout, &stderr); err != nil {
 					t.Fatal(err)
 				}
 				got := decodeCLIOutput(t, stdout.Bytes())
@@ -402,7 +515,7 @@ func TestRunDemoCountsRepeatedDecodedPathsWithoutLosingBoundaries(t *testing.T) 
 		"\"A\\u0000B\": nul-second\nA.\"\": child-second\n"
 	want := []string{"first", "second", "third", "literal-first", "literal-second", "empty-first", "empty-second", "nul-first", "child-first", "nul-second", "child-second"}
 	var stdout, stderr bytes.Buffer
-	if err := run([]string{"-mode", "demo"}, strings.NewReader(source), &stdout, &stderr); err != nil {
+	if err := run([]string{"-mode", "demo"}, strings.NewReader(cliDocument(source)), &stdout, &stderr); err != nil {
 		t.Fatal(err)
 	}
 	got := decodeCLIOutput(t, stdout.Bytes())
@@ -441,7 +554,7 @@ func TestRunFailureProducesNoPartialJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", test.mode}, strings.NewReader(test.source), &stdout, &stderr)
+			err := run([]string{"-mode", test.mode}, strings.NewReader(cliDocument(test.source)), &stdout, &stderr)
 			requireCLIErrorCode(t, err, test.code)
 			if stdout.Len() != 0 {
 				t.Errorf("failure emitted partial output: %q", stdout.String())
@@ -468,7 +581,8 @@ func (reader *cliErrorReader) Read(buffer []byte) (int, error) {
 
 func TestRunReaderErrorIsSanitized(t *testing.T) {
 	var stdout, stderr bytes.Buffer
-	err := run(nil, &cliErrorReader{data: "A: first\n"}, &stdout, &stderr)
+	reader := io.MultiReader(strings.NewReader("@dotReg 1\n\n"), &cliErrorReader{data: "A: first\n"})
+	err := run(nil, reader, &stdout, &stderr)
 	requireCLIErrorCode(t, err, dotreg.ErrInput)
 	if stdout.Len() != 0 || strings.Contains(err.Error()+stderr.String(), "private-reader-error") {
 		t.Errorf("read failure exposed input or partial output: stdout=%q stderr=%q error=%v", stdout.String(), stderr.String(), err)
@@ -508,7 +622,7 @@ func TestRunArgumentsAndFiles(t *testing.T) {
 	}
 	t.Run("explicit stdin and default strings mode", func(t *testing.T) {
 		var stdout, stderr bytes.Buffer
-		if err := run([]string{"-"}, strings.NewReader("A:001"), &stdout, &stderr); err != nil {
+		if err := run([]string{"-"}, strings.NewReader(cliDocument("A:001")), &stdout, &stderr); err != nil {
 			t.Fatal(err)
 		}
 		got := decodeCLIOutput(t, stdout.Bytes())
@@ -518,7 +632,7 @@ func TestRunArgumentsAndFiles(t *testing.T) {
 	})
 	t.Run("file input replaces stdin", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "sample.conf")
-		if err := os.WriteFile(path, []byte("A: file-value"), 0600); err != nil {
+		if err := os.WriteFile(path, []byte(cliDocument("A: file-value")), 0600); err != nil {
 			t.Fatal(err)
 		}
 		var stdout, stderr bytes.Buffer
