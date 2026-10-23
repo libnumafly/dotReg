@@ -53,18 +53,24 @@ See [repeated values and read state](config-format.md#9-repeated-values-and-read
 
 ## Write strings naturally
 
-Unquoted values preserve backslashes. Double quotes preserve surrounding spaces and allow escapes, including Unicode escapes:
+After trimming outer ASCII spaces and tabs, a single-line value that starts with `"` uses quoted syntax for the whole value. Any other first character makes the entire value literal, including later quotes and backslashes. Quoted values preserve surrounding spaces and allow escapes, including Unicode escapes:
 
 ```text
 A.Path: C:\temp\new
 A.Message: "  hello  "
 A.Emoji: "\u{1F600}"
 A."Display.Name": "Caf\u{E9}"
+A.Saying: say "hello"
+A.Unbalanced: x"unterminated
+A.QuoteText: \"hello\"
+A.JsonText: {"x": "\u0041"}
 ```
 
-`A.Path` contains the literal Windows path `C:\temp\new`; `\t` and `\n` are not escapes outside quotes. `A.Message` retains its two spaces at each end. `A.Emoji` decodes to `😀`, and the final value decodes to `Café`.
+`A.Path` contains the literal Windows path `C:\temp\new`; `\t` and `\n` are not escapes in a literal value. `A.Message` retains its two spaces at each end. `A.Emoji` decodes to `😀`, and `A."Display.Name"` has the value `Café`. The remaining four values retain their quotes and backslashes exactly as written. A later quote need not be balanced, and the JSON-looking text is not parsed or unescaped.
 
-Quote an entire key element when its name contains a dot or another syntax character. The last key has two elements, `A` and `Display.Name`, rather than three. Key names are case-sensitive, and Unicode normalisation is not performed.
+A later `"""` also stays literal: `A.Text: text """ more` does not open a block. A value that starts with a quote must still close correctly: `"unterminated`, `"value"tail` and `"\q"` are errors, without fallback to literal text. The exact `"""` header and empty-header pipe forms follow the multiline rules below.
+
+Quote an entire key element when its name contains a dot or another syntax character. The key `A."Display.Name"` has two elements, `A` and `Display.Name`, rather than three. Key names are case-sensitive, and Unicode normalisation is not performed.
 
 See [key paths](config-format.md#3-key-paths) and [common escapes](config-format.md#34-common-escapes-within-quotes) for the detailed rules.
 

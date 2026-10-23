@@ -478,6 +478,71 @@ func TestRepeatedParsedAliasesRetainEachOccurrenceAndKeyBoundary(t *testing.T) {
 	}
 }
 
+func TestBareInternalQuotesRemainLiteralThroughTypedRepeatedRetrieval(t *testing.T) {
+	want := []any{
+		"say \"hello\"",
+		"\\\"hello\\\"",
+		"raw \"unterminated",
+		"{\"quote\":\"value\",\"path\":\"C:\\\\temp\"}",
+		"\u00a0\"\\q\"",
+		"value\"\\",
+		"prefix \"\"\"",
+	}
+	var source strings.Builder
+	for _, value := range want {
+		source.WriteString("A(string): ")
+		source.WriteString(value.(string))
+		source.WriteByte('\n')
+	}
+	entries, err := Parse(strings.NewReader(source.String()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range entries {
+		if entry.Form != "" {
+			t.Errorf("internal quotes selected a block form: %#v", entry)
+		}
+	}
+	cfg, err := Build(entries, DemoProfile())
+	if err != nil {
+		t.Fatal(err)
+	}
+	values, err := cfg.GetAll([]string{"A"}, "string")
+	if err != nil || !reflect.DeepEqual(values, want) {
+		t.Errorf("literal typed GetAll = %#v, %v; want %#v", values, err, want)
+	}
+	for index, expected := range want {
+		value, err := cfg.GetAt([]string{"A"}, index, "string")
+		if err != nil || value != expected {
+			t.Errorf("literal typed GetAt(%d) = %#v, %v; want %#v", index, value, err, expected)
+		}
+	}
+	states, err := cfg.IsUnsetAll([]string{"A"})
+	if err != nil || !reflect.DeepEqual(states, make([]bool, len(want))) {
+		t.Errorf("literal values changed unset state: %#v, %v", states, err)
+	}
+}
+
+func TestBareInternalQuoteFailsOnlyWhenRequestedConversionCannotInterpretIt(t *testing.T) {
+	entries, err := Parse(strings.NewReader("A:001\nA: raw\"001"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Build(entries, DemoProfile())
+	if err != nil {
+		t.Fatalf("literal quote failed string decoding: %v", err)
+	}
+	values, err := cfg.GetAll([]string{"A"}, "int")
+	assertProfileErrorLine(t, err, ErrTypeMismatch, 2)
+	if values != nil {
+		t.Errorf("failed retrieval returned partial values: %#v", values)
+	}
+	values, err = cfg.GetAll([]string{"A"}, "string")
+	if err != nil || !reflect.DeepEqual(values, []any{"001", "raw\"001"}) {
+		t.Errorf("failed numeric retrieval changed stored strings: %#v, %v", values, err)
+	}
+}
+
 func TestRepeatedRetrievalConversionIsPerOccurrenceAndPerCall(t *testing.T) {
 	calls := 0
 	profile := Profile{StringType: "text", Types: map[string]Converter{

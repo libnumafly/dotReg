@@ -114,6 +114,22 @@ Requesting the annotated `A.Code` as `int` returns `ErrTypeMismatch`, regardless
 
 The notation does not perform Unicode normalisation. Key elements are compared exactly after quote and escape decoding, using the same rule for grouping occurrences, retrieval and matching against a configuration schema. For example, the precomposed character `が` (U+304C) and the sequence `か` plus a combining voiced sound mark (U+304B U+3099) are different names. Type expressions and values are not implicitly normalised either.
 
+## Single-line strings
+
+After trimming outer ASCII spaces and tabs, the first character selects how a single-line value is read. If it is a double quote, the whole value must be properly quoted; remove the surrounding quotes and decode the specified escapes. If it is anything else, preserve the entire trimmed value literally, including later quotes and backslashes. Do not enter quoted syntax partway through a literal value.
+
+```text
+A.Saying: say "hello"
+A.Unbalanced: x"unterminated
+A.QuoteText: \"hello\"
+A.JsonText: {"x": "\u0041"}
+A.MidTriple: text """ more
+```
+
+These values retain every quote and backslash as written; the JSON-looking value is not decoded as JSON. In contrast, `"say \"hello\""` uses quoted syntax and decodes to `say "hello"`. A starting quote that is unclosed, followed by anything other than outer ASCII spaces or tabs after its close, or contains an invalid escape still produces `ErrString`; there is no literal fallback. The exact `"""` header opens a triple-quoted block, and pipe detection remains governed by the multiline rules.
+
+See [single-line string decoding](../../docs/config-format.md#82-double-quoted-values-and-common-string-decoding) for the reference rules.
+
 ## Multiline values
 
 Triple-quoted values use the same escapes as ordinary quoted values:
@@ -174,7 +190,7 @@ Custom types can be added through a `Profile`. Known keys, required settings, de
 
 ## Supported rules and provisional choices
 
-The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, ordinary quoted values and triple-quoted bodies. Backslashes in unquoted single-line values and pipe bodies are retained; backslashes in unquoted key elements are rejected.
+The implementation covers the agreed rules for fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, single-line values selected as quoted by their first trimmed character, and triple-quoted bodies. Later quotes and backslashes in literal single-line values, and all pipe-body text, are retained; backslashes in unquoted key elements are rejected.
 
 Quoted key elements generally allow spaces, tabs, syntax characters such as `: ( ) #`, and control characters. Key elements and ordinary quoted values cannot span physical lines; triple-quoted and pipe bodies use the explicit multiline rules above. Represent a quote or a backslash in an ordinary quoted string with `\"` or `\\`; decoded characters are not reinterpreted as syntax. A newline can also be represented as character data with `\n` or a Unicode escape in quoted text. The range of characters representable by escapes is generally unrestricted, but undefined escape forms remain errors.
 
@@ -212,7 +228,7 @@ The following choices are specific to this implementation where the specificatio
 | API and error classification | Use this sample's singular, collection and indexed retrieval APIs and `Code`; singular methods report `ErrMultipleValues`, and `GetAll` fails without partial results; the public API and formal diagnostic format remain undecided |
 | Type-expression identity and conversion failure | Match type names exactly without resolving aliases; report conversion failure for an annotated type during `Build` |
 
-Unsupported type-expression syntax is generally reported as `ErrUnsupported`, syntax that violates agreed rules as `ErrSyntax`, and invalid value quoting or escapes as `ErrString`. Undefined escapes are not reinterpreted as ordinary characters. A backslash in an unquoted value is already an ordinary character, rather than an escape.
+Unsupported type-expression syntax is generally reported as `ErrUnsupported`, syntax that violates agreed rules as `ErrSyntax`, and invalid quoted-value syntax or escapes as `ErrString`. Undefined escapes in quoted forms are not reinterpreted as ordinary characters. A backslash or later quote in a single-line literal value is already an ordinary character, rather than active syntax.
 
 `Error` contains a line number and `Code`. Its diagnostic does not include the right-hand side, block body or error text returned by underlying input or conversion operations. `ParseEach` buffers a complete multiline body before notifying its value entry. Identifying a pipe block or its end can inspect one following physical line; a non-body line is retained for normal parsing only after the callback succeeds. An error returned by the callback is returned unchanged, and stops parsing and notifications for later entries. Input bytes may also have been read ahead. Changes already made by the callback are not rolled back.
 
@@ -227,7 +243,7 @@ go vet ./...
 go build ./...
 ```
 
-The tests cover accepted and rejected input, heading state, key-element boundaries, backslashes within and outside quotes, basic and Unicode escapes, rejection of unknown forms and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
+The tests cover accepted and rejected input, heading state, key-element boundaries, first-character selection of literal or quoted single-line values, literal later quotes and backslashes, basic and Unicode escapes, rejection of unknown quoted escapes and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
 
 Reproducible benchmarks and the local refactor measurements are described in
 [PERFORMANCE.md](PERFORMANCE.md), including allocation counts and trade-offs.

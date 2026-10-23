@@ -12,7 +12,7 @@ Resolution produces a flat space of fully qualified keys and their ordered value
 | Repeated value keys | All occurrences, including identical repeated values, are retained in source order without overwriting or deduplication |
 | Prohibited characters in key elements, quoting, empty names and the unset state of an empty right-hand side | Defined in this document |
 | Treating an unset value as a string | Equivalent to a zero-length string, provided that there is no type expression mismatch with a declaration |
-| Double-quoted values and common escapes | This document defines removal of the surrounding quotes before delivery, preservation of whitespace within quotes, and decoding of the basic and Unicode escapes in section 3.4 only within quotes. Backslashes in unquoted values are preserved |
+| Single-line literal and double-quoted values | After outer ASCII spaces and tabs are removed, an initial double quote selects quoted syntax; otherwise the entire value is literal, including later quotes and backslashes. This document defines quote removal, quoted whitespace and the escapes in section 3.4 |
 | Multiline values | Triple-quoted blocks use the same escapes as ordinary quoted values. Pipe blocks preserve their body literally. Sections 8.3 and 8.4 define markers, margins and line endings |
 | Optional type annotations on the left-hand side of a value line | This document defines their position and the outer whitespace used for alignment |
 | Type conversion and retrieval requests | This document defines the conversion procedure with and without a declaration, and type expression mismatch errors at retrieval |
@@ -190,7 +190,7 @@ The concrete output representation, canonical notation and retrieval API are und
 
 ### 3.4 Common escapes within quotes
 
-A backslash starts an escape only inside double quotes around a key element or value, including the body of a triple-quoted value. Backslashes in unquoted single-line values and pipe blocks are preserved as ordinary characters; backslashes in unquoted key elements are syntax errors. The following basic escapes and the Unicode escapes described below are available in all quoted text.
+A backslash starts an escape only inside double quotes around a key element or a value selected as quoted syntax, including the body of a triple-quoted value. A quote encountered within a literal single-line value does not start quoted syntax, so neither that quote nor later backslashes are interpreted. Backslashes in literal single-line values and pipe blocks are preserved as ordinary characters; backslashes in unquoted key elements are syntax errors. The following basic escapes and the Unicode escapes described below are available in all quoted text.
 
 | Notation | Decoded character |
 |------|-------------|
@@ -679,9 +679,9 @@ A single-line value can be enclosed in double quotes in its entirety to preserve
 
 Common string decoding happens before type conversion; removing quotes is not a rule left for each application to implement. The undecoded right-hand side can be retained separately as a syntax result. If the undecoded right-hand side begins with a double quote after outer ASCII spaces and tabs have been removed, it is treated as a quoted value, and the escapes in section 3.4 are decoded only within those quotes. Ordinary values that do not use quoted syntax preserve backslashes unchanged.
 
-Quoted syntax is selected at the beginning of the trimmed header right-hand side. A quote or triple-quote sequence encountered later does not switch an unquoted single-line value into quoted syntax or open a multiline block. Such quotes remain errors in an unquoted single-line value; they are not accepted as literal characters merely because they do not open a block. Pipe bodies preserve all quotes literally under section 8.4, while an already open triple-quoted body recognises only the closing-line rule in section 8.3.
+Quoted syntax is selected only when the first character of a non-empty single-line right-hand side, after removing outer ASCII spaces and tabs, is a double quote. If that first character is anything else, the entire trimmed right-hand side is literal. Preserve every later double quote, triple-quote sequence and backslash as character data without requiring quote balance or interpreting escapes. A later quote never switches a literal value into quoted syntax or opens a multiline block. This does not change the exact `"""` header rule in section 8.3 or pipe-block detection in section 8.4.
 
-Surrounding quotes are identified before escape decoding. `"\"hello\""` decodes to a string that includes double quotes at both ends. Those decoded quotes are not read again as surrounding quotes and removed. The unquoted form `\"hello\"` is rejected as an invalid value containing bare quotes, because backslashes do not protect quotes outside quoted text.
+Surrounding quotes are identified before escape decoding. `"\"hello\""` decodes to a string that includes double quotes at both ends. Those decoded quotes are not read again as surrounding quotes and removed. The literal form `\"hello\"` begins with a backslash, so both backslashes and both quotes are retained unchanged. These are different source forms and produce different strings.
 
 Within quotes, the basic and Unicode escapes in section 3.4 are available, as they are for key elements. An escaped double quote is part of the value, not an opening or closing quote. Decoding happens exactly once, and decoded characters are not interpreted again as escapes or syntax symbols.
 
@@ -694,6 +694,11 @@ The following are independent input examples. The right-hand column explains the
 | `A: foo\.bar` | The string `foo\.bar`, including its backslash |
 | `A: \q` | Two characters: a backslash and `q`. It is not an escape |
 | `A: value\` | A string ending in a backslash. It is not line continuation |
+| `A: say "hello"` | The literal string `say "hello"` |
+| `A: x"unterminated` | The literal string `x"unterminated`; later quotes need not be balanced |
+| `A: \"hello\"` | The literal string `\"hello\"`, including both backslashes and quotes |
+| `A: {"x": "\u0041"}` | The literal string `{"x": "\u0041"}`; neither JSON parsing nor escape decoding is performed |
+| `A: text """ more` | The literal string `text """ more`; no multiline block is opened |
 | `A: "\"hello\""` | The string `"hello"`, including the quotes at both ends |
 | `A: C:\temp\new` | The string `C:\temp\new` |
 | `A: "C:\\temp\\new"` | The string `C:\temp\new` |
@@ -712,7 +717,7 @@ The following are independent input examples. The right-hand column explains the
 
 Whether a value is unset is determined from its source form before string decoding. An explicit value is not changed to unset even if it decodes to an empty string. By itself, `A:` and `A: ""` are equivalent when retrieved as strings, but remain distinct in syntax results and configuration state. Empty triple-quoted and pipe bodies are also explicit set values.
 
-An ordinary single-line quoted value requires a closing quote. Although `A: "unterminated` can be retained as an undecoded syntax result, string decoding fails and it is not delivered as a configuration value. Only outer ASCII spaces and tabs are allowed after the closing quote; any other trailing characters are errors. An ordinary quoted value must be quoted in its entirety, and double quotes within an unquoted single-line value are also errors. Backslashes outside quotes cannot bypass this restriction. There is no partial quoting or implicit string concatenation. Triple-quoted bodies and literal pipe bodies follow their own quote rules below.
+An ordinary single-line value whose first trimmed character is a double quote requires a closing quote. Although `A: "unterminated` can be retained as an undecoded syntax result, string decoding fails and it is not delivered as a configuration value. Only outer ASCII spaces and tabs are allowed after the closing quote; any other trailing characters are errors. A value that starts quoted must be quoted in its entirety; failure does not fall back to literal text. There is no partial quoting or implicit string concatenation. A value starting with another character instead follows the literal rule above, including any later quotes. Triple-quoted bodies and literal pipe bodies follow their own rules below.
 
 Each of the following independent examples fails string decoding and is not delivered as a configuration value.
 
@@ -721,19 +726,15 @@ A: "value"tail
 ```
 
 ```text
-A: some"value"
+A: "unterminated
 ```
 
 ```text
-A: text """ more
+A: "\
 ```
 
 ```text
 A: "first" "second"
-```
-
-```text
-A: \"hello\"
 ```
 
 ```text
@@ -742,7 +743,7 @@ A: "\q"
 
 Unknown or incomplete escapes within quotes are errors under section 3.4. This escape validation does not apply to an unquoted `\q` or a trailing backslash.
 
-To deliver a quote itself as a character in a value, quote the entire value and use `\"` within it. The concrete categories and notification points for decoding errors are undecided. Neither quoted keys nor quoted values reinterpret decoded characters as syntax. The prohibition on whitespace, control characters and similar characters in unquoted key elements does not apply to values as a blanket rule.
+Within a quoted value, write `\"` to deliver a quote as character data. In a literal value, later quotes are already ordinary characters and need no escaping. The concrete categories and notification points for decoding errors are undecided. Neither quoted keys nor quoted values reinterpret decoded characters as syntax. The prohibition on whitespace, control characters and similar characters in unquoted key elements does not apply to values as a blanket rule.
 
 ### 8.3 Triple-quoted multiline values
 
@@ -895,7 +896,7 @@ This document does not settle the following matters.
 | Remaining whitespace rules for type annotations | Alignment tabs between the key and the type expression, or between the closing parenthesis and the colon |
 | Future escape extensions | Whether to add forms beyond the basic notation, `\u{H...}` and `\uXXXX` defined in section 3.4. The Unicode scalar value range, surrogate pairs in the four-digit form, rejection of invalid notation and absence of replacement are established |
 | Unicode character classification | The concrete classification of whitespace and control characters in unquoted key elements. The absence of Unicode normalisation, and the principle that quoted key elements allow any valid UTF-8 string, are established |
-| Remaining details of value quoting | Categories and notification points for decoding errors. Ordinary single-line quote rules, triple-quoted markers and margins, literal pipe detection, form-specific whitespace and escape handling, and explicit empty block state are established in sections 8.2–8.4 |
+| Remaining details of value quoting | Categories and notification points for decoding errors. First-character selection between wholly quoted and literal single-line values, preservation of later literal quotes and backslashes, triple-quoted markers and margins, literal pipe detection, form-specific whitespace and escape handling, and explicit empty block state are established in sections 8.2–8.4 |
 | Type-specific decoders | Concrete meaning and conversion for numbers, booleans, lists and other types. Common string decoding, empty-header detection including pipe blocks, explicit empty block values and the equivalence of unset to an empty string when string retrieval is permitted are established |
 | Type-specific interpretation of unset | Treatment in non-string types and the relationship to required fields and defaults |
 | Type expression identity | Matching of type aliases, alternative spellings, compound types and similar expressions |
@@ -921,7 +922,7 @@ Implementation conformance is checked against the rules defined in this document
 | Indentation and headings | Parent selection by written heading levels; closing headings when indentation decreases; closing headings with absolute lines; preserving state across blank lines and comments |
 | Type annotation position and alignment | Optional left-hand annotations only on value lines; rejection of annotations on headings and inheritance to children; zero or more ASCII spaces between the key and type expression, between the closing parenthesis and colon, and after the colon, with equivalent meaning; rejection of internal whitespace; extraction with balanced parentheses; no blanket prohibition on symbols for compound types; distinction from parentheses on the right-hand side |
 | Preserving right-hand sides | Removing outer ASCII spaces and tabs only from single-line values and headers; preserving internal whitespace, Unicode whitespace, quotes, leading zeroes, colons and `#`; retaining each block body after removing only its structural markers and margin |
-| Common string decoding of values | Removal of ordinary surrounding quotes before delivery; decoding basic and Unicode escapes in ordinary quoted values and triple-quoted bodies; literal pipe bodies and unquoted single-line backslashes; no reinterpretation of decoded quotes, line breaks or syntax symbols; no trimming again after decoding; distinction between explicit empty and unset; rejection of invalid ordinary single-line quotes and escapes |
+| Common string decoding of values | After outer ASCII SP/HT removal, selecting quoted syntax only from an initial double quote; otherwise preserving the whole single-line value literally, including later unbalanced quotes, triple quotes and backslashes; removing ordinary surrounding quotes and decoding escapes only for quoted forms; literal pipe bodies; no reinterpretation or second trimming; distinction between explicit empty and unset; rejection of invalid starting quotes, trailing text after their closing quote and invalid quoted escapes without fallback |
 | Empty right-hand sides | Treating empty right-hand sides, and those containing only outer ASCII spaces and tabs, as unset unless the immediately following line starts a pipe block; distinguishing unset from explicit empty quoted or block values, the string `null`, headings, omitted keys and non-empty right-hand sides ending in a colon; applying the same rules to type annotations and assignments to headings themselves |
 | Triple-quoted values | Exact opening marker without inline content, recognised only in the value header; no transition into a block at later quotes or lines; closing-marker meaning only within an open block; own-line closing marker; closing-margin removal from every non-empty source line with empty-line exemption; insufficient-margin and missing-close rejection; ordinary quoted escapes; literal internal quotes and triple quotes outside exact closing lines; no reinterpretation or normalisation |
 | Pipe blocks | Immediate-next-line detection after an empty header; strictly deeper ASCII-space indentation; consecutive markers only; literal body after stripping leading spaces and the first pipe; no skipped blank lines or comments; normal processing of the first non-body line; `A:\|` as a single-line value and non-body `\|:` lines subject to ordinary key and indentation rules |

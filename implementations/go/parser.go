@@ -119,24 +119,9 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 				// Store a persistent path, separate from the visitor's slice.
 				scopes = append(scopes, node)
 			} else {
-				switch {
-				case e.Raw == `"""`:
-					e.Raw, eof, err = lines.tripleBody(line)
-					if err != nil {
-						return err
-					}
-					e.Form, e.Unset = TripleQuoted, false
-				case e.Unset && !eof:
-					var raw string
-					var blockEOF, found bool
-					raw, blockEOF, found, err = lines.pipeBody(indent)
-					if err != nil {
-						return err
-					}
-					if found {
-						e.Raw, e.Form, e.Unset = raw, PipeBlock, false
-						eof = blockEOF
-					}
+				eof, err = lines.valueBody(&e, indent, eof)
+				if err != nil {
+					return err
 				}
 			}
 			if err := visit(e); err != nil {
@@ -224,6 +209,30 @@ func (line sourceLine) validate() error {
 		return problem(line.number, ErrSyntax)
 	}
 	return nil
+}
+
+// valueBody completes a value before notification and returns its EOF state.
+// A non-pipe lookahead stays pending; it is parsed only after notification.
+func (lines *sourceLines) valueBody(entry *Entry, indent int, eof bool) (bool, error) {
+	switch {
+	case entry.Raw == `"""`:
+		raw, blockEOF, err := lines.tripleBody(entry.Line)
+		if err != nil {
+			return false, err
+		}
+		entry.Raw, entry.Form, entry.Unset = raw, TripleQuoted, false
+		return blockEOF, nil
+	case entry.Unset && !eof:
+		raw, blockEOF, found, err := lines.pipeBody(indent)
+		if err != nil {
+			return false, err
+		}
+		if found {
+			entry.Raw, entry.Form, entry.Unset = raw, PipeBlock, false
+			return blockEOF, nil
+		}
+	}
+	return eof, nil
 }
 
 func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {

@@ -14,6 +14,8 @@ A.
 
 The grouped entries resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. The code `001` stays text, with its leading zeroes intact.
 
+For a single-line value, only an initial double quote after outer ASCII spaces and tabs are removed selects quoted syntax and escapes. Other values are entirely literal: `A.Message: say "hello"` keeps its quotes, and `A.Path: C:\temp\new` keeps its backslashes. Quotes encountered later never switch modes.
+
 Repeat a key to record multiple values in source order:
 
 ```text

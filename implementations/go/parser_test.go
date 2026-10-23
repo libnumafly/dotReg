@@ -717,6 +717,8 @@ func TestParsePreservesRawBeforeStringDecoding(t *testing.T) {
 	for _, raw := range []string{
 		"\"  value  \"", "\"\"", "\"unterminated", "\"\\q\"", "\"value\"tail",
 		"some\"value\"", "\"first\" \"second\"", "\\\"hello\\\"",
+		"some\"unterminated", "prefix\"\"\"suffix", "prefix\"\"\"",
+		"{\"name\":\"Alice\",\"text\":\"line\\nnext\"}",
 		"C:\\temp\\new", "\\q", "value\\", "value: # literal", "\"\\",
 		"internal\tspace", "\x00value\x7f",
 		"\"\\uD800\"", "\"\\u{110000}\"", "\\u{1F600}", "\\n",
@@ -727,6 +729,23 @@ func TestParsePreservesRawBeforeStringDecoding(t *testing.T) {
 		}
 		if len(got) != 1 || got[0].Raw != raw || got[0].Unset {
 			t.Errorf("raw %q: got %#v", raw, got)
+		}
+	}
+}
+
+func TestParseRightHandQuotesDoNotAffectQuotedKeyOrType(t *testing.T) {
+	const raw = "{\"A:B\":\"value\", \"tail\":\"\\q"
+	const expression = "map(T:U,list(V))"
+	for _, typed := range []bool{false, true} {
+		header := "\"A:B\""
+		want := parserValue(1, []string{"A:B"}, raw)
+		if typed {
+			header += "(" + expression + ")"
+			want.Type, want.HasType = expression, true
+		}
+		got, err := Parse(strings.NewReader(header + ": \t" + raw + " \t"))
+		if err != nil || !reflect.DeepEqual(got, []Entry{want}) {
+			t.Errorf("RHS quote leaked into header parsing: entries=%#v, error=%v; want %#v", got, err, want)
 		}
 	}
 }

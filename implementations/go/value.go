@@ -14,10 +14,11 @@ type Text struct {
 	Unset bool
 }
 
-// DecodeString removes value quotes and decodes the specified escapes inside
-// them. Triple-quoted blocks use the same escapes; pipe blocks and bare values
-// preserve backslashes. Block bodies preserve all whitespace. Entry must be a
-// value entry with a consistent form and Unset flag.
+// DecodeString treats a single-line value as quoted only when its first
+// character after outer SP/HT trimming is a quote. Other single-line values
+// retain all quotes and backslashes literally. Triple-quoted blocks decode
+// escapes; pipe blocks are literal. Block bodies preserve all whitespace.
+// Entry must be a value entry with a consistent form and Unset flag.
 func DecodeString(entry Entry) (Text, error) {
 	if entry.Kind != Value {
 		return Text{}, problem(entry.Line, ErrString)
@@ -47,9 +48,6 @@ func DecodeString(entry Entry) (Text, error) {
 		return Text{Unset: true}, nil
 	}
 	if raw[0] != '"' {
-		if strings.ContainsRune(raw, '"') {
-			return Text{}, problem(entry.Line, ErrString)
-		}
 		return Text{Value: raw}, nil
 	}
 	value, end, err := decodeQuoted(raw)

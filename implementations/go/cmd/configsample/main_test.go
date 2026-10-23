@@ -115,24 +115,92 @@ func TestRunOpaqueTypeAndControlKeyRemainIndependentOfProfile(t *testing.T) {
 }
 
 func TestRunRawRetainsInvalidQuotedValue(t *testing.T) {
-	const source = "A: \"unterminated"
+	for _, raw := range []string{
+		"\"unterminated", "\"value\"tail", "\"first\" \"second\"",
+		"\"\\q\"", "\"\"\"suffix", "\"trailing\\",
+	} {
+		for _, mode := range []string{"raw", "strings", "demo"} {
+			t.Run(mode+"/"+raw, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				source := "A: first\nA: \t" + raw + " \t"
+				err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
+				if mode == "raw" {
+					if err != nil {
+						t.Fatal(err)
+					}
+					got := decodeCLIOutput(t, stdout.Bytes())
+					if len(got) != 2 || got[0]["raw"] != "first" || got[1]["raw"] != raw {
+						t.Errorf("raw output = %#v", got)
+					}
+					return
+				}
+				requireCLIErrorCode(t, err, dotreg.ErrString)
+				var diagnostic *dotreg.Error
+				if !errors.As(err, &diagnostic) || diagnostic.Line != 2 {
+					t.Errorf("quoted-value failure has the wrong line: %v", err)
+				}
+				if stdout.Len() != 0 {
+					t.Errorf("failed %s mode emitted partial output: %q", mode, stdout.String())
+				}
+			})
+		}
+	}
+}
+
+func TestRunNonLeadingQuotesAndBackslashesRemainLiteral(t *testing.T) {
+	rawValues := []string{
+		"{\"name\":\"Alice\",\"text\":\"line\\nnext\",\"path\":\"C:\\\\temp\"}",
+		"some\"value\"",
+		"some\"unterminated",
+		"before \"a:b\" # after (T)",
+		"\\\"hello\\\"",
+		"C:\\temp\\\"name\"\\q\\",
+		"prefix\"\"\"suffix",
+		"some\"value\"",
+		"prefix\"\"\"",
+	}
+	lines := make([]string, len(rawValues))
+	for i, raw := range rawValues {
+		lines[i] = "A: \t" + raw + " \t"
+	}
+	// No terminal newline: a triple quote in the final literal is not a block.
+	source := strings.Join(lines, "\n")
 	for _, mode := range []string{"raw", "strings", "demo"} {
 		t.Run(mode, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
-			err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr)
-			if mode == "raw" {
-				if err != nil {
-					t.Fatal(err)
-				}
-				got := decodeCLIOutput(t, stdout.Bytes())
-				if len(got) != 1 || got[0]["raw"] != "\"unterminated" {
-					t.Errorf("raw output = %#v", got)
-				}
-				return
+			if err := run([]string{"-mode", mode}, strings.NewReader(source), &stdout, &stderr); err != nil {
+				t.Fatal(err)
 			}
-			requireCLIErrorCode(t, err, dotreg.ErrString)
-			if stdout.Len() != 0 {
-				t.Errorf("failed %s mode emitted partial output: %q", mode, stdout.String())
+			got := decodeCLIOutput(t, stdout.Bytes())
+			if len(got) != len(rawValues) || stderr.Len() != 0 {
+				t.Fatalf("literal occurrences=%#v, stderr=%q", got, stderr.String())
+			}
+			for i, entry := range got {
+				path, ok := entry["path"].([]any)
+				if !ok || len(path) != 1 || path[0] != "A" ||
+					entry["kind"] != string(dotreg.Value) || entry["has_type"] != false ||
+					entry["raw"] != rawValues[i] || entry["unset"] != false {
+					t.Errorf("literal occurrence %d changed syntax/state: %#v", i, entry)
+				}
+				if _, exists := entry["form"]; exists {
+					t.Errorf("literal occurrence %d became a block: %#v", i, entry)
+				}
+				if mode == "raw" {
+					if _, exists := entry["decoded"]; exists {
+						t.Error("raw mode unexpectedly decoded a literal")
+					}
+					if _, exists := entry["value"]; exists {
+						t.Error("raw mode unexpectedly converted a literal")
+					}
+					continue
+				}
+				field := "decoded"
+				if mode == "demo" {
+					field = "value"
+				}
+				if entry[field] != rawValues[i] {
+					t.Errorf("literal occurrence %d decoded to %#v; want %q", i, entry[field], rawValues[i])
+				}
 			}
 		})
 	}

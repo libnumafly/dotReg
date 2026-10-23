@@ -14,6 +14,13 @@ A.
  .NullText: null
  .Pattern: ^foo\.bar$
 
+ # Only an initial quote selects quoted syntax; later quotes stay literal.
+ .Saying: say "hello"
+ .Unbalanced: x"unterminated
+ .QuoteText: \"hello\"
+ .JsonText: {"x": "\u0041"}
+ .MidTriple: text """ more
+
  # Every occurrence is retained, including repeated identical values.
  .Tag:red
  .Tag:green
