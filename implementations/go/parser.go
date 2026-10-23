@@ -10,7 +10,10 @@ import (
 	"unicode/utf8"
 )
 
-const bom = "\xef\xbb\xbf"
+const (
+	bom         = "\xef\xbb\xbf"
+	indentWidth = 2
+)
 
 type Kind string
 
@@ -83,7 +86,7 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 		if trimmed != "" && !strings.HasPrefix(trimmed, "#") {
 			indent := leadingSpaces(source)
 			body := strings.TrimRight(source[indent:], " \t")
-			if body[0] == '\t' {
+			if body[0] == '\t' || indent%indentWidth != 0 {
 				return problem(line, ErrSyntax)
 			}
 			relative := strings.HasPrefix(body, ".")
@@ -96,15 +99,16 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 			}
 			var parent *pathNode
 			if relative {
-				if indent > len(scopes) {
+				depth := indent / indentWidth
+				if depth > len(scopes) {
 					return problem(line, ErrSyntax)
 				}
 				if !strings.HasPrefix(key, ".") {
 					return problem(line, ErrSyntax)
 				}
 				// Even a value line closes deeper scopes when it dedents.
-				scopes = scopes[:indent]
-				parent = scopes[indent-1]
+				scopes = scopes[:depth]
+				parent = scopes[depth-1]
 				key = key[1:] // The relative marker, not a key element.
 			} else {
 				scopes = nil

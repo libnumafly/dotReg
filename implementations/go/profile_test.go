@@ -81,11 +81,11 @@ func TestDecodedUnicodeKeysAndValuesReachProfileWithoutNormalization(t *testing.
 
 func TestMultilineFormsReachProfileWithTheirOwnDecodingRules(t *testing.T) {
 	const source = "A.\n" +
-		" .(string): \"\"\"\n" +
+		"  .(string): \"\"\"\n" +
 		"  say \"hello\"\\n\\u{1F600}\n" +
 		"  \"\"\"\n" +
-		" .Literal:\n" +
-		"  |say \"hello\"\\n\\u{1F600}\n" +
+		"  .Literal:\n" +
+		"   |say \"hello\"\\n\\u{1F600}\n" +
 		"EmptyTriple: \"\"\"\n\"\"\"\n" +
 		"EmptyPipe:\n |\n" +
 		"Unset:\n"
@@ -149,7 +149,7 @@ func TestMultilineDecodingPrecedesDeclaredTypeConversion(t *testing.T) {
 }
 
 func TestEscapedTripleClosingMarkerIsLiteralThroughLookup(t *testing.T) {
-	const source = "A.\n .B: \"\"\"\n  \\\"\"\"\n  \"\"\"\n .C: next"
+	const source = "A.\n  .B: \"\"\"\n  \\\"\"\"\n  \"\"\"\n  .C: next"
 	entries, err := Parse(strings.NewReader(parserDocument(source)))
 	if err != nil {
 		t.Fatal(err)
@@ -455,7 +455,7 @@ func TestRepeatedSettingsPreserveOrderEqualValuesAndUnsetStates(t *testing.T) {
 
 func TestRepeatedParsedAliasesRetainEachOccurrenceAndKeyBoundary(t *testing.T) {
 	entries, err := Parse(strings.NewReader(parserDocument(
-		"\"A.B\": first\n\"\\u0041.B\": second\nA.B: separate\nA.\n .B: relative",
+		"\"A.B\": first\n\"\\u0041.B\": second\nA.B: separate\nA.\n  .B: relative",
 	)))
 	if err != nil {
 		t.Fatal(err)

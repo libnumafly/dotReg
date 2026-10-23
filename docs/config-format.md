@@ -112,23 +112,23 @@ Each of the following four examples assigns the right-hand side `value` to the f
 The `= A.B` below is an explanation showing the resolved key; it is not written in the configuration file.
 
 ```text
-A.B: value       = A.B
+A.B: value      = A.B
 ```
 
 ```text
 A.
- .B: value      = A.B
+  .B: value     = A.B
 ```
 
 ```text
 A.B.
- .: value       = A.B
+  .: value      = A.B
 ```
 
 ```text
 A.
- .B.
-  .: value      = A.B
+  .B.
+    .: value    = A.B
 ```
 
 A heading is a line that specifies a prefix. On its own, it does not set a value.
@@ -324,7 +324,7 @@ In a value line with a type annotation, the colon following the outer closing pa
 
 ### 5.1 Absolute and relative lines
 
-Absolute headings and value lines with fully qualified keys begin at the start of the line. Relative headings and relative value lines are indented by one more ASCII space than their parent heading and begin with `.`.
+Absolute headings and value lines with fully qualified keys begin at the start of the line. Relative headings and relative value lines, including assignments to a heading itself, are indented by exactly two more ASCII spaces than their parent heading and begin with `.`. Each written heading level therefore adds two ASCII spaces; structural indentation is always an even number of spaces.
 
 The leading dot of relative notation and the terminating dot of a heading appear outside quoted key elements. Quoted key elements, escapes within quotes and empty names written as `""` follow the same rules for fully qualified keys, relative keys and headings. A dot or `\.` inside a quoted element does not increase indentation depth or the number of written heading levels.
 
@@ -333,11 +333,11 @@ The leading dot of relative notation and the terminating dot of a heading appear
 ```text
 A.
 
- .B.
-  .C: first
-  .D.E: second
+  .B.
+    .C: first
+    .D.E: second
 
- .F: third
+  .F: third
 ```
 
 The value lines resolve as follows.
@@ -348,7 +348,7 @@ A.B.D.E: second
 A.F: third
 ```
 
-Outside multiline bodies, an indented non-comment line without a leading `.`, a relative line at column one, tab indentation, and a jump to a depth without a parent heading are rejected. Relative lines without indentation are not accepted. Multiline body indentation follows sections 8.3 and 8.4 and does not create headings.
+Outside multiline bodies, an indented non-comment line without a leading `.`, a relative line at column one, an odd number of leading ASCII spaces, tab indentation, and a jump to a depth without a parent heading are rejected. Relative lines without indentation are not accepted. Blank lines and comments follow section 7.2 rather than the structural indentation rule. Multiline body indentation follows sections 8.3 and 8.4 and does not create headings.
 
 ### 5.2 Depth follows the number of written heading levels
 
@@ -358,34 +358,34 @@ All three examples below assign a value to `A.B.C.D`. The `= A.B.C.D` is explana
 
 ```text
 A.B.C.
- .D: value      = A.B.C.D
-```
-
-```text
-A.
- .B.C.
   .D: value     = A.B.C.D
 ```
 
 ```text
 A.
- .B.
-  .C.
-   .D: value    = A.B.C.D
+  .B.C.
+    .D: value   = A.B.C.D
+```
+
+```text
+A.
+  .B.
+    .C.
+      .D: value = A.B.C.D
 ```
 
 ### 5.3 Choosing the parent after reducing indentation
 
-Let `d` be the number of leading ASCII spaces. The parent of a relative line is the currently active heading at indentation `d-1`. When selecting the parent, headings deeper than that parent are closed. A value line does not create a new heading.
+Let `d` be the number of leading ASCII spaces on a structural line. Its logical depth is `d/2`; `d` must be even. A relative line must have `d >= 2`, and its parent is the currently active heading at indentation `d-2`, one written heading level above it. When selecting the parent, headings deeper than that parent are closed. A value line does not create a new heading.
 
 The final line in the following example is rejected.
 
 ```text
 A.
- .B.
-  .C: first
- .D: sibling
-  .E: invalid
+  .B.
+    .C: first
+  .D: sibling
+    .E: invalid
 ```
 
 Reducing the indentation at `.D` closes the heading `A.B`. Since `.D` is a value line, it cannot be the parent of the final `.E`. Closed headings are not revived by searching backwards.
@@ -398,9 +398,9 @@ The final line in the following example is rejected.
 
 ```text
 A.
- .B: first
+  .B: first
 X.Y: second
- .C: invalid
+  .C: invalid
 ```
 
 `X.Y: second` closes the headings, leaving `.C` without a parent. To resume relative notation, write an absolute heading again.
@@ -411,9 +411,9 @@ If the left-hand side of a relative value line is a single unquoted `.`, the val
 
 ```text
 A.B.
- .: parent
- .C: child
- .D.E: descendant
+  .: parent
+  .C: child
+  .D.E: descendant
 ```
 
 The value lines resolve as follows.
@@ -428,17 +428,17 @@ The ordinary value-key restrictions apply to the resolved path; no special key n
 
 | Parent heading and value line | Result |
 |---------------------------|---------------------|
-| ` .: value` under `A.B.` | Accepted as an assignment to `A.B` |
-| ` .: value` under `A.` | Accepted as an assignment to `A` |
-| ` .: value` under `1.` | Accepted as an assignment to `1` |
-| ` .: value` under `A.1.` | Accepted as an assignment to `A.1` |
-| ` .Key: value` under `A.1.` | Accepted as an assignment to `A.1.Key` |
+| `  .: value` under `A.B.` | Accepted as an assignment to `A.B` |
+| `  .: value` under `A.` | Accepted as an assignment to `A` |
+| `  .: value` under `1.` | Accepted as an assignment to `1` |
+| `  .: value` under `A.1.` | Accepted as an assignment to `A.1` |
+| `  .Key: value` under `A.1.` | Accepted as an assignment to `A.1.Key` |
 
 Assignment to a one-element heading itself can also be written as follows.
 
 ```text
 A.
- .: value
+  .: value
 ```
 
 These two lines represent the same key and right-hand side as `A: value`.
@@ -447,14 +447,14 @@ Assignment to the parent itself is distinct from assignment to a child element w
 
 ```text
 A.
- .:
+  .:
 ```
 
 This example has the key `A` and the element sequence `["A"]`.
 
 ```text
 A.
- ."":
+  ."":
 ```
 
 This example has the key `A.""` and the element sequence `["A", ""]`.
@@ -463,19 +463,19 @@ The same rules apply to a heading with an empty name.
 
 ```text
 "".
- .:
+  .:
 ```
 
 This example assigns a value to the one-element key `""`. The single dot in relative notation is not interpreted as a child element with an empty name.
 
-For assignment to a heading itself, omitting the right-hand side as in ` .:` still includes the resolved key and leaves its value unset unless its immediately following line starts a pipe block. Either multiline form can assign to the heading itself. A heading line on its own does not create a value-key occurrence.
+For assignment to a heading itself, omitting the right-hand side as in `  .:` still includes the resolved key and leaves its value unset unless its immediately following line starts a pipe block. Either multiline form can assign to the heading itself. A heading line on its own does not create a value-key occurrence.
 
 Entirely numeric headings follow the same rules.
 
 ```text
 1.
- .: parent
- .2: child
+  .: parent
+  .2: child
 ```
 
 The value lines resolve as follows.
@@ -561,16 +561,16 @@ On relative value lines and assignments to a heading itself, a type annotation a
 
 ```text
 A.B.
- .(string): parent
- .Code(string): 001
- .Count (int): 123
+  .(string): parent
+  .Code(string): 001
+  .Count (int): 123
 ```
 
 | Line | Resolved key | Type expression | Undecoded right-hand side |
 |-----------------------|-------------|----------|----------|
-| ` .(string): parent`  | `A.B`       | `string` | `parent` |
-| ` .Code(string): 001` | `A.B.Code`  | `string` | `001`    |
-| ` .Count (int): 123`  | `A.B.Count` | `int`    | `123`    |
+| `  .(string): parent`  | `A.B`       | `string` | `parent` |
+| `  .Code(string): 001` | `A.B.Code`  | `string` | `001`    |
+| `  .Count (int): 123`  | `A.B.Count` | `int`    | `123`    |
 
 The value-key restrictions in section 3 and the path resolution rules in section 5 apply to the key portion after the annotation has been separated. An annotation neither creates a parent heading nor changes indentation depth.
 
@@ -617,10 +617,10 @@ Within the file body and outside multiline values, after removing ASCII spaces a
 
 ```text
 A.
- .B.
+  .B.
 
 # This comment also preserves the headings
-  .C: value
+    .C: value
 ```
 
 Blank lines and comment lines may contain tabs or deep indentation. Character encoding and lone CR validation still take place before they are skipped.
@@ -804,14 +804,14 @@ This header check is the only way to start a triple-quoted block. A `"""` sequen
 
 ```text
 A.
- .Message: """
+  .Message: """
   first\nsecond
     indented
   """
- .Next: value
+  .Next: value
 ```
 
-A closing line consists of zero or more leading ASCII spaces, exactly `"""`, and optional trailing ASCII spaces or tabs. Let `m` be its number of leading spaces. Remove exactly `m` leading ASCII spaces from every non-empty source body line; a line with no characters is exempt. A non-empty line with fewer than `m` leading spaces is an error, including a whitespace-only line that is too short. Additional leading spaces and all other body whitespace are preserved. Tabs do not count towards this margin. The closing margin is independent of the header indentation and can be zero, including for pasted public-key text.
+A closing line consists of zero or more leading ASCII spaces, exactly `"""`, and optional trailing ASCII spaces or tabs. Let `m` be its number of leading spaces. Remove exactly `m` leading ASCII spaces from every non-empty source body line; a line with no characters is exempt. A non-empty line with fewer than `m` leading spaces is an error, including a whitespace-only line that is too short. Additional leading spaces and all other body whitespace are preserved. Tabs do not count towards this margin. The closing margin is an independent raw space count, rather than a structural heading depth: it may be odd or zero regardless of the header indentation, including for pasted public-key text. The two-space hierarchy rule does not apply to the body or closing marker.
 
 In the example, `m` is two. The first source body line becomes `first\nsecond`, and the second retains two leading spaces. With LF source line endings, the decoded value is `first`, LF, `second`, LF and two spaces followed by `indented`. The body neither creates headings nor changes the heading scope; `.Next` remains a child of `A`.
 
@@ -834,15 +834,15 @@ A value header with an empty right-hand side starts a pipe block only when its i
 
 ```text
 A.
- .Literal:
-  |C:\temp\new
-  |"quoted" \q
-  |"""
-  |# literal body text
- .Next: value
+  .Literal:
+   |C:\temp\new
+   |"quoted" \q
+   |"""
+   |# literal body text
+  .Next: value
 ```
 
-Collect consecutive qualifying pipe lines. Each line independently needs more leading ASCII spaces than the value header; their indentation need not be identical. Remove all leading ASCII spaces and the first `|` from each collected line. Everything after that first marker, including spaces, tabs, additional pipes, quotes and backslashes, is literal body text. There is no escape decoding or further whitespace trimming, and encountering a quote never switches the body into quoted syntax. In the example, the Windows path and `\q` retain their backslashes, `"""` is three literal quote characters rather than a block delimiter, and `#` does not begin a comment.
+Collect consecutive qualifying pipe lines. Each line independently needs more leading ASCII spaces than the value header; their indentation need not be identical. This comparison uses raw space counts, rather than structural heading depths: a body line may have an odd number of leading spaces, and need not be two spaces deeper than the header. Remove all leading ASCII spaces and the first `|` from each collected line. Everything after that first marker, including spaces, tabs, additional pipes, quotes and backslashes, is literal body text. There is no escape decoding or further whitespace trimming, and encountering a quote never switches the body into quoted syntax. In the example, the Windows path and `\q` retain their backslashes, `"""` is three literal quote characters rather than a block delimiter, and `#` does not begin a comment.
 
 Preserve the original LF or CRLF between collected body lines, excluding the line ending between the header and the first body line and the final body line ending. A final pipe with no content explicitly adds a terminal source line ending after the preceding body text:
 
@@ -872,7 +872,7 @@ A.Tag:red
 
 A heading alone does not create a value occurrence, and headings may be redeclared. Each read operation starts with fresh heading state and its own occurrence sequence. Do not implicitly share headings or values across read calls or merge separately read files.
 
-The same applies to one-element value keys. Writing both `A: value` and ` .: value` under the heading `A.` within one read operation records two occurrences for the same fully qualified key `A`.
+The same applies to one-element value keys. Writing both `A: value` and `  .: value` under the heading `A.` within one read operation records two occurrences for the same fully qualified key `A`.
 
 Adding a type annotation does not change key identity, which is based on the resolved fully qualified key. Preserve the type annotation, unset state, value form and source position of each occurrence independently. Typed and untyped occurrences may coexist; individual type conversion follows section 8.1.
 

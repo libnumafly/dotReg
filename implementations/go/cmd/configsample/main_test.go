@@ -508,7 +508,7 @@ func TestRunRepeatedValuesKeepEachOccurrence(t *testing.T) {
 }
 
 func TestRunDemoCountsRepeatedDecodedPathsWithoutLosingBoundaries(t *testing.T) {
-	const source = "A.B: first\nA.\n .B: second\nA.\n .\"\\u0042\": third\n" +
+	const source = "A.B: first\nA.\n  .B: second\nA.\n  .\"\\u0042\": third\n" +
 		"\"A.B\": literal-first\n\"A.B\": literal-second\n" +
 		"\"\": empty-first\n\"\": empty-second\n" +
 		"\"A\\u0000B\": nul-first\nA.\"\": child-first\n" +
@@ -531,6 +531,28 @@ func TestRunDemoCountsRepeatedDecodedPathsWithoutLosingBoundaries(t *testing.T) 
 	}
 	if i != len(want) {
 		t.Fatalf("value count = %d, want %d", i, len(want))
+	}
+}
+
+func TestRunRejectsOddHierarchyIndentationInEveryMode(t *testing.T) {
+	for _, test := range []struct{ name, source string }{
+		{"one-space child", "A.\n .B: private-RHS"},
+		{"one-space self", "A.\n .: private-RHS"},
+		{"three-space grandchild", "A.\n  .B.\n   .C: private-RHS"},
+	} {
+		for _, mode := range []string{"raw", "strings", "demo"} {
+			t.Run(test.name+"/"+mode, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				err := run([]string{"-mode", mode}, strings.NewReader(cliDocument(test.source)), &stdout, &stderr)
+				requireCLIErrorCode(t, err, dotreg.ErrSyntax)
+				if stdout.Len() != 0 {
+					t.Errorf("invalid indentation emitted partial output: %q", stdout.String())
+				}
+				if strings.Contains(err.Error()+stderr.String(), "private-RHS") {
+					t.Errorf("indentation failure leaked the RHS: %v; stderr=%q", err, stderr.String())
+				}
+			})
+		}
 	}
 }
 

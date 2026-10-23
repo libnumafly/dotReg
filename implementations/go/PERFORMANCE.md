@@ -1,10 +1,11 @@
 # Parser refactor measurements
 
-These are historical measurements from before support for repeated value keys
-and mandatory file property declarations. The measured implementation rejected
-repeated keys and had no declaration region; the current implementation retains
-every occurrence and requires file properties. The figures below are not
-measurements of the current implementation.
+These are historical measurements from before support for repeated value keys,
+mandatory file property declarations and fixed two-space hierarchy indentation.
+The current implementation retains every occurrence, requires file properties
+and uses two ASCII spaces per heading level. The figures below are not
+measurements of the current implementation. Current benchmark fixtures follow
+the current syntax and do not reproduce the historical input byte for byte.
 
 This records the Go parser refactor on 2026-10-23. The comparison uses an exact
 working-tree snapshot taken immediately before the refactor, including both

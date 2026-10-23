@@ -19,10 +19,10 @@ func TestRefactorHeaderErrorPrecedence(t *testing.T) {
 		{"bare path before empty type", "A..B():private", ErrUnsupported, 1, 0},
 		{"quoted boundary before empty type", "\"A\"tail():private", ErrUnsupported, 1, 0},
 		{"invalid escape before empty type", "\"A\\q\"():private", ErrSyntax, 1, 0},
-		{"missing scope and empty type", " .A..B():private", ErrUnsupported, 1, 0},
-		{"dedented scope and empty type", "A.\n .B.\n .C:ok\n  .D():private", ErrUnsupported, 4, 3},
-		{"dedented scope and valid type", "A.\n .B.\n .C:ok\n  .D(T):private", ErrSyntax, 4, 3},
-		{"absolute closed scope and empty type", "A.\nB:ok\n .C():private", ErrUnsupported, 3, 2},
+		{"missing scope and empty type", "  .A..B():private", ErrUnsupported, 1, 0},
+		{"dedented scope and empty type", "A.\n  .B.\n  .C:ok\n    .D():private", ErrUnsupported, 4, 3},
+		{"dedented scope and valid type", "A.\n  .B.\n  .C:ok\n    .D(T):private", ErrSyntax, 4, 3},
+		{"absolute closed scope and empty type", "A.\nB:ok\n  .C():private", ErrUnsupported, 3, 2},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -151,9 +151,9 @@ func TestRefactorTripleQuoteClosingCandidates(t *testing.T) {
 }
 
 func TestRefactorVisitorEntriesSurviveLaterInput(t *testing.T) {
-	source := "\"A\\u{2E}B\".\n .\"C\\\"D\": \" value \"\n"
+	source := "\"A\\u{2E}B\".\n  .\"C\\\"D\": \" value \"\n"
 	for i := 0; i < 8; i++ {
-		source += " ." + strings.Repeat("K", i+1) + ":" + strings.Repeat(string(rune('a'+i)), 5000) + "\n"
+		source += "  ." + strings.Repeat("K", i+1) + ":" + strings.Repeat(string(rune('a'+i)), 5000) + "\n"
 	}
 	var retained, snapshots []Entry
 	err := ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {

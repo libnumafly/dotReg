@@ -145,7 +145,7 @@ func TestParseAccepted(t *testing.T) {
 		},
 		{
 			name:   "comments preserve scope",
-			source: "A.\n .B.\n\n\t  # quoted \"\\q and tab indentation are comment text\n  .C: value\n",
+			source: "A.\n  .B.\n\n\t  # quoted \"\\q and tab indentation are comment text\n    .C: value\n",
 			want: []Entry{
 				parserHeading(1, "A"),
 				parserHeading(2, "A", "B"),
@@ -154,7 +154,7 @@ func TestParseAccepted(t *testing.T) {
 		},
 		{
 			name:   "heading declaration depth differs from element count",
-			source: "A.B.C.\n .D.E.\n  .F: first\n .G: second\n",
+			source: "A.B.C.\n  .D.E.\n    .F: first\n  .G: second\n",
 			want: []Entry{
 				parserHeading(1, "A", "B", "C"),
 				parserHeading(2, "A", "B", "C", "D", "E"),
@@ -164,7 +164,7 @@ func TestParseAccepted(t *testing.T) {
 		},
 		{
 			name:   "self empty child and literal dot child",
-			source: "A.\n .:\n .\"\":\n .\".\": dot\n",
+			source: "A.\n  .:\n  .\"\":\n  .\".\": dot\n",
 			want: []Entry{
 				parserHeading(1, "A"),
 				parserValue(2, []string{"A"}, ""),
@@ -174,7 +174,7 @@ func TestParseAccepted(t *testing.T) {
 		},
 		{
 			name:   "empty heading self",
-			source: "\"\".\n .: value\n",
+			source: "\"\".\n  .: value\n",
 			want: []Entry{
 				parserHeading(1, ""),
 				parserValue(2, []string{""}, "value"),
@@ -182,7 +182,7 @@ func TestParseAccepted(t *testing.T) {
 		},
 		{
 			name:   "heading redeclaration and absolute reset",
-			source: "A.\n .B: first\nA.\n .C: second\nX.\n .D: third\n",
+			source: "A.\n  .B: first\nA.\n  .C: second\nX.\n  .D: third\n",
 			want: []Entry{
 				parserHeading(1, "A"),
 				parserValue(2, []string{"A", "B"}, "first"),
@@ -240,7 +240,7 @@ func TestParseTypeAnnotationPlacement(t *testing.T) {
 			t.Errorf("Parse(%q) = %#v, want %#v", source, got, want)
 		}
 	}
-	got, err := Parse(strings.NewReader(parserDocument("A.B.\n .(Custom_1):\n .\"C.D\"(Other): value\nX: (string) 001\n")))
+	got, err := Parse(strings.NewReader(parserDocument("A.B.\n  .(Custom_1):\n  .\"C.D\"(Other): value\nX: (string) 001\n")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,7 +257,7 @@ func TestParseTypeAnnotationPlacement(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("entries = %#v, want %#v", got, want)
 	}
-	got, err = Parse(strings.NewReader(parserDocument("A.\n .(int):")))
+	got, err = Parse(strings.NewReader(parserDocument("A.\n  .(int):")))
 	if err != nil {
 		t.Fatalf("typed self assignment: %v", err)
 	}
@@ -491,7 +491,7 @@ func TestParseMultilineValues(t *testing.T) {
 		},
 		{
 			name:   "shallow pipe is an absolute key",
-			source: "A.\n .B:\n|: ordinary key",
+			source: "A.\n  .B:\n|: ordinary key",
 			want: []Entry{
 				parserHeading(1, "A"),
 				parserValue(2, []string{"A", "B"}, ""),
@@ -510,7 +510,7 @@ func TestParseMultilineValues(t *testing.T) {
 		},
 		{
 			name:   "pipe leaves heading scope unchanged",
-			source: "A.\n .B:\n  |first\n .C: second",
+			source: "A.\n  .B:\n   |first\n  .C: second",
 			want: []Entry{
 				parserHeading(1, "A"),
 				parserBlockValue(2, []string{"A", "B"}, "first", PipeBlock),
@@ -532,7 +532,7 @@ func TestParseMultilineValues(t *testing.T) {
 }
 
 func TestParseTypedMultilineSelfAndChild(t *testing.T) {
-	got, err := Parse(strings.NewReader(parserDocument("A.\n .(string): \"\"\"\n   first\n   \"\"\"\n .B(string):\n  |second")))
+	got, err := Parse(strings.NewReader(parserDocument("A.\n  .(string): \"\"\"\n   first\n   \"\"\"\n  .B(string):\n   |second")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -557,7 +557,7 @@ func TestParseRejectsInvalidMultilineStructure(t *testing.T) {
 		"A: \"\"\"\n\xff\n\"\"\"",
 		"A:\n\n |not immediate",
 		"A:\n# comment\n |not immediate",
-		"A.\n .B:\n  |value\n  .C: values do not create scope",
+		"A.\n  .B:\n   |value\n    .C: values do not create scope",
 	} {
 		t.Run(source, func(t *testing.T) {
 			got, err := Parse(strings.NewReader(parserDocument(source)))
@@ -706,7 +706,7 @@ func TestParseLookaheadDoesNotPreemptCurrentCallback(t *testing.T) {
 
 func TestParsePipeLookaheadReplaysSameIndentLine(t *testing.T) {
 	var got []Entry
-	err := ParseEach(strings.NewReader(parserDocument("A.\n .B:\n |:x")), func(entry Entry) error {
+	err := ParseEach(strings.NewReader(parserDocument("A.\n  .B:\n  |:x")), func(entry Entry) error {
 		got = append(got, entry)
 		return nil
 	})
@@ -771,17 +771,17 @@ func TestParseRejectsMalformedSyntax(t *testing.T) {
 		{"missing final element", "A.: value", 1},
 		{"missing heading element", "A..", 1},
 		{"relative at column zero", ".A: value", 1},
-		{"relative self without parent", " .: value", 1},
-		{"indent without relative dot", "A.\n B: value", 2},
-		{"relative without parent", " .A: value", 1},
-		{"relative heading without child", "A.\n .", 2},
-		{"relative heading with omitted element", "A.\n ..", 2},
-		{"indent jump", "A.\n  .B: value", 2},
+		{"relative self without parent", "  .: value", 1},
+		{"indent without relative dot", "A.\n  B: value", 2},
+		{"relative without parent", "  .A: value", 1},
+		{"relative heading without child", "A.\n  .", 2},
+		{"relative heading with omitted element", "A.\n  ..", 2},
+		{"indent jump", "A.\n    .B: value", 2},
 		{"tab indent", "A.\n\t.B: value", 2},
 		{"mixed tab indent", "A.\n \t.B: value", 2},
-		{"relative value is not parent", "A.\n .B: value\n  .C: invalid", 3},
-		{"closed heading does not revive", "A.\n .B.\n  .C: value\n .D: value\n  .E: invalid", 5},
-		{"absolute value closes scope", "A.\n .B: value\nX.Y: value\n .C: invalid", 4},
+		{"relative value is not parent", "A.\n  .B: value\n    .C: invalid", 3},
+		{"closed heading does not revive", "A.\n  .B.\n    .C: value\n  .D: value\n    .E: invalid", 5},
+		{"absolute value closes scope", "A.\n  .B: value\nX.Y: value\n  .C: invalid", 4},
 		{"bare backslash key", "A\\.B: value", 1},
 		{"bare terminal backslash", "A\\: value", 1},
 		{"bare escape heading", "A\\.B.", 1},
@@ -810,7 +810,7 @@ func TestParseRejectsMalformedSyntax(t *testing.T) {
 		{"unclosed nested type", "A(map(string,list(int)): value", 1},
 		{"extra type closing parenthesis", "A(T)): value", 1},
 		{"typed heading", "A(T).", 1},
-		{"relative typed heading", "A.\n .B(list(int)).", 2},
+		{"relative typed heading", "A.\n  .B(list(int)).", 2},
 		{"bare CR", "A: x\rB: y", 1},
 		{"bare CR at EOF", "A: x\r", 1},
 		{"bare CR in comment", "# comment\r", 1},
@@ -848,8 +848,8 @@ func TestParseReportsUndecidedGrammarAsUnsupported(t *testing.T) {
 
 func TestParseRepeatedKeyIdentity(t *testing.T) {
 	for _, source := range []string{
-		"A.B: first\nA.\n .B: second",
-		"A: first\nA.\n .: second",
+		"A.B: first\nA.\n  .B: second",
+		"A: first\nA.\n  .: second",
 		"A.B: first\nA.\"B\": second",
 		"\"A.B\": first\n\"A\\.B\": second",
 		"A.\"B.C\": first\nA.\"B\\.C\": second",
@@ -883,7 +883,7 @@ func TestParseRepeatedKeyIdentity(t *testing.T) {
 
 func TestParseEachCallbackContracts(t *testing.T) {
 	t.Run("source order includes headings", func(t *testing.T) {
-		source := "\n# comment\nA.\n .B: first\n .C.\n  .: second\n"
+		source := "\n# comment\nA.\n  .B: first\n  .C.\n    .: second\n"
 		var got []Entry
 		err := ParseEach(strings.NewReader(parserDocument(source)), func(entry Entry) error {
 			got = append(got, entry)
@@ -927,7 +927,7 @@ func TestParseEachCallbackContracts(t *testing.T) {
 	})
 	t.Run("callback cannot mutate scope or later repeated paths", func(t *testing.T) {
 		var paths [][]string
-		err := ParseEach(strings.NewReader(parserDocument("A.\n .B: first\nA.B: second\n")), func(entry Entry) error {
+		err := ParseEach(strings.NewReader(parserDocument("A.\n  .B: first\nA.B: second\n")), func(entry Entry) error {
 			paths = append(paths, append([]string(nil), entry.Path...))
 			entry.Path[0] = "changed"
 			return nil
@@ -1037,7 +1037,7 @@ func TestParseLongPhysicalLines(t *testing.T) {
 			}
 		})
 	}
-	source := "\ufeffA.\r\n .B:" + strings.Repeat("x", sampleBytes) + "\r\n"
+	source := "\ufeffA.\r\n  .B:" + strings.Repeat("x", sampleBytes) + "\r\n"
 	if _, err := Parse(strings.NewReader(parserDocument(source))); err != nil {
 		t.Fatalf("long relative value line: %v", err)
 	}
@@ -1051,7 +1051,7 @@ func TestParseLongExpandedPaths(t *testing.T) {
 		if heading {
 			suffix = "."
 		}
-		source := "\ufeff" + parent + ".\r\n .\"" + child + "\"" + suffix + "\r\n"
+		source := "\ufeff" + parent + ".\r\n  .\"" + child + "\"" + suffix + "\r\n"
 		got, err := Parse(strings.NewReader(parserDocument(source)))
 		if err != nil {
 			t.Fatalf("long expanded path, heading=%v: %v", heading, err)
@@ -1086,17 +1086,17 @@ func TestParseHasNoWholeFileByteLimit(t *testing.T) {
 
 func TestParseStateIsPerCall(t *testing.T) {
 	for range 2 {
-		if _, err := Parse(strings.NewReader(parserDocument("A.\n .B: value"))); err != nil {
+		if _, err := Parse(strings.NewReader(parserDocument("A.\n  .B: value"))); err != nil {
 			t.Fatalf("repeated parse failed: %v", err)
 		}
 	}
-	_, err := Parse(strings.NewReader(parserDocument(" .C: value")))
+	_, err := Parse(strings.NewReader(parserDocument("  .C: value")))
 	parserRequireCode(t, err, ErrSyntax, 3)
 }
 
 func FuzzSampleParserNoPanic(f *testing.F) {
 	for _, source := range []string{
-		"", "A:001", "A.\n .", "A.\n ..", "A.\n .(int):",
+		"", "A:001", "A.\n  .", "A.\n  ..", "A.\n  .(int):",
 		"\"A\\.B\": \"say \\\"hello\\\"\"", "\"\":", "\ufeffA: value\r\n",
 		"A: \"\\q\"", "A: value\\", "A..B: value", "A:\xff",
 		"\"A\x00 B:#()\": value", "A(map(T:U,list(V))): first:second",

@@ -2,54 +2,54 @@
 
 # Sample: string / int / bool are type names from the demo profile.
 A.
- .Code(string):001
- .Count(int):42
- .Enabled(bool):true
- .Path: C:\temp\new
- .QuotedPath: "C:\\temp\\new"
- .Message: "  say \"hello\"  "
- .LineBreak: "first\nsecond"
- .Emoji: "\u{1F600}"
- .EmojiJson: "\uD83D\uDE00"
- .Missing:
- .Empty: ""
- .NullText: null
- .Pattern: ^foo\.bar$
+  .Code(string):001
+  .Count(int):42
+  .Enabled(bool):true
+  .Path: C:\temp\new
+  .QuotedPath: "C:\\temp\\new"
+  .Message: "  say \"hello\"  "
+  .LineBreak: "first\nsecond"
+  .Emoji: "\u{1F600}"
+  .EmojiJson: "\uD83D\uDE00"
+  .Missing:
+  .Empty: ""
+  .NullText: null
+  .Pattern: ^foo\.bar$
 
- # Only an initial quote selects quoted syntax; later quotes stay literal.
- .Saying: say "hello"
- .Unbalanced: x"unterminated
- .QuoteText: \"hello\"
- .JsonText: {"x": "\u0041"}
- .MidTriple: text """ more
+  # Only an initial quote selects quoted syntax; later quotes stay literal.
+  .Saying: say "hello"
+  .Unbalanced: x"unterminated
+  .QuoteText: \"hello\"
+  .JsonText: {"x": "\u0041"}
+  .MidTriple: text """ more
 
- # Every occurrence is retained, including repeated identical values.
- .Tag:red
- .Tag:green
- .Tag:red
+  # Every occurrence is retained, including repeated identical values.
+  .Tag:red
+  .Tag:green
+  .Tag:red
 
- # Triple quotes decode the same escapes as ordinary quoted values.
- .Multiline(string): """
+  # Triple quotes decode the same escapes as ordinary quoted values.
+  .Multiline(string): """
    first line
      indented second line: \u{1F600}
    say \"hello\"
    """
 
- # Pipe blocks keep everything after | literally, including backslashes.
- .Literal:
-  |C:\temp\new
-  |"quotes" and \n stay literal
-  ||this line begins with a pipe
+  # Pipe blocks keep everything after | literally, including backslashes.
+  .Literal:
+   |C:\temp\new
+   |"quotes" and \n stay literal
+   ||this line begins with a pipe
 
- # An extra empty body line explicitly includes a final newline.
- .FinalNewline:
-  |first line
-  |
+  # An extra empty body line explicitly includes a final newline.
+  .FinalNewline:
+   |first line
+   |
 
- .Group.
-  .: group-value
-  ."B.C": dot-in-one-name
-  ."": empty-child-name
+  .Group.
+    .: group-value
+    ."B.C": dot-in-one-name
+    ."": empty-child-name
 
 "A.B": one-element-key
 "": empty-key-name

@@ -8,13 +8,13 @@ dotReg is a line-oriented configuration notation. Write full keys directly, or g
 @dotReg 1
 
 A.
- .Code:001
- .Message: "Hello, dotReg"
- .Group.
-  .Enabled:true
+  .Code:001
+  .Message: "Hello, dotReg"
+  .Group.
+    .Enabled:true
 ```
 
-The grouped entries resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. The code `001` stays text, with its leading zeroes intact.
+The grouped entries resolve to `A.Code`, `A.Message` and `A.Group.Enabled`. Each heading level adds exactly two ASCII spaces. The code `001` stays text, with its leading zeroes intact.
 
 Every file starts with the exact declaration `@dotReg 1` and a required blank separator. Declarations are file properties, separate from settings. The shorter notation examples below show body fragments; prepend the same declaration and blank line when parsing them. See [file properties](docs/config-format.md#11-file-property-declarations) for validation rules.
 

@@ -171,7 +171,7 @@ A.Message: """
   """
 ```
 
-The header right-hand side is exactly `"""`; no inline content follows it. The closing marker is on its own line, with optional trailing ASCII spaces or tabs. Its leading ASCII-space count is the margin removed from every non-empty source body line; truly empty lines are exempt. Non-empty lines with insufficient margin are rejected. A closing margin of zero is allowed. Ordinary quote characters are body data; only an exact closing line terminates the block. Escape one of its quotes, for example `\"""`, to represent such a line as body data, or use a pipe block instead.
+The header right-hand side is exactly `"""`; no inline content follows it. The closing marker is on its own line, with optional trailing ASCII spaces or tabs. Its leading ASCII-space count is the margin removed from every non-empty source body line; truly empty lines are exempt. Non-empty lines with insufficient margin are rejected. The closing margin is independent of structural indentation and may be odd or zero. Ordinary quote characters are body data; only an exact closing line terminates the block. Escape one of its quotes, for example `\"""`, to represent such a line as body data, or use a pipe block instead.
 
 After structural processing, `DecodeString` decodes the body escapes exactly once and does not trim or normalise the result. With LF source endings, the example becomes `Hello, 😀`, LF and two spaces followed by `indented`. Invalid escapes still fail decoding, and a backslash never continues a physical line.
 
@@ -179,14 +179,14 @@ A pipe block starts only when the physical line immediately after an empty heade
 
 ```text
 A.
- .Literal:
-  |C:\temp\new
-  |"quotes" and \q remain literal
-  |# literal text
- .Next: value
+  .Literal:
+   |C:\temp\new
+   |"quotes" and \q remain literal
+   |# literal text
+  .Next: value
 ```
 
-Collect consecutive deeper pipe lines, stripping their leading spaces and first pipe. Everything after each marker is literal: retain whitespace, additional pipes, quotes and backslashes without escape decoding. Different body-line indentation is allowed if every line remains deeper than the header. Do not skip blank lines or comments to find or continue a pipe body. The first non-body line is processed normally. `A:|` is an ordinary single-line value. A same-depth or shallower `|:` line is not body content and must satisfy ordinary key and indentation rules: unindented `|: value` can name the key `|`, but an indented absolute key remains invalid.
+Collect consecutive deeper pipe lines, stripping their leading spaces and first pipe. Everything after each marker is literal: retain whitespace, additional pipes, quotes and backslashes without escape decoding. Different body-line indentation is allowed if every line remains deeper than the header. Compare raw leading-space counts: odd counts and a one-space increase are allowed for pipe bodies independently of the two-space hierarchy rule. Do not skip blank lines or comments to find or continue a pipe body. The first non-body line is processed normally. `A:|` is an ordinary single-line value. A same-depth or shallower `|:` line is not body content and must satisfy ordinary key and indentation rules: unindented `|: value` can name the key `|`, but an indented absolute key remains invalid.
 
 Both forms preserve original LF or CRLF between body lines, exclude boundary line endings and infer no terminal newline. Add an empty body line before a triple-quoted close or an empty final pipe to retain a terminal newline:
 
@@ -220,7 +220,7 @@ Custom types can be added through a `Profile`. Known keys, required settings, de
 
 ## Supported rules and provisional choices
 
-The implementation covers the required declaration region and blank separator, fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, single-line values selected as quoted by their first trimmed character, and triple-quoted bodies. Later quotes and backslashes in literal single-line values, and all pipe-body text, are retained; backslashes in unquoted key elements are rejected.
+The implementation covers the required declaration region and blank separator, fully qualified keys, headings, relative notation, assigning to the heading itself, quoted key elements, empty names, the position of type annotations, alignment with ASCII spaces, unset values, single-line values, both multiline forms, common string decoding and source-ordered repeated values. Structural child lines require exactly two more ASCII spaces than their parent heading; odd structural indentation, tab indentation and missing parents are rejected. Blank lines, comments, triple-quoted margins and pipe bodies follow their separate whitespace rules. It retains identical repetitions without overwriting or deduplication. Escapes are decoded in quoted key elements, single-line values selected as quoted by their first trimmed character, and triple-quoted bodies. Later quotes and backslashes in literal single-line values, and all pipe-body text, are retained; backslashes in unquoted key elements are rejected.
 
 Quoted key elements generally allow spaces, tabs, syntax characters such as `: ( ) #`, and control characters. Key elements and ordinary quoted values cannot span physical lines; triple-quoted and pipe bodies use the explicit multiline rules above. Represent a quote or a backslash in an ordinary quoted string with `\"` or `\\`; decoded characters are not reinterpreted as syntax. A newline can also be represented as character data with `\n` or a Unicode escape in quoted text. The range of characters representable by escapes is generally unrestricted, but undefined escape forms remain errors.
 

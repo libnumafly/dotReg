@@ -49,21 +49,21 @@ A heading ends with a dot and supplies a shared prefix. Relative lines begin wit
 
 ```text
 A.
- .Code:001
- .Count:42
+  .Code:001
+  .Count:42
 ```
 
 This has the same result as the full-key example above. Include both examples in one file only when you want to record each value twice.
 
-Use one additional **ASCII space** for each heading level. Tabs cannot replace these spaces. The number of levels follows the headings you write, not the number of dots in a key:
+Use exactly two additional **ASCII spaces** for each heading level. Odd numbers of leading spaces are invalid on headings and value lines, and tabs cannot replace these spaces. The number of levels follows the headings you write, not the number of dots in a key:
 
 ```text
 A.B.
- .C.
-  .Code:001
+  .C.
+    .Code:001
 ```
 
-`A.B.` is one heading level, so `.C.` has one leading space and `.Code` has two. The value belongs to `A.B.C.Code`.
+`A.B.` is one heading level, so `.C.` has two leading spaces and `.Code` has four. The value belongs to `A.B.C.Code`.
 
 ## Keep repeated values
 
@@ -101,7 +101,7 @@ A.Message: """
   """
 ```
 
-The closing marker goes on its own line. Its leading spaces set the margin removed from non-empty body lines. The body decodes to `Hello, 😀`, a line break, and two spaces followed by `second line`.
+The closing marker goes on its own line. Its leading spaces set the margin removed from non-empty body lines. This margin is independent of heading indentation and may be odd or zero. The body decodes to `Hello, 😀`, a line break, and two spaces followed by `second line`.
 
 Use a pipe block when the body should stay literal:
 
@@ -113,7 +113,7 @@ A.Literal:
 A.Next: value
 ```
 
-The first pipe line must immediately follow the empty header and be indented more deeply. Each body line loses its indentation and first `|`; the remaining text is kept as written. `A.Next` is then read as a normal setting.
+The first pipe line must immediately follow the empty header and have more leading ASCII spaces than it. Pipe-body indentation is not subject to the two-space hierarchy rule: the single leading space in this example is sufficient. Each body line loses its indentation and first `|`; the remaining text is kept as written. `A.Next` is then read as a normal setting.
 
 Neither block form adds a final line break automatically. See [triple-quoted values](config-format.md#83-triple-quoted-multiline-values) and [pipe blocks](config-format.md#84-literal-pipe-blocks) for exact indentation and line-ending rules.
 

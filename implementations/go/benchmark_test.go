@@ -19,15 +19,15 @@ func benchmarkSettings(quoted, typed bool) string {
 	out.WriteString("@dotReg 1\n\nA.\n")
 	for group := 0; group < 8; group++ {
 		if quoted {
-			fmt.Fprintf(&out, " .\"Group\\.%02d\".\n", group)
+			fmt.Fprintf(&out, "  .\"Group\\.%02d\".\n", group)
 		} else {
-			fmt.Fprintf(&out, " .Group%02d.\n", group)
+			fmt.Fprintf(&out, "  .Group%02d.\n", group)
 		}
 		for key := 0; key < 64; key++ {
 			if quoted {
-				fmt.Fprintf(&out, "  .\"Key\\u{2E}%02d\"", key)
+				fmt.Fprintf(&out, "    .\"Key\\u{2E}%02d\"", key)
 			} else {
-				fmt.Fprintf(&out, "  .Key%02d", key)
+				fmt.Fprintf(&out, "    .Key%02d", key)
 			}
 			switch {
 			case typed && key%4 == 0:
