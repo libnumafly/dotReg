@@ -4,9 +4,11 @@ This published campaign transfers one established Go optimisation to the other
 public sample parsers: persistent parent/suffix nodes are needed for active headings,
 but an ordinary value can construct its independent output path without a
 temporary scope node. The change covers Python, JavaScript, Java, C#, Rust and
-C++; TypeScript shares the JavaScript engine. The public Go parser already
-contains this change and the additional improvements described in the
-[Go tuning report](../tuning-2026-10-24/README.md).
+C++; TypeScript shares the JavaScript engine. The Go control in this campaign
+already contains this path-construction change. The separately published
+[Go multiline and allocation report](../multiline-allocation-2026-10-24/README.md)
+measures subsequent Go changes from its own recorded source snapshots; its
+results do not update the native observations retained here.
 
 The [benchmark overview](../README.md) links to the latest published results
 for each suite. The [native methodology guide](../native-2026-10-24/README.md)
@@ -396,5 +398,9 @@ sample rounds. Runtime tuning environment overrides must be cleared first.
 [render.py](render.py) validates the retained raw observations and regenerates
 only the marked result tables in this document. `python
 implementations/benchmarks/public-rollin-2026-10-24/render.py --check` checks
-the tables and current parser source hashes against the report. CI checks
-correctness and report consistency; performance thresholds are not imposed.
+the tables and recorded source manifests against the completed report. The
+measured snapshots remain identified by their recorded hashes as the public
+parsers continue to change. To additionally require a checkout's current
+production sources to match the measured candidate, pass
+`--check --check-current-sources`. CI checks correctness and recorded report
+consistency; performance thresholds are not imposed.

@@ -46,7 +46,7 @@ export default defineConfig({
           { label: 'C++ sample', slug: 'implementations/cpp' },
           { label: 'Time and memory measurements', slug: 'implementations/benchmarks' },
           { label: 'Public sample parser adoption', slug: 'implementations/benchmarks/public-rollin-2026-10-24' },
-          { label: 'Go parser tuning results', slug: 'implementations/benchmarks/tuning-2026-10-24' },
+          { label: 'Go multiline and allocation results', slug: 'implementations/benchmarks/multiline-allocation-2026-10-24' },
           { label: 'Configuration comparison methodology', slug: 'implementations/benchmarks/comparison' },
           { label: 'Native workload methodology', slug: 'implementations/benchmarks/native-2026-10-24' },
         ] },

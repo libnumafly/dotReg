@@ -41,10 +41,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify the published tuning tables
+      - name: Verify the latest published benchmark tables
         run: |
-          python ../tuning-2026-10-24/render.py --check
+          python ../multiline-allocation-2026-10-24/render.py --check
           python ../public-rollin-2026-10-24/render.py --check
+      - name: Check focused block and loading fixtures
+        working-directory: implementations/benchmarks/assembly
+        run: |
+          go test -count=1 ./...
+          go test -run='^$' -bench='^BenchmarkAssembly$' -benchtime=1x -count=1 -cpu=1 .
       - name: Check semantic equivalence
         run: go test -count=1 ./...
       - name: Verify the recorded fixture manifest

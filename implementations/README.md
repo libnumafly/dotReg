@@ -125,7 +125,7 @@ collection and workload shape matter when comparing results.
 
 The latest results pushed to the repository are the
 [native sample report](benchmarks/public-rollin-2026-10-24/README.md) and the
-[Go format-comparison and API report](benchmarks/tuning-2026-10-24/README.md).
+[Go format-comparison, API and assembly report](benchmarks/multiline-allocation-2026-10-24/README.md).
 Each identifies its own measured source snapshots and scope. Only the latest
 pushed report per measurement series is published; local experiments and
 unpublished replacement measurements do not change those results. A paired

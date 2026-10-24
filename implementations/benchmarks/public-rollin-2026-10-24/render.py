@@ -1,9 +1,10 @@
-"""Verify the paired native observations and render only the README result block.
+"""Verify the published native campaign and render its README result block.
 
 Copy the completed campaign to report.json beside this script, then run it.
---check leaves files untouched, checks the generated block and verifies that
-the six changed production parsers and Go control sources still match the
-measured candidate. No parser, benchmark, compiler or Git process is launched.
+--check leaves files untouched and checks the recorded observations, source
+manifests and generated block. The completed report does not require today's
+parser sources to match its measured snapshot. --check-current-sources adds
+that explicit check. No parser, benchmark, compiler or Git process is launched.
 """
 
 import argparse
@@ -190,6 +191,32 @@ def read_report(path):
     return report, summaries
 
 
+def check_source_records(report):
+    for variant in VARIANTS:
+        manifest = report["variants"][variant].get("source_sha256")
+        require(isinstance(manifest, dict) and manifest, f"{variant}: missing source manifest")
+        engines = report["variants"][variant]["engines"]
+        names = set(PRODUCTION) | {"docs/config-format.md"}
+        names.update(name for engine in engines for name in engine["sources"])
+        require(names <= manifest.keys(), f"{variant}: required measured sources are missing")
+        for name, digest in manifest.items():
+            relative = Path(name)
+            require(not relative.is_absolute() and ".." not in relative.parts and "\\" not in name
+                    and bool(relative.parts) and ":" not in name,
+                    "Source manifest name must be repository-relative")
+            require(isinstance(digest, str) and len(digest) == 64
+                    and all(c in "0123456789abcdef" for c in digest),
+                    f"{variant}: invalid recorded SHA-256: {name}")
+    # Go is an unchanged control in this campaign. Check that fact between the
+    # retained snapshots, rather than requiring future checkouts to stay frozen.
+    baseline = report["variants"]["baseline"]["source_sha256"]
+    candidate = report["variants"]["candidate"]["source_sha256"]
+    go_engine = next(engine for engine in report["variants"]["candidate"]["engines"]
+                     if engine["language"] == "go")
+    for name in go_engine["sources"]:
+        require(baseline[name] == candidate[name], f"Recorded Go control differs between snapshots: {name}")
+
+
 def check_candidate_sources(report):
     candidate = report["variants"]["candidate"]
     manifest = candidate["source_sha256"]
@@ -290,13 +317,16 @@ def result_block(readme, generated):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="Verify the existing block and measured candidate sources without editing")
+    parser.add_argument("--check", action="store_true", help="Verify the recorded result block without editing")
+    parser.add_argument("--check-current-sources", action="store_true",
+                        help="Additionally require current production sources to match the measured candidate")
     parser.add_argument("--report", type=Path, default=HERE / "report.json")
     parser.add_argument("--readme", type=Path, default=HERE / "README.md")
     args = parser.parse_args()
     try:
         report, summaries = read_report(args.report)
-        if args.check:
+        check_source_records(report)
+        if args.check_current_sources:
             check_candidate_sources(report)
         require(args.readme.is_file(), "README.md is missing")
         with args.readme.open(encoding="utf-8", newline="") as source:
@@ -304,7 +334,7 @@ def main():
         expected = result_block(original, render(report, summaries))
         if args.check:
             require(original == expected, "README result block is stale; run render.py without --check")
-            print("Verified 840 observations, 84 independent validations, 168 summaries, candidate sources and generated result block.")
+            print("Verified 840 observations, 84 independent validations, 168 summaries, recorded source manifests and generated result block.")
         else:
             with args.readme.open("w", encoding="utf-8", newline="") as output:
                 output.write(expected)

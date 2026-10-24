@@ -1,0 +1,2607 @@
+# Balanced baseline/candidate Go campaign; exact flags and hashes are in the JSON report.
+
+# discovery variant=baseline started_at_utc=2026-10-24T12:20:06.621863+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	       1	      1900 ns/op	  26.32 MB/s	    4360 B/op	      11 allocs/op
+BenchmarkAssembly/TripleShort3LF       	       1	      1400 ns/op	  40.00 MB/s	    4576 B/op	      16 allocs/op
+BenchmarkAssembly/PipeManyShortLF      	       1	    136600 ns/op	 285.01 MB/s	  207792 B/op	    2074 allocs/op
+BenchmarkAssembly/PipeManyShortCRLF    	       1	    120100 ns/op	 341.24 MB/s	  207792 B/op	    2074 allocs/op
+BenchmarkAssembly/TripleManyShortLF    	       1	    209800 ns/op	 175.85 MB/s	  400880 B/op	    2087 allocs/op
+BenchmarkAssembly/TripleManyShortCRLF  	       1	    142600 ns/op	 273.11 MB/s	  400880 B/op	    2087 allocs/op
+BenchmarkAssembly/PipeLong1MiB         	       1	    511800 ns/op	2048.85 MB/s	 3173904 B/op	     273 allocs/op
+BenchmarkAssembly/TripleLong1MiB       	       1	    710200 ns/op	1476.50 MB/s	 3173920 B/op	     274 allocs/op
+BenchmarkAssembly/PipeDiscardedMargin  	       1	     43900 ns/op	1120.50 MB/s	  109184 B/op	      30 allocs/op
+BenchmarkAssembly/TripleDiscardedMargin         	       1	     33300 ns/op	1969.31 MB/s	  144336 B/op	      39 allocs/op
+BenchmarkAssembly/PipeBoundary1MiB              	       1	    282900 ns/op	3706.73 MB/s	 2125416 B/op	     277 allocs/op
+BenchmarkAssembly/PipeBuffered8Rows             	       1	      2200 ns/op	1841.82 MB/s	   12480 B/op	      16 allocs/op
+BenchmarkAssembly/Bare512CollectDecode          	       1	     60800 ns/op	 185.54 MB/s	  163840 B/op	    1043 allocs/op
+BenchmarkAssembly/Quoted512CollectDecode        	       1	    105500 ns/op	 160.31 MB/s	  188416 B/op	    2067 allocs/op
+BenchmarkAssembly/ParseBuildDistinct512         	       1	    194800 ns/op	  57.91 MB/s	  382040 B/op	    1576 allocs/op
+BenchmarkAssembly/ParseBuildRepeated512         	       1	     89900 ns/op	 125.48 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# discovery variant=candidate started_at_utc=2026-10-24T12:20:06.669908+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	       1	      1800 ns/op	  27.78 MB/s	    4312 B/op	       8 allocs/op
+BenchmarkAssembly/TripleShort3LF       	       1	      1400 ns/op	  40.00 MB/s	    4344 B/op	      12 allocs/op
+BenchmarkAssembly/PipeManyShortLF      	       1	    122900 ns/op	 316.78 MB/s	  158640 B/op	      26 allocs/op
+BenchmarkAssembly/PipeManyShortCRLF    	       1	    110600 ns/op	 370.55 MB/s	  158640 B/op	      26 allocs/op
+BenchmarkAssembly/TripleManyShortLF    	       1	    133100 ns/op	 277.18 MB/s	  278848 B/op	    2066 allocs/op
+BenchmarkAssembly/TripleManyShortCRLF  	       1	    122600 ns/op	 317.66 MB/s	  287040 B/op	    2066 allocs/op
+BenchmarkAssembly/PipeLong1MiB         	       1	    592600 ns/op	1769.49 MB/s	 3173904 B/op	     273 allocs/op
+BenchmarkAssembly/TripleLong1MiB       	       1	    694800 ns/op	1509.22 MB/s	 3173920 B/op	     274 allocs/op
+BenchmarkAssembly/PipeDiscardedMargin  	       1	     49900 ns/op	 985.77 MB/s	  109184 B/op	      30 allocs/op
+BenchmarkAssembly/TripleDiscardedMargin         	       1	     23100 ns/op	2838.87 MB/s	  144144 B/op	      36 allocs/op
+BenchmarkAssembly/PipeBoundary1MiB              	       1	    267400 ns/op	3921.59 MB/s	 2125368 B/op	     274 allocs/op
+BenchmarkAssembly/PipeBuffered8Rows             	       1	      2200 ns/op	1841.82 MB/s	   12480 B/op	      16 allocs/op
+BenchmarkAssembly/Bare512CollectDecode          	       1	     51400 ns/op	 219.47 MB/s	  163840 B/op	    1043 allocs/op
+BenchmarkAssembly/Quoted512CollectDecode        	       1	    100100 ns/op	 168.96 MB/s	  188416 B/op	    2067 allocs/op
+BenchmarkAssembly/ParseBuildDistinct512         	       1	    100800 ns/op	 111.91 MB/s	  332792 B/op	    1576 allocs/op
+BenchmarkAssembly/ParseBuildRepeated512         	       1	     80600 ns/op	 139.96 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=1 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:07.319114+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1729	    124078 ns/op	 297.34 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=2 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:07.575001+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     871	    287925 ns/op	3642.03 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=3 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:07.874846+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1800	    122726 ns/op	 137.81 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=4 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:08.128349+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1443	    142909 ns/op	 258.16 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=5 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:08.378359+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10778	     22242 ns/op	2211.62 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=6 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:08.777074+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     626	    336042 ns/op	3120.46 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=7 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:09.045488+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11256	     21371 ns/op	2301.71 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=8 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:09.451676+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  110767	      1972 ns/op	2054.61 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=9 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:09.721395+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     877	    274285 ns/op	3823.16 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=10 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:10.021704+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  310656	       780.7 ns/op	  64.05 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=11 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:10.492910+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1675	    122022 ns/op	 335.86 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=12 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:10.741249+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1478	    143059 ns/op	 272.23 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=13 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:10.995952+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  269852	       876.8 ns/op	  63.87 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=14 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:11.443307+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     655	    325249 ns/op	3223.99 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=15 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:11.725686+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1844	    112766 ns/op	 345.25 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=16 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:11.980303+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     676	    327369 ns/op	3203.14 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=17 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:12.271114+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  277671	       821.7 ns/op	  68.15 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=18 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:12.735632+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2018	    122205 ns/op	  92.31 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=19 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:13.033001+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1939	    106001 ns/op	 367.28 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=20 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:13.279779+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1824	    133069 ns/op	 127.10 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=21 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:13.567684+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1562	    134747 ns/op	 289.02 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=22 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:13.827585+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1586	    132526 ns/op	  85.12 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=23 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:14.076926+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8464	     27655 ns/op	2371.26 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=24 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:14.488251+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    2140	    111528 ns/op	 101.15 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=25 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:14.973357+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    2908	     74184 ns/op	 152.07 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=26 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:15.232305+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     738	    322241 ns/op	3254.09 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=27 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:15.535833+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3614	     62088 ns/op	 181.69 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=28 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:15.987504+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  108524	      1986 ns/op	2040.24 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=29 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:16.256862+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  303111	       837.2 ns/op	  59.72 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=30 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:16.730835+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    1922	    123770 ns/op	  91.14 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=candidate sample=1 order_seed=20261024 sequence=31 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:17.217290+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1981	    119529 ns/op	 342.87 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=1 order_seed=20261024 sequence=32 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:17.685397+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    5688	     40787 ns/op	1607.81 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=33 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:18.110865+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1826	    113601 ns/op	 342.71 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=34 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:18.361162+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     698	    318623 ns/op	3291.03 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=35 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:18.638475+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     739	    274136 ns/op	3825.23 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=36 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:18.908698+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1762	    135569 ns/op	 124.76 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=37 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:19.185190+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  192754	      1060 ns/op	  52.83 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=38 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:19.436293+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    2911	     74672 ns/op	 151.07 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=39 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:19.692320+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1538	    153912 ns/op	 253.03 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=40 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:19.974465+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     664	    337828 ns/op	3103.97 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=41 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:20.262957+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  125352	      1999 ns/op	2026.61 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=42 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:20.754984+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  313855	       762.0 ns/op	  65.62 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=43 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:21.215875+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10756	     21656 ns/op	2271.43 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=44 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:21.602040+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1792	    136809 ns/op	  82.46 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=45 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:21.885502+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1662	    145965 ns/op	 252.75 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=46 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:22.183537+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3133	     73862 ns/op	 152.73 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=47 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:22.639246+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  295896	       801.4 ns/op	  69.87 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=48 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:23.103823+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  329520	       733.4 ns/op	  68.17 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=49 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:23.566948+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1807	    130746 ns/op	 129.36 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=50 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:23.846793+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1683	    133079 ns/op	  84.77 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=51 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:24.121599+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     865	    276921 ns/op	3786.77 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=52 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:24.418023+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  100970	      2087 ns/op	1941.77 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=53 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:24.684270+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    5883	     40856 ns/op	1605.09 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=54 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:25.106497+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1471	    146639 ns/op	 265.58 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=55 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:25.360146+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2348	    102474 ns/op	 110.09 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=56 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:25.835649+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1450	    142358 ns/op	 259.16 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=57 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:26.084576+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2037	    112413 ns/op	 100.35 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=58 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:26.347423+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1838	    119393 ns/op	 343.26 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=59 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:26.620570+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10749	     21232 ns/op	2316.82 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=60 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:26.987994+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     674	    329730 ns/op	3180.18 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=61 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:27.278863+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1556	    134260 ns/op	 305.25 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=62 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:27.528988+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1964	    105759 ns/op	 368.12 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=2 order_seed=20261025 sequence=63 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:27.778617+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     685	    338953 ns/op	3093.67 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=2 order_seed=20261025 sequence=64 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:28.074622+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8568	     27662 ns/op	2370.67 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=65 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:28.481729+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1692	    124486 ns/op	 296.36 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=66 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:28.736971+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1664	    120504 ns/op	 323.08 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=67 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:28.976338+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1455	    142569 ns/op	 273.17 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=68 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:29.231898+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1729	    115705 ns/op	  97.50 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=69 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:29.482448+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  101082	      2027 ns/op	1998.92 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=70 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:29.747465+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     848	    264740 ns/op	3960.99 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=71 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:30.029041+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     730	    317046 ns/op	3307.41 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=72 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:30.336960+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     879	    260263 ns/op	4029.14 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=73 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:30.623289+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     706	    328234 ns/op	3194.70 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=74 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:30.925322+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1574	    130314 ns/op	 283.11 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=75 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:31.178065+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11343	     21312 ns/op	2308.10 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=76 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:31.585019+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1582	    137252 ns/op	 283.75 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=77 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:31.849526+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8276	     28366 ns/op	2311.82 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=78 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:32.254365+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  312934	       756.1 ns/op	  66.13 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=79 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:32.713220+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3889	     61700 ns/op	 182.84 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=80 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:33.180337+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     706	    340247 ns/op	3081.88 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=81 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:33.481108+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    2067	    114292 ns/op	 358.58 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=82 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:33.937671+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1747	    137432 ns/op	 123.06 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=83 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:34.225373+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6004	     38285 ns/op	1712.87 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=84 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:34.653425+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2146	    112633 ns/op	 100.16 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=85 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:34.938164+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2360	    102721 ns/op	 379.01 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=86 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:35.416287+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    4010	     58881 ns/op	 191.59 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=87 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:35.873236+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    1958	    118573 ns/op	  95.14 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=88 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:36.139315+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1812	    130964 ns/op	  86.14 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=89 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:36.429263+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     727	    326356 ns/op	3213.08 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=90 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:36.737764+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  267991	       904.0 ns/op	  61.95 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=91 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:37.205291+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1875	    113491 ns/op	 149.03 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=92 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:37.462129+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  110415	      1875 ns/op	2160.76 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=93 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:37.715415+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10947	     21235 ns/op	2316.50 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=94 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:38.098172+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  303140	       802.4 ns/op	  69.79 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=candidate sample=3 order_seed=20261026 sequence=95 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:38.575428+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  324702	       730.8 ns/op	  68.41 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=3 order_seed=20261026 sequence=96 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:38.998267+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1656	    121087 ns/op	 338.46 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=97 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:39.247972+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  288976	       793.4 ns/op	  70.58 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=98 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:39.711347+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2193	    119154 ns/op	 326.74 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=99 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:40.204959+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  112465	      1882 ns/op	2153.41 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=100 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:40.470479+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11295	     20999 ns/op	2342.53 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=101 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:40.874742+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1593	    134875 ns/op	 273.53 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=102 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:41.138924+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1791	    134922 ns/op	 125.35 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=103 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:41.432805+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    2938	     75599 ns/op	 149.22 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=104 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:41.685440+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1568	    134008 ns/op	 126.21 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=105 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:41.958116+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1770	    117044 ns/op	  96.38 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=106 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:42.202877+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     663	    338706 ns/op	3095.92 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=107 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:42.497761+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     699	    340648 ns/op	3078.27 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=108 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:42.795299+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     699	    317504 ns/op	3302.63 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=109 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:43.091291+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1773	    114469 ns/op	 358.03 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=110 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:43.340629+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1593	    132164 ns/op	 294.67 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=111 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:43.598324+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6036	     38952 ns/op	1683.57 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=112 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:44.014946+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2047	     98699 ns/op	 114.30 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=113 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:44.267374+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1694	    145435 ns/op	 253.67 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=114 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:20:44.545384+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2108	    115358 ns/op	  97.79 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=115 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:44.841237+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2007	    108629 ns/op	 358.39 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=116 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:45.107315+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  210460	       974.9 ns/op	  57.44 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=117 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:45.350903+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10257	     21087 ns/op	2332.70 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=118 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:45.716197+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    4026	     58376 ns/op	 193.25 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=119 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:46.185532+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1708	    123197 ns/op	 332.66 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=120 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:46.440735+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     895	    260841 ns/op	4020.21 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=121 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:46.732543+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1477	    143483 ns/op	 271.42 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=122 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:46.994457+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8734	     27519 ns/op	2382.99 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=123 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:47.400272+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     873	    264157 ns/op	3969.73 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=124 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:47.696296+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     741	    310110 ns/op	3381.38 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=125 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:47.982239+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  122650	      1934 ns/op	2095.18 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=4 order_seed=20261027 sequence=126 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:48.466081+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  326660	       732.8 ns/op	  68.23 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=127 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:48.932196+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1670	    133770 ns/op	  84.33 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=4 order_seed=20261027 sequence=128 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:49.200801+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  314008	       756.6 ns/op	  66.08 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=129 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:49.673472+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     705	    340640 ns/op	3078.35 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=130 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:49.981104+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1846	    123573 ns/op	 331.65 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=131 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:50.250640+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  297164	       798.3 ns/op	  70.15 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=132 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:50.712561+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1449	    145244 ns/op	 268.13 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=133 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:50.968368+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  328544	       732.7 ns/op	  68.24 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=134 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:51.438990+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2372	    105215 ns/op	 370.02 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=135 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:51.927933+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3837	     61699 ns/op	 182.84 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=136 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:20:52.392067+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1376	    158503 ns/op	 245.70 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=137 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:20:52.669232+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  298489	       752.4 ns/op	  66.46 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=138 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:53.114274+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     853	    265058 ns/op	3956.25 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=139 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:53.403788+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6267	     38790 ns/op	1690.60 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=140 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:53.833832+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1796	    130650 ns/op	 129.45 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=141 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:54.107157+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	    9394	     23628 ns/op	2081.81 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=142 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:20:54.524086+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1756	    139351 ns/op	 121.37 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=143 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:54.826808+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  107769	      2039 ns/op	1987.51 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=144 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:55.104699+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1621	    150179 ns/op	 245.66 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=145 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:55.413391+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     622	    380074 ns/op	2758.93 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=146 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:20:55.731996+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8073	     29034 ns/op	2258.64 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=147 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:20:56.139886+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     559	    363796 ns/op	2882.41 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=148 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:20:56.435093+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     772	    294682 ns/op	3558.52 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=149 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:20:56.732405+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1731	    125258 ns/op	 327.19 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=150 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:20:57.014110+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1550	    136934 ns/op	 269.42 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=151 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:20:57.278758+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3110	     75082 ns/op	 150.25 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=152 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:20:57.561580+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1641	    123954 ns/op	 314.08 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=153 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:20:57.819283+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  122084	      1919 ns/op	2111.13 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=154 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:58.309822+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1600	    128055 ns/op	  88.09 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=155 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:20:58.563572+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  260876	       906.6 ns/op	  61.77 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=156 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:20:59.045554+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1596	    138295 ns/op	  81.57 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=157 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:20:59.324293+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     769	    318591 ns/op	3291.37 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=158 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:20:59.639312+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10616	     23144 ns/op	2125.39 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=5 order_seed=20261028 sequence=159 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:00.060995+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    1644	    122783 ns/op	  91.88 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=baseline sample=5 order_seed=20261028 sequence=160 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:00.310170+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    1731	    125033 ns/op	  90.22 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=161 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:00.576475+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     699	    337213 ns/op	3109.60 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=162 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:01.059658+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  289401	       807.7 ns/op	  69.33 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=163 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:01.525070+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  270214	       895.6 ns/op	  62.53 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=164 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:02.001821+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    2961	     74438 ns/op	 151.55 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=165 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:02.253459+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1699	    137250 ns/op	 123.23 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=166 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:02.539482+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     614	    344470 ns/op	3044.12 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=167 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:02.826521+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3913	     59480 ns/op	 189.66 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=168 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:03.298094+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     866	    277545 ns/op	3778.25 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=169 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:03.606342+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1574	    134727 ns/op	  83.73 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=170 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:03.869034+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1785	    134370 ns/op	 125.87 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=171 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:04.157593+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  322780	       721.1 ns/op	  69.33 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=172 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:04.628868+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1756	    117661 ns/op	  95.88 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=173 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:04.888786+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1641	    134380 ns/op	 289.81 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=174 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:05.162840+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2088	    112636 ns/op	 100.15 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=175 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:05.638550+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     684	    323092 ns/op	3245.51 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=176 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:05.935889+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1686	    146815 ns/op	 251.29 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=177 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:06.233487+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1964	    112437 ns/op	 346.26 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=178 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:06.513850+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  122740	      2079 ns/op	1948.72 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=179 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:07.041749+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     882	    270908 ns/op	3870.82 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=180 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:07.341716+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2173	    116841 ns/op	 333.21 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=181 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:07.826422+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2370	     96773 ns/op	 116.57 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=182 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:08.303199+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1424	    145490 ns/op	 267.68 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=183 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:08.561294+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8414	     28027 ns/op	2339.82 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=184 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:08.985903+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10952	     21197 ns/op	2320.64 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=185 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:09.373007+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    2024	    113704 ns/op	 360.43 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=186 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:09.846167+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10903	     21559 ns/op	2281.69 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=187 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:10.250573+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  308773	       766.0 ns/op	  65.28 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=188 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:10.734244+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1591	    130949 ns/op	 281.74 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=189 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:10.999821+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6063	     39375 ns/op	1665.48 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=190 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:11.435868+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  110871	      2005 ns/op	2020.74 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=6 order_seed=20261029 sequence=191 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:11.716520+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1711	    121765 ns/op	 336.57 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=6 order_seed=20261029 sequence=192 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:11.983442+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     668	    328454 ns/op	3192.56 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=193 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:12.280238+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11152	     21088 ns/op	2332.57 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=194 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:12.699641+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  277952	       806.7 ns/op	  69.42 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=195 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:13.141767+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6100	     38330 ns/op	1710.90 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=196 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:13.576533+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     753	    316985 ns/op	3308.04 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=197 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:13.872625+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1720	    127459 ns/op	 289.45 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=198 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:14.151174+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     831	    268874 ns/op	3900.10 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=199 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:14.436205+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1621	    131014 ns/op	 312.81 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=200 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:14.718176+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11170	     21222 ns/op	2317.83 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=201 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:15.128242+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     699	    329393 ns/op	3183.46 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=202 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:15.440610+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  195628	      1036 ns/op	  54.07 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=203 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:15.697754+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3028	     74107 ns/op	 152.23 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=204 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:15.959864+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1729	    133764 ns/op	 126.44 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=205 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:16.233619+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2012	    102458 ns/op	 379.98 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=206 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:16.507013+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2361	     99335 ns/op	 113.57 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=207 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:16.995948+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  332239	       728.7 ns/op	  68.62 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=208 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:17.451963+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  108812	      1932 ns/op	2097.04 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=209 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:17.722636+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     698	    328869 ns/op	3188.53 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=210 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:18.022864+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  314820	       755.2 ns/op	  66.20 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=211 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:18.483156+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1522	    167621 ns/op	 232.34 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=212 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:18.795401+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     744	    277545 ns/op	3778.25 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=213 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:19.079961+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     558	    412783 ns/op	2540.32 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=214 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:19.389908+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  120968	      1909 ns/op	2122.08 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=215 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:19.879100+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1890	    124476 ns/op	 312.77 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=216 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:20.307948+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2086	     98237 ns/op	 114.83 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=217 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:20.562436+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3802	     61688 ns/op	 182.87 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=218 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:21.049287+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1827	    116381 ns/op	 352.15 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=219 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:21.310743+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1802	    122483 ns/op	  92.10 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=220 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:21.578530+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1442	    144009 ns/op	 270.43 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=221 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:21.845390+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8540	     27523 ns/op	2382.68 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=222 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:22.251688+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1876	    114125 ns/op	 148.20 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=7 order_seed=20261030 sequence=223 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:22.522013+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    2061	    117549 ns/op	  95.97 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=7 order_seed=20261030 sequence=224 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:23.005364+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1818	    131848 ns/op	 279.82 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=225 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:23.475623+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  324775	       727.7 ns/op	  68.71 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=226 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:23.946721+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  106894	      2076 ns/op	1951.90 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=227 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:24.217678+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1914	    112902 ns/op	 149.80 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=228 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:24.495169+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1576	    131132 ns/op	 281.34 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=229 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:24.753259+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6193	     39142 ns/op	1675.40 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=230 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:25.196101+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8523	     27958 ns/op	2345.62 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=231 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:25.608810+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3871	     58886 ns/op	 191.57 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=232 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:26.068583+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1368	    167368 ns/op	 232.69 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=233 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:26.357361+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  305266	       796.6 ns/op	  70.30 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=234 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:26.840269+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     721	    332956 ns/op	3149.39 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=235 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:27.156618+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1812	    117419 ns/op	 144.04 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=236 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:27.420713+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11268	     21279 ns/op	2311.63 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=237 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:27.821931+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  314551	       761.2 ns/op	  65.69 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=238 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:28.292190+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2042	    111944 ns/op	 100.77 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=239 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:28.577519+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1660	    133797 ns/op	  84.31 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=240 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:28.849281+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  113424	      1925 ns/op	2104.64 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=241 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:29.128520+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1981	    117650 ns/op	 330.91 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=242 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:29.609140+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1612	    138464 ns/op	 281.27 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=243 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:29.886754+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     867	    277412 ns/op	3780.06 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=244 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:30.192360+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11386	     20964 ns/op	2346.42 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=245 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:30.595845+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     688	    313803 ns/op	3341.59 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=246 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:30.889482+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  268326	       884.3 ns/op	  63.33 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=247 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:31.374715+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1984	    120745 ns/op	 305.54 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=248 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:31.865169+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     787	    311250 ns/op	3368.99 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=249 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:32.173144+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1802	    111892 ns/op	 100.82 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=250 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:32.420192+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3895	     62081 ns/op	 181.71 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=251 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:32.905361+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    1929	    104545 ns/op	 107.91 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=252 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:33.149758+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     732	    330024 ns/op	3177.37 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=253 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:33.465624+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1827	    116557 ns/op	 351.61 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=254 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:33.726517+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1976	    105972 ns/op	 367.38 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=8 order_seed=20261031 sequence=255 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:33.983984+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1958	    124550 ns/op	 329.05 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=8 order_seed=20261031 sequence=256 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:34.469405+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     824	    260105 ns/op	4031.58 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=257 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:34.758905+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1713	    120854 ns/op	 305.27 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=258 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:35.015558+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11166	     20988 ns/op	2343.77 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=259 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:35.430254+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     865	    268918 ns/op	3899.45 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=260 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:35.729841+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     744	    302049 ns/op	3471.62 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=261 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:36.029463+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8222	     27892 ns/op	2351.13 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=262 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:36.438050+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1768	    134352 ns/op	 125.89 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=263 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:36.741989+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1395	    155430 ns/op	 250.56 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=264 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:37.010848+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     735	    304885 ns/op	3439.33 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=265 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:37.310560+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3879	     61162 ns/op	 184.45 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=266 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:37.780998+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1813	    132172 ns/op	  85.35 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=267 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:38.069162+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  332931	       736.9 ns/op	  67.85 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=268 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:38.543197+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  314484	       759.9 ns/op	  65.80 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=269 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:39.010019+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1834	    113781 ns/op	 148.65 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=270 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:39.279516+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     702	    328974 ns/op	3187.51 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=271 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:39.575989+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  298650	       794.8 ns/op	  70.46 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=272 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:40.072833+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  268204	       883.8 ns/op	  63.36 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=273 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:40.546588+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   10962	     21112 ns/op	2329.93 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=274 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:40.956465+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1827	    114896 ns/op	 338.85 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=275 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:41.213633+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    2010	    121593 ns/op	 337.05 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=276 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:41.711719+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3022	     70810 ns/op	 159.31 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=277 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:41.967837+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    5959	     38750 ns/op	1692.33 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=278 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:42.407175+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     728	    330283 ns/op	3174.88 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=279 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:42.744434+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1982	    107444 ns/op	 362.35 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=280 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:43.006360+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1575	    131357 ns/op	  85.88 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=281 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:43.263200+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  108468	      2003 ns/op	2022.71 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=282 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:43.540855+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1580	    131683 ns/op	 280.16 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=283 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:43.797554+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  111495	      1946 ns/op	2082.14 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=284 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:44.076270+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    2103	    117043 ns/op	 350.15 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=9 order_seed=20261032 sequence=285 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:44.569410+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2082	     97257 ns/op	 115.99 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=286 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:44.833474+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     868	    257060 ns/op	4079.34 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=287 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:45.125835+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2388	     99641 ns/op	 113.22 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=baseline sample=9 order_seed=20261032 sequence=288 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:45.623592+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1438	    146795 ns/op	 265.30 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=289 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:45.893975+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     843	    263156 ns/op	3984.83 MB/s	 2125408 B/op	     277 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=290 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:46.187066+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1746	    131195 ns/op	 128.92 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=291 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:46.477992+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1725	    119207 ns/op	 343.80 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=292 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:46.733743+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    2394	    103169 ns/op	 377.36 MB/s	  158632 B/op	      26 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=293 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:47.239772+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1723	    118939 ns/op	 310.18 MB/s	  278848 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=294 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:47.499140+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     759	    315243 ns/op	3326.33 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=295 operation=BenchmarkAssembly/PipeLong1MiB started_at_utc=2026-10-24T12:21:47.828074+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeLong1MiB         	     746	    309592 ns/op	3387.04 MB/s	 3173898 B/op	     273 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=296 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:48.140350+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11230	     21107 ns/op	2330.45 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=297 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:48.561026+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3966	     59725 ns/op	 188.88 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=298 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:49.016544+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     682	    313573 ns/op	3344.06 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=299 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:49.320403+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  269648	       902.7 ns/op	  62.04 MB/s	    4568 B/op	      16 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=300 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:49.818635+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1748	    132607 ns/op	  85.07 MB/s	  382040 B/op	    1576 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=301 operation=BenchmarkAssembly/PipeManyShortCRLF started_at_utc=2026-10-24T12:21:50.093291+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortCRLF         	    1938	    120186 ns/op	 341.00 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=302 operation=BenchmarkAssembly/Bare512CollectDecode started_at_utc=2026-10-24T12:21:50.578917+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Bare512CollectDecode         	    3842	     63809 ns/op	 176.79 MB/s	  163840 B/op	    1043 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=303 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:51.045091+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    6162	     38690 ns/op	1694.95 MB/s	  144336 B/op	      39 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=304 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:51.469184+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1614	    131255 ns/op	 296.71 MB/s	  287040 B/op	    2066 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=305 operation=BenchmarkAssembly/TripleLong1MiB started_at_utc=2026-10-24T12:21:51.734158+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleLong1MiB         	     738	    330484 ns/op	3172.95 MB/s	 3173905 B/op	     274 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=306 operation=BenchmarkAssembly/Quoted512CollectDecode started_at_utc=2026-10-24T12:21:52.046372+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/Quoted512CollectDecode         	    1809	    136993 ns/op	 123.46 MB/s	  188416 B/op	    2067 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=307 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:52.357331+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  319581	       734.0 ns/op	  68.12 MB/s	    4304 B/op	       8 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=308 operation=BenchmarkAssembly/PipeBoundary1MiB started_at_utc=2026-10-24T12:21:52.828292+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBoundary1MiB         	     877	    270588 ns/op	3875.40 MB/s	 2125360 B/op	     274 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=309 operation=BenchmarkAssembly/ParseBuildDistinct512 started_at_utc=2026-10-24T12:21:53.135319+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildDistinct512         	    1906	    110849 ns/op	 101.77 MB/s	  332792 B/op	    1576 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=310 operation=BenchmarkAssembly/TripleShort3LF started_at_utc=2026-10-24T12:21:53.401443+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleShort3LF         	  298842	       785.4 ns/op	  71.31 MB/s	    4344 B/op	      12 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=311 operation=BenchmarkAssembly/TripleManyShortCRLF started_at_utc=2026-10-24T12:21:53.881587+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortCRLF         	    1478	    148479 ns/op	 262.29 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=312 operation=BenchmarkAssembly/PipeShort3LF started_at_utc=2026-10-24T12:21:54.156484+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeShort3LF         	  242025	       827.2 ns/op	  60.45 MB/s	    4352 B/op	      11 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=313 operation=BenchmarkAssembly/PipeDiscardedMargin started_at_utc=2026-10-24T12:21:54.414014+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeDiscardedMargin         	   11307	     21176 ns/op	2322.90 MB/s	  109184 B/op	      30 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=314 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:54.827557+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    1798	    118942 ns/op	  94.84 MB/s	  275920 B/op	    1669 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=315 operation=BenchmarkAssembly/TripleManyShortLF started_at_utc=2026-10-24T12:21:55.100353+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleManyShortLF         	    1785	    129967 ns/op	 283.86 MB/s	  400880 B/op	    2087 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=316 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:55.578737+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  123708	      1914 ns/op	2116.54 MB/s	   12472 B/op	      16 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=317 operation=BenchmarkAssembly/TripleDiscardedMargin started_at_utc=2026-10-24T12:21:56.078992+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/TripleDiscardedMargin         	    8620	     27331 ns/op	2399.42 MB/s	  144136 B/op	      36 allocs/op
+PASS
+
+# variant=baseline sample=10 order_seed=20261033 sequence=318 operation=BenchmarkAssembly/PipeManyShortLF started_at_utc=2026-10-24T12:21:56.501437+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeManyShortLF         	    1846	    109373 ns/op	 355.95 MB/s	  207784 B/op	    2074 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=319 operation=BenchmarkAssembly/ParseBuildRepeated512 started_at_utc=2026-10-24T12:21:56.757026+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/ParseBuildRepeated512         	    2186	     93378 ns/op	 120.81 MB/s	  232792 B/op	    1662 allocs/op
+PASS
+
+# variant=candidate sample=10 order_seed=20261033 sequence=320 operation=BenchmarkAssembly/PipeBuffered8Rows started_at_utc=2026-10-24T12:21:57.008272+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/benchmarks/assembly
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkAssembly/PipeBuffered8Rows         	  120952	      1884 ns/op	2150.98 MB/s	   12472 B/op	      16 allocs/op
+PASS

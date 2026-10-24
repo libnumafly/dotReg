@@ -330,7 +330,7 @@ The tests cover required declarations and their blank separator, malformed, repe
 
 The latest measurements pushed to the repository and their reproduction
 instructions are in the [benchmark overview](../benchmarks/README.md) and the
-[published Go tuning report](../benchmarks/tuning-2026-10-24/README.md).
+[published Go multiline and allocation report](../benchmarks/multiline-allocation-2026-10-24/README.md).
 The published report identifies its measured source snapshots; local parser
 changes and unpushed measurements do not replace those results. Superseded
 standalone results are removed when their replacement is published.

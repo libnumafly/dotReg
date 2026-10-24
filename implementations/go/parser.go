@@ -107,11 +107,13 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 					return problem(line, ErrSyntax)
 				}
 				// Even a value line closes deeper scopes when it dedents.
+				clear(scopes[depth:])
 				scopes = scopes[:depth]
 				parent = scopes[depth-1]
 				key = key[1:] // The relative marker, not a key element.
 			} else {
-				scopes = nil
+				clear(scopes)
+				scopes = scopes[:0]
 			}
 			self := relative && key == "" && e.Kind == Value
 			if e.Kind == Heading {
@@ -301,7 +303,12 @@ func (lines *sourceLines) valueBody(entry *Entry, indent int, eof bool) (bool, e
 }
 
 func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
-	var body []struct{ text, ending string }
+	// The closing marker supplies the margin, so retain the body until it is
+	// known. Small bodies keep their line metadata on the stack; longer bodies
+	// grow normally, without imposing a notation length limit.
+	var initial [8]struct{ text, ending string }
+	body := initial[:0]
+	outputBytes, nonempty, minimumMargin := 0, 0, 0
 	for {
 		line := lines.next()
 		if err := line.validate(); err != nil {
@@ -309,13 +316,22 @@ func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
 		}
 		margin := leadingSpaces(line.text)
 		if trimRightSpaceTab(line.text[margin:]) == `"""` {
+			// Do not reject a short margin before the closer arrives: a later
+			// physical-line validation error must keep its existing priority.
+			if nonempty > 0 && margin > minimumMargin {
+				for i, part := range body {
+					if part.text != "" && leadingSpaces(part.text) < margin {
+						return "", false, problem(opening+i+1, ErrSyntax)
+					}
+				}
+			}
 			var raw strings.Builder
+			// Every nonempty line now has at least this margin. The exact
+			// output size needs no additional content or escape-sizing pass.
+			raw.Grow(outputBytes - margin*nonempty)
 			for i, part := range body {
 				text := part.text
 				if text != "" {
-					if leadingSpaces(text) < margin {
-						return "", false, problem(opening+i+1, ErrSyntax)
-					}
 					text = text[margin:]
 				}
 				if i > 0 {
@@ -328,6 +344,16 @@ func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
 		if line.eof {
 			return "", false, problem(opening, ErrSyntax)
 		}
+		if len(body) > 0 {
+			outputBytes += len(body[len(body)-1].ending)
+		}
+		outputBytes += len(line.text)
+		if line.text != "" {
+			nonempty++
+			if nonempty == 1 || margin < minimumMargin {
+				minimumMargin = margin
+			}
+		}
 		body = append(body, struct{ text, ending string }{line.text, line.ending})
 	}
 }
@@ -335,43 +361,63 @@ func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
 func (lines *sourceLines) pipeBody(indent int) (string, bool, bool, error) {
 	// Buffer only small bodies so their compact result needs one allocation.
 	// Count the original source, including discarded indentation, to bound
-	// retained input. Larger bodies continue through the streaming builder.
+	// buffering. Borrowed line bytes are copied before the next read. Larger
+	// bodies continue through the streaming builder without retaining input.
 	const maxBufferedSource = 4096
+	var output [256]byte
 	var parts [8]pipeBodyPart
-	buffered, sourceBytes, outputBytes := 0, 0, 0
+	buffered, sourceBytes, outputBytes, stackBytes := 0, 0, 0, 0
+	spilled := false
 	buffering := true
 	var raw strings.Builder
 	var previousEnding string
 	found := false
 	for {
-		line := lines.next()
-		prefix := leadingSpaces(line.text)
-		if prefix <= indent || prefix == len(line.text) || line.text[prefix] != '|' {
-			lines.unread(line)
+		line := lines.nextBodyLine()
+		prefix, pipe := line.pipePrefix(indent)
+		if !pipe {
+			// Lookahead validation belongs to the next logical entry. Its bytes
+			// must survive both the current visitor and later buffer refills.
+			lines.unread(line.owned())
 			if buffering {
-				writePipeBodyParts(&raw, parts[:buffered], outputBytes)
+				if !spilled {
+					return string(output[:stackBytes]), false, found, nil
+				}
+				raw.Grow(outputBytes)
+				writePipeBodyParts(&raw, output[:], parts[:buffered])
 			}
 			return raw.String(), false, found, nil
 		}
 		if err := line.validate(); err != nil {
 			return "", false, false, err
 		}
-		text := line.text[prefix+1:]
 		if buffering {
-			footprint := len(line.text) + len(line.ending)
+			footprint := line.size() + len(line.ending)
+			payload := line.size() - prefix - 1
+			if found {
+				payload += len(previousEnding)
+			}
 			if buffered < len(parts) && footprint <= maxBufferedSource-sourceBytes {
-				parts[buffered] = pipeBodyPart{text, line.ending}
+				if !spilled && payload <= len(output)-stackBytes {
+					if found {
+						stackBytes += copy(output[stackBytes:], previousEnding)
+					}
+					start := stackBytes
+					stackBytes += line.copyTail(output[stackBytes:], prefix+1)
+					parts[buffered] = pipeBodyPart{start: start, end: stackBytes, ending: line.ending}
+				} else {
+					// Keep the original small-body sizing advantage after the
+					// tiny stack buffer fills, without growing every call's stack.
+					spilled = true
+					parts[buffered] = pipeBodyPart{ownedText: line.ownTail(prefix + 1), ending: line.ending}
+				}
+				outputBytes += payload
 				buffered++
 				sourceBytes += footprint
-				outputBytes += len(text)
-				if found {
-					outputBytes += len(previousEnding)
-				}
 			} else {
 				// Preserve streaming growth for larger bodies. An up-front
 				// prefix reservation can inflate later growth allocations.
-				writePipeBodyParts(&raw, parts[:buffered], 0)
-				parts = [8]pipeBodyPart{}
+				writePipeBodyParts(&raw, output[:], parts[:buffered])
 				buffering = false
 			}
 		}
@@ -379,27 +425,38 @@ func (lines *sourceLines) pipeBody(indent int) (string, bool, bool, error) {
 			if found {
 				raw.WriteString(previousEnding)
 			}
-			raw.WriteString(text)
+			line.writeTail(&raw, prefix+1)
 		}
 		found, previousEnding = true, line.ending
 		if line.eof {
 			if buffering {
-				writePipeBodyParts(&raw, parts[:buffered], outputBytes)
+				if !spilled {
+					return string(output[:stackBytes]), true, true, nil
+				}
+				raw.Grow(outputBytes)
+				writePipeBodyParts(&raw, output[:], parts[:buffered])
 			}
 			return raw.String(), true, true, nil
 		}
 	}
 }
 
-type pipeBodyPart struct{ text, ending string }
+type pipeBodyPart struct {
+	start, end int
+	ownedText  string
+	ending     string
+}
 
-func writePipeBodyParts(raw *strings.Builder, parts []pipeBodyPart, size int) {
-	raw.Grow(size)
+func writePipeBodyParts(raw *strings.Builder, output []byte, parts []pipeBodyPart) {
 	for i, part := range parts {
 		if i > 0 {
 			raw.WriteString(parts[i-1].ending)
 		}
-		raw.WriteString(part.text)
+		if part.ownedText != "" {
+			raw.WriteString(part.ownedText)
+		} else {
+			raw.Write(output[part.start:part.end])
+		}
 	}
 }
 
@@ -589,13 +646,19 @@ func (n *pathNode) copyElements(path []string) {
 
 func pathID(path []string) string {
 	var b strings.Builder
-	size := 2 * len(path) // At least one length digit and a colon per element.
+	size := len(path) // One colon per element, plus exact decimal byte lengths.
 	for _, s := range path {
-		size += len(s)
+		length := len(s)
+		size += length + 1
+		for length >= 10 {
+			length /= 10
+			size++
+		}
 	}
 	b.Grow(size)
+	var digits [20]byte // Enough for a decimal byte length on 32- and 64-bit Go.
 	for _, s := range path {
-		b.WriteString(strconv.Itoa(len(s)))
+		b.Write(strconv.AppendInt(digits[:0], int64(len(s)), 10))
 		b.WriteByte(':')
 		b.WriteString(s)
 	}

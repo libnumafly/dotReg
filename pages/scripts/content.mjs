@@ -111,10 +111,10 @@ export const pages = [
     description: 'Public parser changes, path ownership checks and balanced before-and-after measurements.',
   },
   {
-    source: 'implementations/benchmarks/tuning-2026-10-24/README.md',
-    slug: 'implementations/benchmarks/tuning-2026-10-24',
-    title: 'Go parser tuning results',
-    description: 'Balanced before-and-after measurements of the general Go parser against JSON, TOML, YAML and INI.',
+    source: 'implementations/benchmarks/multiline-allocation-2026-10-24/README.md',
+    slug: 'implementations/benchmarks/multiline-allocation-2026-10-24',
+    title: 'Go multiline and allocation results',
+    description: 'Paired Go multiline, ordinary-load and API measurements, with equivalent JSON, TOML, YAML and INI loads.',
   },
   {
     source: 'implementations/benchmarks/comparison/README.md',

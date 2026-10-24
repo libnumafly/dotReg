@@ -52,7 +52,7 @@ The site imports these repository files rather than maintaining separate copies:
 | `../implementations/cpp/README.md` | `implementations/cpp/` |
 | `../implementations/benchmarks/README.md` | `implementations/benchmarks/` |
 | `../implementations/benchmarks/public-rollin-2026-10-24/README.md` | `implementations/benchmarks/public-rollin-2026-10-24/` |
-| `../implementations/benchmarks/tuning-2026-10-24/README.md` | `implementations/benchmarks/tuning-2026-10-24/` |
+| `../implementations/benchmarks/multiline-allocation-2026-10-24/README.md` | `implementations/benchmarks/multiline-allocation-2026-10-24/` |
 | `../implementations/benchmarks/comparison/README.md` | `implementations/benchmarks/comparison/` |
 | `../implementations/benchmarks/native-2026-10-24/README.md` | `implementations/benchmarks/native-2026-10-24/` |
 | `../examples/sample.txt` | `examples/` and the original `.txt` download |
@@ -98,7 +98,10 @@ to `main` and manual runs build and publish `pages/dist/`. The [Go workflow](../
 checks the existing Go implementation; the [parser samples workflow](../.github/workflows/parsers.yml)
 checks all eight language entries and the comparison harness's semantic equivalence
 and smoke workloads, and verifies the published tuning and public sample adoption
-tables against their recorded observations. The adoption table check is
+tables against their recorded observations. The Go table check is
+`python implementations/benchmarks/multiline-allocation-2026-10-24/render.py --check`;
+it checks all three paired campaigns and their separately retained raw output.
+The adoption table check is
 `python implementations/benchmarks/public-rollin-2026-10-24/render.py --check`;
 it validates the recorded tables without running measurements.
 Dependencies are pinned in `package-lock.json`,

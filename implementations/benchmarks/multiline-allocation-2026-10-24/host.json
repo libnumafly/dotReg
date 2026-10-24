@@ -1,0 +1,33 @@
+{
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-1370P",
+    "physical_cores": 14,
+    "logical_processors": 20,
+    "physical_memory_bytes": 16819617792,
+    "os": "Microsoft Windows 11 Enterprise 10.0.26200 64 \u30d3\u30c3\u30c8",
+    "battery_status_code": 2,
+    "battery_charge_percent": 94,
+    "observed_at_utc": "2026-10-24T12:12:20.118686+00:00",
+    "power_scheme_observation": "\u96fb\u6e90\u8a2d\u5b9a\u306e GUID: a6aff7c0-d900-42fd-bdcb-df4c7e20bdbc  (MY)",
+    "observation_scope": "Point-in-time preparation observation; not continuously monitored or enforced during timing",
+    "background_workload": "Benchmark jobs serial; agents coordinated to avoid builds/tests during timing. Other desktop/OS activity uncontrolled.",
+    "runtime_policy": "Go test processes use CPU=1, GOMAXPROCS=1, GOGC=100, GOMEMLIMIT=off; no forced GC inside timed loops, affinity, priority or power-plan change."
+  },
+  "go": "go version go1.27.0 windows/amd64",
+  "controller_python": "3.12.14",
+  "build_flags": [
+    "go test -c",
+    "-trimpath"
+  ],
+  "baseline_production_commit": "47a48799b2cf6caa1fe26b45a53fff2c284b4674",
+  "shared_regression_overlay_sha256": {
+    "implementations/go/assembly_optimisation_test.go": "27c446b960f8732b3056caa4d65ac43b481c9d8837b45f0738adf0afa4d5414b",
+    "implementations/go/identity_optimisation_test.go": "50c85b5303822671b4e7469d03c9514df45b088a652f8c6a457b89925baa7ae5",
+    "implementations/go/storage_test.go": "3c2e0eb8d0121c48d9f0386808d245f1207f4af3e618027f20717a4fa29a83b1",
+    "implementations/go/pipe_assembly_optimisation_test.go": "06dd2359b937a78af986ea0b823cca979edb5daaf0f30f786780fd37a70894ce"
+  },
+  "shared_assembly_overlay_sha256": {
+    "implementations/benchmarks/assembly/go.mod": "b98e26c4081b4ab9ac1b0c5b445f9a43a858d63bbc5a042e5fc859867a401538",
+    "implementations/benchmarks/assembly/assembly_test.go": "1a550dc4b05a1280729ad011ace7e6734162aa9edc9ec1f539e857b72a735a54"
+  }
+}

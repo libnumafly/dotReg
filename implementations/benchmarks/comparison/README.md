@@ -1,7 +1,7 @@
 # Configuration comparison methodology
 
 This guide describes the common-map workloads, library options and reproduction
-commands used for the [latest published Go parser tuning report](../tuning-2026-10-24/README.md).
+commands used for the [latest published Go tuning report](../multiline-allocation-2026-10-24/README.md).
 Measured results and their raw observations are published only in that report.
 
 This isolated Go module compares the current dotReg Go sample with JSON, TOML,
@@ -69,7 +69,7 @@ planned round, verify exact workload semantics and source/input hashes, and
 regenerate and check its tables from the complete raw observations. Unpushed
 experiments remain outside the published results. For a before/after comparison,
 follow the balanced paired protocol and validation requirements in the
-[Go tuning report](../tuning-2026-10-24/README.md#paired-measurement-protocol).
+[Go multiline and allocation report](../multiline-allocation-2026-10-24/README.md).
 
 For an external process-memory observer, build and run the single-operation
 CLI. The command reads its input once before timing and checks exact semantics

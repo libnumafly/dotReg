@@ -3,8 +3,10 @@
 This guide describes the fixed native workloads, timing boundaries and
 reproduction helpers used for the [latest published native parser report](../public-rollin-2026-10-24/README.md).
 Measured results and their raw observations are published only in that report.
-The [Go tuning report](../tuning-2026-10-24/README.md) separately measures
-resident-input decoded-map loads and Go API costs.
+The [Go multiline and allocation report](../multiline-allocation-2026-10-24/README.md)
+separately measures resident-input decoded-map loads, Go API costs and focused
+assembly workloads. Its Go source snapshot differs from this native campaign's
+recorded Go control; the two reports identify their own measured sources.
 
 The native workload covers dotReg syntax and common string decoding in seven
 engines; TypeScript shares the JavaScript engine. It includes the mandatory

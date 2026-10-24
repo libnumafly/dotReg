@@ -182,7 +182,7 @@ def main():
         source_records[variant] = {
             "source_commit": args.baseline_commit if variant == "baseline" else head,
             "observed_git_head": head,
-            "source_state": ("Baseline source hashes identify the supplied commit snapshot." if variant == "baseline"
+            "source_state": ("The supplied commit identifies the baseline production reference; exact source hashes identify the measured tree and any shared test or benchmark instrumentation." if variant == "baseline"
                              else "Source hashes identify the candidate working tree, including uncommitted tuning changes."),
             "source_sha256": source_manifest(roots[variant], modules[variant]),
             "binary_sha256": sha256(binaries[variant]),

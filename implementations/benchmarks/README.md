@@ -44,13 +44,15 @@ results and Pages navigation.
 | Measurement series | Latest pushed report | Recorded data |
 |---|---|---|
 | Native parser APIs across seven engines | [Public sample parser adoption](public-rollin-2026-10-24/README.md) | [Paired process observations and validation](public-rollin-2026-10-24/report.json) |
-| Equivalent decoded configuration maps | [Go parser tuning results](tuning-2026-10-24/README.md) | [Paired comparison observations](tuning-2026-10-24/comparison.json), [raw output](tuning-2026-10-24/comparison.txt) |
-| Go parser, decoder, consumer and prefix-selection stages | [Go parser tuning results](tuning-2026-10-24/README.md) | [Paired API observations](tuning-2026-10-24/go-api.json), [raw output](tuning-2026-10-24/go-api.txt) |
+| Equivalent decoded configuration maps | [Go multiline and allocation results](multiline-allocation-2026-10-24/README.md) | [Paired comparison observations](multiline-allocation-2026-10-24/comparison.json), [raw output](multiline-allocation-2026-10-24/comparison.txt) |
+| Go parser, decoder, consumer and prefix-selection stages | [Go multiline and allocation results](multiline-allocation-2026-10-24/README.md) | [Paired API observations](multiline-allocation-2026-10-24/go-api.json), [raw output](multiline-allocation-2026-10-24/go-api.txt) |
+| Focused multiline assembly and ordinary Go loading | [Go multiline and allocation results](multiline-allocation-2026-10-24/README.md) | [Paired assembly observations](multiline-allocation-2026-10-24/assembly.json), [raw output](multiline-allocation-2026-10-24/assembly.txt) |
 
 The native report includes seven engines and eight language interfaces:
 TypeScript shares the JavaScript engine. It retains 840 timed process
 observations and 84 independent complete-output validations. The Go reports
-retain 720 configuration-format observations and 560 API-stage observations.
+retain 720 configuration-format observations, 560 API-stage observations and
+320 focused assembly observations, giving 1,600 Go observations in total.
 These are the samples in the published campaigns, rather than claims about
 every possible workload or later implementation revision.
 
@@ -65,6 +67,7 @@ not repeat older tables.
 | Native parser APIs | Syntax plus common string decoding, with buffered file reads | Streaming consumption or a collected sequence of entries |
 | Other configuration formats | Loading equivalent string settings with selected Go libraries | A fresh two-level map of decoded strings |
 | Go consumer APIs | Parsing, decoding, configuration construction or selection, according to the benchmark name | A built configuration or selected ordered occurrences |
+| Focused Go assembly and loading | Multiline assembly plus decoding, collected ordinary loads, or parsing plus configuration construction | Decoded entries or a built configuration, according to the operation name |
 
 Prefix selection belongs to the Go consumer API. It is outside both the native
 parser timings and the other-format comparison. Stage names and output
@@ -91,6 +94,12 @@ campaign and its validation have completed.
 - [Paired Go runner](run-paired-go.py) uses the
   [isolated Go measurement support](run-go.py) and the
   [configuration comparison module](comparison/README.md).
+- [Focused assembly harness](assembly/assembly_test.go) provides reusable
+  measurements for block construction and loading. The latest Go report records
+  the same instrumentation overlaid on both production snapshots.
+- [Paired Go result validation](paired-go-results.py) supplies shared observation
+  and summary checks for the latest report's table renderer. Validation reads
+  retained results without rerunning measurements.
 - [Single-input fixture generator](fixture.mjs),
   [suite controller](suite.py) and [process-memory wrapper](measure.py)
   remain available for independent local measurements.

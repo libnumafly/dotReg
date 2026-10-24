@@ -20,12 +20,11 @@ type SelectedValue struct {
 	Line         int
 }
 
-// settingRef records source order without duplicating stored settings or
-// retaining decoded path slices. Index zero denotes values; later indices
-// address more at index minus one.
+// settingRef owns one setting in source order. All equal IDs share the first
+// occurrence's immutable storage, without retaining decoded path slices.
 type settingRef struct {
 	pathID string
-	index  int
+	item   setting
 }
 
 // SelectPrefix returns values at prefix and all its descendants in source
@@ -44,16 +43,15 @@ func (cfg *Config) SelectPrefix(prefix []string) ([]SelectedValue, error) {
 	}
 	selected := make([]SelectedValue, 0)
 	prefixID := pathID(prefix)
-	for _, ref := range cfg.order {
+	order := cfg.order
+	for i := range order {
+		ref := &order[i]
 		// The length-prefixed encoding ensures that a matching prefix ends at
 		// an element boundary, including when element names contain dots.
 		if !strings.HasPrefix(ref.pathID, prefixID) {
 			continue
 		}
-		item := cfg.values[ref.pathID]
-		if ref.index > 0 {
-			item = cfg.more[ref.pathID][ref.index-1]
-		}
+		item := ref.item
 		path := pathFromID(ref.pathID)
 		relative := make([]string, len(path)-len(prefix))
 		copy(relative, path[len(prefix):])

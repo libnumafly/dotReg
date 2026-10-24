@@ -52,9 +52,15 @@ func DemoProfile() Profile {
 // treated as immutable.
 type Config struct {
 	profile Profile
-	values  map[string]setting
-	more    map[string][]setting
+	values  map[string]settingGroup
 	order   []settingRef
+}
+
+// settingGroup indexes one key's occurrences within the source-order array.
+// Repeated values grow a compact index slice, without copying stored settings.
+type settingGroup struct {
+	first int
+	more  []int
 }
 
 type setting struct {
@@ -81,7 +87,7 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 		}
 		copyProfile.Types[name] = converter
 	}
-	// Reserve source-order references only for values. This pass does not
+	// Reserve source-order storage only for values. This pass does not
 	// decode or validate entries, so conversion and failure order stay intact.
 	valueCount := 0
 	for i := range entries {
@@ -91,7 +97,7 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 	}
 	cfg := &Config{
 		profile: copyProfile,
-		values:  make(map[string]setting),
+		values:  make(map[string]settingGroup),
 		order:   make([]settingRef, 0, valueCount),
 	}
 	for _, entry := range entries {
@@ -113,16 +119,17 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 				return nil, problem(entry.Line, ErrTypeConversion)
 			}
 		}
-		if _, exists := cfg.values[key]; exists {
-			if cfg.more == nil {
-				cfg.more = make(map[string][]setting)
-			}
-			cfg.more[key] = append(cfg.more[key], item)
-			cfg.order = append(cfg.order, settingRef{pathID: key, index: len(cfg.more[key])})
+		index := len(cfg.order)
+		if group, exists := cfg.values[key]; exists {
+			// Retain the first occurrence's immutable ID rather than another
+			// allocation for every repetition of the same decoded key.
+			key = cfg.order[group.first].pathID
+			group.more = append(group.more, index)
+			cfg.values[key] = group
 		} else {
-			cfg.values[key] = item
-			cfg.order = append(cfg.order, settingRef{pathID: key})
+			cfg.values[key] = settingGroup{first: index}
 		}
+		cfg.order = append(cfg.order, settingRef{pathID: key, item: item})
 	}
 	return cfg, nil
 }
@@ -131,31 +138,31 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 // Multiple occurrences return ErrMultipleValues at the second header, before
 // any retrieval conversion. Use GetAll to retrieve repeated values.
 func (cfg *Config) Get(path []string, want string) (any, error) {
-	first, more, ok := cfg.lookup(path)
+	group, ok := cfg.lookup(path)
 	if !ok {
 		return nil, problem(0, ErrMissing)
 	}
-	if len(more) > 0 {
-		return nil, problem(more[0].line, ErrMultipleValues)
+	if len(group.more) > 0 {
+		return nil, problem(cfg.order[group.more[0]].item.line, ErrMultipleValues)
 	}
-	return cfg.get(first, want)
+	return cfg.get(cfg.order[group.first].item, want)
 }
 
 // GetAll retrieves every occurrence in source order. Each declaration must
 // match want; untyped occurrences convert on demand without caching. A failure
 // reports that occurrence's header and returns no partial values.
 func (cfg *Config) GetAll(path []string, want string) ([]any, error) {
-	first, more, ok := cfg.lookup(path)
+	group, ok := cfg.lookup(path)
 	if !ok {
 		return nil, problem(0, ErrMissing)
 	}
-	values := make([]any, 1+len(more))
+	values := make([]any, 1+len(group.more))
 	for i := range values {
-		item := first
+		index := group.first
 		if i > 0 {
-			item = more[i-1]
+			index = group.more[i-1]
 		}
-		value, err := cfg.get(item, want)
+		value, err := cfg.get(cfg.order[index].item, want)
 		if err != nil {
 			return nil, err
 		}
@@ -167,14 +174,14 @@ func (cfg *Config) GetAll(path []string, want string) ([]any, error) {
 // GetAt retrieves one zero-based occurrence using that occurrence's declaration
 // and conversion rules. Missing keys and out-of-range indices return ErrMissing.
 func (cfg *Config) GetAt(path []string, index int, want string) (any, error) {
-	first, more, ok := cfg.lookup(path)
-	if !ok || index < 0 || index > len(more) {
+	group, ok := cfg.lookup(path)
+	if !ok || index < 0 || index > len(group.more) {
 		return nil, problem(0, ErrMissing)
 	}
 	if index == 0 {
-		return cfg.get(first, want)
+		return cfg.get(cfg.order[group.first].item, want)
 	}
-	return cfg.get(more[index-1], want)
+	return cfg.get(cfg.order[group.more[index-1]].item, want)
 }
 
 // A declaration is checked before conversion or unset-to-empty interpretation.
@@ -196,38 +203,38 @@ func (cfg *Config) get(item setting, want string) (any, error) {
 // IsUnset reports the state for a key with exactly one occurrence. It does not
 // request or convert a type. Repeated keys return ErrMultipleValues.
 func (cfg *Config) IsUnset(path []string) (bool, error) {
-	first, more, ok := cfg.lookup(path)
+	group, ok := cfg.lookup(path)
 	if !ok {
 		return false, problem(0, ErrMissing)
 	}
-	if len(more) > 0 {
-		return false, problem(more[0].line, ErrMultipleValues)
+	if len(group.more) > 0 {
+		return false, problem(cfg.order[group.more[0]].item.line, ErrMultipleValues)
 	}
-	return first.text.Unset, nil
+	return cfg.order[group.first].item.text.Unset, nil
 }
 
 // IsUnsetAll returns each occurrence's original unset state in source order.
 // The returned slice is independent of the Config and of other calls.
 func (cfg *Config) IsUnsetAll(path []string) ([]bool, error) {
-	first, more, ok := cfg.lookup(path)
+	group, ok := cfg.lookup(path)
 	if !ok {
 		return nil, problem(0, ErrMissing)
 	}
-	states := make([]bool, 1+len(more))
-	states[0] = first.text.Unset
-	for i, item := range more {
-		states[i+1] = item.text.Unset
+	states := make([]bool, 1+len(group.more))
+	states[0] = cfg.order[group.first].item.text.Unset
+	for i, index := range group.more {
+		states[i+1] = cfg.order[index].item.text.Unset
 	}
 	return states, nil
 }
 
-func (cfg *Config) lookup(path []string) (setting, []setting, bool) {
+func (cfg *Config) lookup(path []string) (settingGroup, bool) {
 	if cfg == nil || len(path) == 0 {
-		return setting{}, nil, false
+		return settingGroup{}, false
 	}
 	key := pathID(path)
-	first, ok := cfg.values[key]
-	return first, cfg.more[key], ok
+	group, ok := cfg.values[key]
+	return group, ok
 }
 
 func (cfg *Config) convert(text Text, want string) (any, error) {
