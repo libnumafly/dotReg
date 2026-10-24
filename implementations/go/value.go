@@ -40,8 +40,8 @@ func DecodeString(entry Entry) (Text, error) {
 			return Text{}, problem(entry.Line, ErrString)
 		}
 	}
-	raw := strings.Trim(entry.Raw, " \t")
-	if !utf8.ValidString(raw) || strings.ContainsAny(raw, "\r\n") || entry.Unset != (raw == "") {
+	raw := trimSpaceTab(entry.Raw)
+	if !utf8.ValidString(raw) || strings.IndexByte(raw, '\r') >= 0 || strings.IndexByte(raw, '\n') >= 0 || entry.Unset != (raw == "") {
 		return Text{}, problem(entry.Line, ErrString)
 	}
 	if entry.Unset {
@@ -65,22 +65,37 @@ func validBlockText(s string) bool {
 	if !utf8.ValidString(s) {
 		return false
 	}
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\r' && (i+1 == len(s) || s[i+1] != '\n') {
+	for offset := 0; ; {
+		found := strings.IndexByte(s[offset:], '\r')
+		if found < 0 {
+			return true
+		}
+		i := offset + found
+		if i+1 == len(s) || s[i+1] != '\n' {
 			return false
 		}
+		offset = i + 2
 	}
-	return true
 }
 
 // Quotes and physical line breaks in a triple-quoted body are ordinary data.
 // Escapes are decoded once, using exactly the ordinary quoted-string repertoire.
 func decodeBlockEscapes(s string) (string, error) {
-	escape := strings.IndexByte(s, '\\')
-	if escape < 0 {
+	if strings.IndexByte(s, '\\') < 0 {
 		return s, nil
 	}
+	// A block has no closing-quote scan to supply its decoded size. Decode it
+	// in one pass rather than visiting every Unicode escape twice.
+	return decodeSizedEscapes(s, 0)
+}
+
+// Quoted strings supply their exact decoded size from the closing-quote scan.
+// Blocks pass zero and let the builder grow during their single decoding pass.
+// Neither path reserves raw source length for contracting Unicode escapes.
+func decodeSizedEscapes(s string, size int) (string, error) {
 	var decoded strings.Builder
+	decoded.Grow(size)
+	escape := strings.IndexByte(s, '\\')
 	for escape >= 0 {
 		decoded.WriteString(s[:escape])
 		value, end, err := decodeEscape(s, escape)
@@ -100,40 +115,59 @@ func decodeBlockEscapes(s string) (string, error) {
 // Callers validate UTF-8 before calling and validate the remaining characters
 // for their own key/value grammar.
 func decodeQuoted(s string) (string, int, error) {
-	var decoded strings.Builder
-	end, err := scanQuoted(s, &decoded)
-	if err != nil {
-		return "", 0, err
-	}
-	return decoded.String(), end, nil
-}
-
-// scanQuoted validates the same quoted grammar with or without output.
-// A nil builder locates the closing quote without allocating decoded text.
-func scanQuoted(s string, decoded *strings.Builder) (int, error) {
 	if len(s) == 0 || s[0] != '"' {
-		return 0, errQuoted
+		return "", 0, errQuoted
 	}
+	size := 0
 	literal := 1
+	escaped := false
 	for i := 1; i < len(s); i++ {
 		switch s[i] {
 		case '"':
-			if decoded != nil {
-				decoded.WriteString(s[literal:i])
+			body := s[1:i]
+			if !escaped {
+				// Keep decoded quoted text compact. A tiny key or value must
+				// not newly retain an arbitrarily large physical source line.
+				return strings.Clone(body), i + 1, nil
 			}
+			value, err := decodeSizedEscapes(body, size+i-literal)
+			if err != nil {
+				return "", 0, err
+			}
+			return value, i + 1, nil
+		case '\r', '\n':
+			return "", 0, errQuoted
+		case '\\':
+			value, end, err := decodeEscape(s, i)
+			if err != nil {
+				return "", 0, err
+			}
+			size += i - literal + utf8.RuneLen(value)
+			literal = end
+			escaped = true
+			i = end - 1
+		}
+	}
+	return "", 0, errQuoted
+}
+
+// scanQuoted locates the closing quote and validates escapes without allocating
+// decoded text. Header classification does not need an owned decoded key yet.
+func scanQuoted(s string) (int, error) {
+	if len(s) == 0 || s[0] != '"' {
+		return 0, errQuoted
+	}
+	for i := 1; i < len(s); i++ {
+		switch s[i] {
+		case '"':
 			return i + 1, nil
 		case '\r', '\n':
 			return 0, errQuoted
 		case '\\':
-			value, end, err := decodeEscape(s, i)
+			_, end, err := decodeEscape(s, i)
 			if err != nil {
 				return 0, err
 			}
-			if decoded != nil {
-				decoded.WriteString(s[literal:i])
-				decoded.WriteRune(value)
-			}
-			literal = end
 			i = end - 1
 		}
 	}

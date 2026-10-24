@@ -5,6 +5,12 @@ and its [sample implementations](../README.md). The campaign dated 24 October
 2026 has three measurement tiers. They answer different questions and use
 different output contracts, so their timings are presented separately.
 
+**The latest [Go parser tuning follow-up](tuning-2026-10-24/README.md) remeasures
+the original and optimised implementations together against the same inputs and
+libraries.** The tables on this overview page retain the initial campaign before
+that tuning, including the seven-engine native comparison. The follow-up reports
+the current Go parser results and controlled before/after changes separately.
+
 | Tier | Question | Timed result |
 |---|---|---|
 | Native parser APIs | How do the seven engines handle the same dotReg documents in streaming and collecting modes? | Syntax plus common string decoding, with buffered file reads |
@@ -45,9 +51,10 @@ fixture hashes and reproduction settings:
   [ordered-load and prefix-selection source](../go/prefix_benchmark_test.go),
   [individual parser, decoder and build stages](../go/benchmark_test.go).
 
-The campaign starts from base commit
-`e45c1ca433aeee61e45e278f6dcffccdb403f40c` and measures the working-tree changes
-being published with this benchmark update. **The recorded SHA-256 manifest is
+The initial campaign started from base commit
+`e45c1ca433aeee61e45e278f6dcffccdb403f40c` and measured the working-tree changes
+subsequently published in commit `d57788b518ae28240e2d2e65b3fd1527c21b43da`.
+**The recorded SHA-256 manifest is
 the authoritative identification of the measured source snapshot.** The base
 commit alone does not identify that snapshot. Compiled binary hashes, exact
 toolchains and flags are also retained where the runner records them.

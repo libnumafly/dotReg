@@ -1,5 +1,9 @@
 # Decoded configuration comparison
 
+The latest [Go parser tuning results](../tuning-2026-10-24/README.md) compare the
+original and optimised implementations in one balanced campaign. The tables on
+this page retain the initial measurement snapshot before those changes.
+
 This isolated Go module compares the current dotReg Go sample with JSON, TOML,
 YAML and INI libraries. Every operation starts with preloaded UTF-8 bytes and
 ends with the same application representation:

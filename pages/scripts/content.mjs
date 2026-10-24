@@ -105,6 +105,12 @@ export const pages = [
     description: 'Current-specification parser, consumer and equivalent-format measurements, with recorded conditions and source hashes.',
   },
   {
+    source: 'implementations/benchmarks/tuning-2026-10-24/README.md',
+    slug: 'implementations/benchmarks/tuning-2026-10-24',
+    title: 'Go parser tuning results',
+    description: 'Balanced before-and-after measurements of the general Go parser against JSON, TOML, YAML and INI.',
+  },
+  {
     source: 'implementations/benchmarks/comparison/README.md',
     slug: 'implementations/benchmarks/comparison',
     title: 'Configuration format comparison',

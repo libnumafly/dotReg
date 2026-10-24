@@ -1,5 +1,10 @@
 # Native sample parser measurements, 24 October 2026
 
+This is the initial seven-engine campaign. The later
+[Go tuning follow-up](../tuning-2026-10-24/README.md) changes the Go implementation
+and measures its decoded-map and API costs separately. The native observations
+below remain tied to their original source manifest.
+
 This run measures the current dotReg syntax and common string decoding in all seven native engines. TypeScript shares the JavaScript engine. It covers the mandatory `@dotReg 1` declaration, two-space heading indentation, quoted element boundaries, repeated occurrences, annotations, Unicode, unset values and explicit multiline values. Long-line and deep-heading cases exercise the format's absence of fixed size/depth limits at the specified sizes. The consuming application's `Build`, type profile, retrieval and prefix-selection operations are outside the timed work.
 
 The [raw report](report.json) contains every process sample, execution order, UTC timestamps, fixture and source SHA-256 hashes, native binary hashes, versions and build flags. Its base commit identifies the starting checkout; the working-tree source hashes identify the actual snapshot, including the current Go consumer sources and a benchmark harness correction that consumes decoded string lengths.

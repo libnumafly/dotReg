@@ -82,10 +82,10 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 			return err
 		}
 		source, eof, line := physical.text, physical.eof, physical.number
-		trimmed := strings.Trim(source, " \t")
+		trimmed := trimSpaceTab(source)
 		if trimmed != "" && !strings.HasPrefix(trimmed, "#") {
 			indent := leadingSpaces(source)
-			body := strings.TrimRight(source[indent:], " \t")
+			body := trimRightSpaceTab(source[indent:])
 			if body[0] == '\t' || indent%indentWidth != 0 {
 				return problem(line, ErrSyntax)
 			}
@@ -113,23 +113,36 @@ func ParseEach(r io.Reader, visit func(Entry) error) error {
 			} else {
 				scopes = nil
 			}
-			var suffix []string
 			self := relative && key == "" && e.Kind == Value
-			if !self {
-				suffix, err = parsePath(key, line)
+			if e.Kind == Heading {
+				suffix, err := parsePath(key, line)
 				if err != nil {
 					return err
 				}
-			}
-			node := parent
-			if !self {
-				node = extendPath(parent, suffix)
-			}
-			e.Path = node.elements()
-			if e.Kind == Heading {
 				// Store a persistent path, separate from the visitor's slice.
+				node := extendPath(parent, suffix)
+				e.Path = node.elements()
 				scopes = append(scopes, node)
 			} else {
+				if self {
+					e.Path = parent.elements()
+				} else {
+					// Values need only the visitor's owned path, not a persistent
+					// scope node and a temporary suffix. Reserve one suffix
+					// element, growing only as further elements are validated.
+					parentCount := 0
+					if parent != nil {
+						parentCount = parent.count
+					}
+					path := make([]string, parentCount, parentCount+1)
+					if parent != nil {
+						parent.copyElements(path)
+					}
+					e.Path, err = appendPath(path, key, line)
+					if err != nil {
+						return err
+					}
+				}
 				eof, err = lines.valueBody(&e, indent, eof)
 				if err != nil {
 					return err
@@ -231,7 +244,7 @@ func (lines *sourceLines) properties() (bool, error) {
 		if err := line.validate(); err != nil {
 			return false, err
 		}
-		text := strings.TrimRight(line.text, " \t")
+		text := trimRightSpaceTab(line.text)
 		if text == "" {
 			// An empty read at EOF is not a physical blank separator line.
 			if !declared || (line.text == "" && line.ending == "") {
@@ -243,7 +256,7 @@ func (lines *sourceLines) properties() (bool, error) {
 		if separator <= 0 || text[0] != '@' {
 			return false, problem(line.number, ErrSyntax)
 		}
-		name, value := text[:separator], strings.TrimLeft(text[separator:], " \t")
+		name, value := text[:separator], trimSpaceTab(text[separator:])
 		if value == "" {
 			return false, problem(line.number, ErrSyntax)
 		}
@@ -295,7 +308,7 @@ func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
 			return "", false, err
 		}
 		margin := leadingSpaces(line.text)
-		if strings.TrimRight(line.text[margin:], " \t") == `"""` {
+		if trimRightSpaceTab(line.text[margin:]) == `"""` {
 			var raw strings.Builder
 			for i, part := range body {
 				text := part.text
@@ -320,6 +333,13 @@ func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
 }
 
 func (lines *sourceLines) pipeBody(indent int) (string, bool, bool, error) {
+	// Buffer only small bodies so their compact result needs one allocation.
+	// Count the original source, including discarded indentation, to bound
+	// retained input. Larger bodies continue through the streaming builder.
+	const maxBufferedSource = 4096
+	var parts [8]pipeBodyPart
+	buffered, sourceBytes, outputBytes := 0, 0, 0
+	buffering := true
 	var raw strings.Builder
 	var previousEnding string
 	found := false
@@ -328,24 +348,85 @@ func (lines *sourceLines) pipeBody(indent int) (string, bool, bool, error) {
 		prefix := leadingSpaces(line.text)
 		if prefix <= indent || prefix == len(line.text) || line.text[prefix] != '|' {
 			lines.unread(line)
+			if buffering {
+				writePipeBodyParts(&raw, parts[:buffered], outputBytes)
+			}
 			return raw.String(), false, found, nil
 		}
 		if err := line.validate(); err != nil {
 			return "", false, false, err
 		}
-		if found {
-			raw.WriteString(previousEnding)
+		text := line.text[prefix+1:]
+		if buffering {
+			footprint := len(line.text) + len(line.ending)
+			if buffered < len(parts) && footprint <= maxBufferedSource-sourceBytes {
+				parts[buffered] = pipeBodyPart{text, line.ending}
+				buffered++
+				sourceBytes += footprint
+				outputBytes += len(text)
+				if found {
+					outputBytes += len(previousEnding)
+				}
+			} else {
+				// Preserve streaming growth for larger bodies. An up-front
+				// prefix reservation can inflate later growth allocations.
+				writePipeBodyParts(&raw, parts[:buffered], 0)
+				parts = [8]pipeBodyPart{}
+				buffering = false
+			}
 		}
-		raw.WriteString(line.text[prefix+1:])
+		if !buffering {
+			if found {
+				raw.WriteString(previousEnding)
+			}
+			raw.WriteString(text)
+		}
 		found, previousEnding = true, line.ending
 		if line.eof {
+			if buffering {
+				writePipeBodyParts(&raw, parts[:buffered], outputBytes)
+			}
 			return raw.String(), true, true, nil
 		}
 	}
 }
 
+type pipeBodyPart struct{ text, ending string }
+
+func writePipeBodyParts(raw *strings.Builder, parts []pipeBodyPart, size int) {
+	raw.Grow(size)
+	for i, part := range parts {
+		if i > 0 {
+			raw.WriteString(parts[i-1].ending)
+		}
+		raw.WriteString(part.text)
+	}
+}
+
 func leadingSpaces(s string) int {
-	return len(s) - len(strings.TrimLeft(s, " "))
+	i := 0
+	for i < len(s) && s[i] == ' ' {
+		i++
+	}
+	return i
+}
+
+// The grammar trims only ASCII SP/HT, not Unicode whitespace. Keep these
+// frequent boundary checks byte-based without constructing a character set.
+func trimSpaceTab(s string) string {
+	start := 0
+	for start < len(s) && (s[start] == ' ' || s[start] == '\t') {
+		start++
+	}
+	return trimRightSpaceTab(s[start:])
+}
+
+func trimRightSpaceTab(s string) string {
+	end := len(s)
+	for end > 0 && (s[end-1] == ' ' || s[end-1] == '\t') {
+		end--
+	}
+	return s[:end]
 }
 
 // splitLine stops at the delimiter. It never scans or decodes the right side.
@@ -355,14 +436,14 @@ func splitLine(body string, line int) (Entry, string, error) {
 	for i := 0; i < len(body); {
 		switch body[i] {
 		case '"':
-			end, err := scanQuoted(body[i:], nil)
+			end, err := scanQuoted(body[i:])
 			if err != nil {
 				return Entry{}, "", problem(line, ErrSyntax)
 			}
 			i += end
 			continue
 		case ':':
-			key, rhs = strings.Trim(body[:i], " \t"), body[i+1:]
+			key, rhs = trimSpaceTab(body[:i]), body[i+1:]
 		case '(':
 			key = strings.TrimRight(body[:i], " ")
 			if strings.HasSuffix(key, "\t") {
@@ -388,7 +469,7 @@ func splitLine(body string, line int) (Entry, string, error) {
 			i++
 			continue
 		}
-		e.Kind, e.Raw = Value, strings.Trim(rhs, " \t")
+		e.Kind, e.Raw = Value, trimSpaceTab(rhs)
 		e.Unset = e.Raw == ""
 		return e, key, nil
 	}
@@ -423,7 +504,12 @@ func typeEnd(body string, open, line int) (int, error) {
 }
 
 func parsePath(key string, line int) ([]string, error) {
-	var path []string
+	return appendPath(nil, key, line)
+}
+
+// appendPath decodes a key suffix into the caller's owned path. Headings keep
+// their compact suffix separately; values build their final path directly.
+func appendPath(path []string, key string, line int) ([]string, error) {
 	for {
 		if key == "" {
 			return nil, problem(line, ErrSyntax)
@@ -447,10 +533,20 @@ func parsePath(key string, line int) ([]string, error) {
 			if element == "" {
 				return nil, problem(line, ErrSyntax)
 			}
-			for _, c := range element {
-				if unicode.IsSpace(c) || unicode.IsControl(c) || strings.ContainsRune(":()#\"\\", c) {
+			for i := 0; i < len(element); {
+				c := element[i]
+				if c < utf8.RuneSelf {
+					if c <= ' ' || c == 0x7f || c == ':' || c == '(' || c == ')' || c == '#' || c == '"' || c == '\\' {
+						return nil, problem(line, ErrSyntax)
+					}
+					i++
+					continue
+				}
+				r, width := utf8.DecodeRuneInString(element[i:])
+				if unicode.IsSpace(r) || unicode.IsControl(r) {
 					return nil, problem(line, ErrSyntax)
 				}
+				i += width
 			}
 		}
 		path = append(path, element)
@@ -478,13 +574,17 @@ func extendPath(parent *pathNode, suffix []string) *pathNode {
 
 func (n *pathNode) elements() []string {
 	path := make([]string, n.count)
+	n.copyElements(path)
+	return path
+}
+
+func (n *pathNode) copyElements(path []string) {
 	end := len(path)
 	for current := n; current != nil; current = current.parent {
 		start := end - len(current.suffix)
 		copy(path[start:end], current.suffix)
 		end = start
 	}
-	return path
 }
 
 func pathID(path []string) string {
