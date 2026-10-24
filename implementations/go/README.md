@@ -328,12 +328,10 @@ go build ./...
 
 The tests cover required declarations and their blank separator, malformed, repeated and unsupported declarations, physical line numbers, accepted and rejected body input, heading state, key-element boundaries, first-character selection of literal or quoted single-line values, literal later quotes and backslashes, basic and Unicode escapes, rejection of unknown quoted escapes and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
 
-The latest measurements pushed to the repository and their reproduction
-instructions are in the [benchmark overview](../benchmarks/README.md) and the
-[published Go multiline and allocation report](../benchmarks/multiline-allocation-2026-10-24/README.md).
-The published report identifies its measured source snapshots; local parser
-changes and unpushed measurements do not replace those results. Superseded
-standalone results are removed when their replacement is published.
+Benchmark results and reproduction instructions are in the
+[benchmark overview](../benchmarks/README.md) and the
+[Go multiline and allocation report](../benchmarks/multiline-allocation-2026-10-24/README.md).
+Each report identifies the source snapshot it measures.
 
 To generate arbitrary inputs during fuzzing:
 
@@ -348,8 +346,6 @@ go run ./cmd/configsample -mode raw ../../examples/sample.txt
 go run ./cmd/configsample -mode strings ../../examples/sample.txt
 go run ./cmd/configsample -mode demo ../../examples/sample.txt
 ```
-
-CI is configured for Windows and Linux with Go 1.22 and the current stable Go release. It checks formatting, runs tests and static analysis, builds the packages and checks all CLI modes. The Linux stable-Go job also runs the race detector and generated-input fuzzing. Check GitHub's results after pushing changes; local checks and remote CI results are separate.
 
 ## Licence
 

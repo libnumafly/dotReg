@@ -76,14 +76,6 @@ work when read on GitHub.
 When adding a document, register its source and route in `scripts/content.mjs`
 and add its sidebar entry in `astro.config.mjs`.
 
-Publish only the most recent report already pushed to `origin/main` for each
-distinct measurement series. Completed local measurements and unpushed source
-changes do not replace that published result.
-Replace superseded result tables, raw data and navigation together, while
-retaining the methodology and reproduction tools needed for the current reports.
-Unfinished campaigns and unpushed replacement reports stay outside the published
-results and Pages navigation.
-
 ## Publish with GitHub Pages
 
 1. In `libnumafly/dotReg`, open **Settings → Pages** and choose **GitHub Actions**

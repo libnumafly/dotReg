@@ -1,8 +1,7 @@
 # Native workload methodology
 
 This guide describes the fixed native workloads, timing boundaries and
-reproduction helpers used for the [latest published native parser report](../public-rollin-2026-10-24/README.md).
-Measured results and their raw observations are published only in that report.
+reproduction helpers for the [native parser report](../public-rollin-2026-10-24/README.md).
 The [Go multiline and allocation report](../multiline-allocation-2026-10-24/README.md)
 separately measures resident-input decoded-map loads, Go API costs and focused
 assembly workloads. Its Go source snapshot differs from this native campaign's
@@ -111,8 +110,8 @@ other engines report process memory only.
 Build native benchmark and CLI commands from the exact source snapshot before
 validation and timing. Record source/test hashes, fixture and independent
 expectation hashes, prepared binary hashes, compiler/runtime descriptions and
-build flags with the report. A base commit alone does not identify uncommitted
-source changes. Keep baseline and candidate builds in separate temporary
+build flags with the report. A base commit alone may not identify the exact
+source snapshot, so record hashes for every measured source. Keep baseline and candidate builds in separate temporary
 directories when comparing snapshots, using matching toolchains and flags.
 
 The [Windows preparation helper](prepare_windows.py) accepts explicit installed
@@ -153,13 +152,8 @@ matrix report records fixture and expectation hashes alongside each sample's
 metadata; large generated inputs remain outside Git. A partial report or a
 verification-only run is not a completed measurement campaign.
 
-A local reproduction does not update published results automatically. Keep
-in-progress reports and generated outputs in temporary storage. For a
-before/after campaign, follow the [paired controller and validation guide](../public-rollin-2026-10-24/README.md#recorded-source-and-reproduction).
-Replace the latest report pushed to the repository only after every planned
-round has completed, source/input hashes and metadata have been checked, and
-its result tables have been regenerated and validated from complete raw
-observations. Unpushed experiments remain outside the published results.
+For a before/after measurement, use the
+[paired controller and validation guide](../public-rollin-2026-10-24/README.md#recorded-source-and-reproduction).
 
 The [main benchmark guide](../README.md) distinguishes native file-input
 measurements from the separate resident-input comparison of configuration

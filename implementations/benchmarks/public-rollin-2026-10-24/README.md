@@ -1,16 +1,15 @@
 # Public sample parser adoption
 
-This published campaign transfers one established Go optimisation to the other
-public sample parsers: persistent parent/suffix nodes are needed for active headings,
-but an ordinary value can construct its independent output path without a
-temporary scope node. The change covers Python, JavaScript, Java, C#, Rust and
-C++; TypeScript shares the JavaScript engine. The Go control in this campaign
-already contains this path-construction change. The separately published
+This benchmark measures direct value-path construction in the public sample
+parsers. Active headings retain parent/suffix nodes, while each value builds an
+independent output path without a temporary scope node. The change covers
+Python, JavaScript, Java, C#, Rust and C++; TypeScript shares the JavaScript
+engine. Go is the unchanged control for this comparison. The separate
 [Go multiline and allocation report](../multiline-allocation-2026-10-24/README.md)
-measures subsequent Go changes from its own recorded source snapshots; its
-results do not update the native observations retained here.
+measures file loading and Go API stages, so its results cover a different
+measurement scope.
 
-The [benchmark overview](../README.md) links to the latest published results
+The [benchmark overview](../README.md) links to the benchmark reports
 for each suite. The [native methodology guide](../native-2026-10-24/README.md)
 describes the workload and reproduction tools used by this campaign.
 
@@ -22,13 +21,13 @@ path or the parser's heading state.
 
 ## Contents
 
-- [Adopted change](#adopted-change)
+- [Path construction](#path-construction)
 - [Findings and limits](#findings-and-limits)
 - [Results](#results)
 - [Conditions and validation](#conditions-and-validation)
 - [Recorded source and reproduction](#recorded-source-and-reproduction)
 
-## Adopted change
+## Path construction
 
 The six engines now distinguish heading construction from value construction.
 Headings retain their private parent/suffix nodes and separately materialised
@@ -368,12 +367,11 @@ ranges and deviations in the tables use the complete accepted report.
 [report.json](report.json) contains every raw wrapper result, its order and
 timestamps, fixture and independent expectation hashes, source/test manifests,
 compiler/runtime descriptions and prepared binary hashes. The source manifests
-identify the measured snapshots; a baseline commit alone does not identify a
-candidate working tree. The controller verifies all recorded source, input,
-controller, local configuration and prepared-artifact hashes again at the end.
-The accepted report has status `complete`, all 84 validations, all 840
-observations and all 168 condition summaries. Private executable paths remain
-in local configurations and are omitted from the published report.
+identify the measured snapshots; commit references alone do not identify every
+measured source file. The controller verifies all recorded source, input,
+controller, configuration and prepared-artifact hashes again at the end. The
+accepted report has status `complete`, all 84 validations, all 840 observations
+and all 168 condition summaries.
 
 Prepare separate baseline and candidate directories using the unchanged
 [Windows preparation helper](../native-2026-10-24/prepare_windows.py), supplying
@@ -389,11 +387,10 @@ python implementations/benchmarks/run-paired-native.py --baseline-root BASELINE 
 ```
 
 Add `--verify-only` for the 84 untimed independent output checks. Reports are
-written atomically to local temporary storage during the run, outside the
-synchronised checkout. Copy a complete report to this directory only after
-the campaign finishes. The [controller](../run-paired-native.py) rejects
-changing inputs or sources, mismatched measurement metadata and incomplete
-sample rounds. Runtime tuning environment overrides must be cleared first.
+written atomically to the selected output path during the run. The
+[controller](../run-paired-native.py) rejects changing inputs or sources,
+mismatched measurement metadata and incomplete sample rounds. Runtime tuning
+environment overrides must be cleared first.
 
 [render.py](render.py) validates the retained raw observations and regenerates
 only the marked result tables in this document. `python
@@ -402,5 +399,5 @@ the tables and recorded source manifests against the completed report. The
 measured snapshots remain identified by their recorded hashes as the public
 parsers continue to change. To additionally require a checkout's current
 production sources to match the measured candidate, pass
-`--check --check-current-sources`. CI checks correctness and recorded report
-consistency; performance thresholds are not imposed.
+`--check --check-current-sources`. Correctness checks validate the recorded
+report; performance thresholds are not imposed.

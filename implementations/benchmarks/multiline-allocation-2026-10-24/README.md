@@ -3,20 +3,20 @@
 This campaign measures multiline construction and remaining allocation costs
 in ordinary Go loading. It compares the public sample at
 [`47a4879`](https://github.com/libnumafly/dotReg/commit/47a48799b2cf6caa1fe26b45a53fff2c284b4674)
-with the adopted candidate described below. The current
+with the candidate implementation described below. The current
 [specification](../../../docs/config-format.md), syntax, public APIs, decoded
 values, output ownership, occurrence order and diagnostic priority are retained.
 The changes apply to the Go sample only.
 
-This is the latest published Go comparison and API-stage report. Its paired
-baseline is the public implementation before this change. The separate
-[native parser report](../public-rollin-2026-10-24/README.md) retains the latest
-seven-engine process measurements, which apply to its own recorded source
-snapshots. Those native measurements do not measure this Go candidate.
+This report measures the Go comparison and API stages. Its paired baseline is
+the public implementation before these changes. The separate
+[native parser report](../public-rollin-2026-10-24/README.md) records seven-engine
+process measurements for its own source snapshots. Those native results cover a
+different source snapshot and measurement scope.
 
 ## Contents
 
-- [Adopted changes](#adopted-changes)
+- [Implementation changes](#implementation-changes)
 - [Findings](#findings)
 - [Results](#results)
   - [Direct loading and the fastest other implementation](#direct-loading-and-the-fastest-other-implementation)
@@ -26,7 +26,7 @@ snapshots. Those native measurements do not measure this Go candidate.
 - [Conditions and validation](#conditions-and-validation)
 - [Reproduction](#reproduction)
 
-## Adopted changes
+## Implementation changes
 
 - Triple-quoted assembly retains up to eight lines of metadata on the stack.
   While reading, it records the eventual body size and the minimum nonempty
@@ -119,10 +119,7 @@ below, including the ordinary cases where dotReg is close to another library.
 
 The eight-row buffered-pipe guard retains 12,472 to 12,472 B/op (+0.0%)
 and 16 to 16 allocs/op. Long-line, CRLF and large-discarded-margin
-cases are also retained. Trial strategies that reserved a large stack buffer
-on every call or flushed small bodies early were not adopted: they traded away
-CPU time or the existing small-body allocation advantage. Their diagnostic
-artifacts stay outside the published result set.
+cases are also included in the report.
 
 The measured benefit is lower allocation traffic, especially for multiline
 bodies and consumer storage. Retained heap, process peak memory and electrical
@@ -289,15 +286,9 @@ runs in both variants in each of ten rounds, with a 200 ms Go benchmark timing
 target. All observations are retained without outlier removal.
 
 The baseline production sources are the unchanged
-`47a48799b2cf6caa1fe26b45a53fff2c284b4674` sources. The same new assembly module
-and four public-API regression files were copied into both measured trees:
-`assembly_optimisation_test.go`, `identity_optimisation_test.go`,
-`storage_test.go` and `pipe_assembly_optimisation_test.go`. These additions are
-shared test and benchmark instrumentation, not baseline production changes.
-The candidate additionally contains `body_reader_test.go`, which tests its new
-internal reader helper and cannot compile against the baseline internals.
-Exact source hashes identify all measured bytes rather than relying on a
-commit name alone.
+`47a48799b2cf6caa1fe26b45a53fff2c284b4674` sources. Both variants use the same
+assembly and public-API regression instrumentation. Per-file source hashes
+identify the measured bytes rather than relying on a commit name alone.
 
 Both variants are built before timing with the same Go toolchain and build
 flags. The [paired controller](../run-paired-go.py) runs one exact operation per
@@ -361,13 +352,11 @@ system activity was uncontrolled; builds, tests and benchmark suites did not
 overlap the timed jobs. Power and battery observations were point-in-time
 metadata, not continuously enforced conditions.
 
-The candidate was measured before its implementation commit. Its JSON records
-identify the observed repository HEAD and every measured source hash; that HEAD
-alone does not include the uncommitted tuning changes. Reproduction must use the
-recorded candidate bytes. Both variants completed the shared public-API
-regressions and conformance tests. The final candidate also passed its reader
-tests, `go vet`, `go build` and a five-second parser fuzz run. CI repeats the
-cross-platform and supported-Go-version checks after publication.
+The recorded source hashes identify the exact candidate snapshot; commit
+references alone do not identify every measured source file. Reproduction must
+use the candidate sources recorded in the report. Both variants completed the
+shared public-API regressions and conformance tests. The final candidate also
+passed its reader tests, `go vet`, `go build` and a five-second parser fuzz run.
 
 ## Reproduction
 

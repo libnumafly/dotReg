@@ -1,8 +1,7 @@
 # Configuration comparison methodology
 
 This guide describes the common-map workloads, library options and reproduction
-commands used for the [latest published Go tuning report](../multiline-allocation-2026-10-24/README.md).
-Measured results and their raw observations are published only in that report.
+commands for the [Go parser comparison report](../multiline-allocation-2026-10-24/README.md).
 
 This isolated Go module compares the current dotReg Go sample with JSON, TOML,
 YAML and INI libraries. Every operation starts with preloaded UTF-8 bytes and
@@ -59,16 +58,11 @@ operation names; each measured child must report exactly the selected
 operation. Adaptive iteration counts are chosen by Go's `testing.B`; the
 200 ms target is per operation per observation. These are short, warmed parses
 with Go's adaptive calibration, not a guarantee of universal steady-state
-behaviour. Compiler and process startup time are excluded. Keep reports and
-raw output in local temporary storage while a campaign is in progress. Report
-writing and any later publication are outside the benchmark timer.
+behaviour. Compiler and process startup time are excluded. Record raw output
+and report metadata outside the benchmark timer.
 
-A local reproduction does not update the published results automatically.
-Before replacing the latest report pushed to the repository, finish every
-planned round, verify exact workload semantics and source/input hashes, and
-regenerate and check its tables from the complete raw observations. Unpushed
-experiments remain outside the published results. For a before/after comparison,
-follow the balanced paired protocol and validation requirements in the
+For a before/after comparison, follow the balanced paired protocol and
+validation requirements in the
 [Go multiline and allocation report](../multiline-allocation-2026-10-24/README.md).
 
 For an external process-memory observer, build and run the single-operation

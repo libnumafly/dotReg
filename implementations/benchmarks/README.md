@@ -1,47 +1,35 @@
-# Published benchmark results
+# Benchmark results
 
-This directory contains the latest benchmark reports pushed to the repository
-for the [dotReg specification](../../docs/config-format.md) and its
-[sample implementations](../README.md). The suites measure different output
-contracts, so their timings are presented separately.
+This directory contains benchmark reports for the
+[dotReg specification](../../docs/config-format.md) and its
+[sample implementations](../README.md). Each suite measures a different
+output contract, so its results are presented separately.
 
 ## Contents
 
-- [Publication policy](#publication-policy)
-- [Latest published reports](#latest-published-reports)
+- [Reports and data](#reports-and-data)
+- [Available reports](#available-reports)
 - [Measurement scope](#measurement-scope)
 - [Reproduction and tooling](#reproduction-and-tooling)
 - [Interpreting time and memory](#interpreting-time-and-memory)
-- [Validation and CI](#validation-and-ci)
+- [Validation](#validation)
 
-## Publication policy
+## Reports and data
 
-**Latest means the most recent report already pushed to the main branch for
-that measurement series.** A finished local measurement or an unpushed source
-change does not replace the published result.
-
-The repository working tree and Pages retain only that report version.
-When publishing a replacement, update its rendered tables, raw observations,
-source and fixture manifests, links and Pages registrations together, and remove
-the superseded standalone results. Do not keep earlier result tables,
-diagnostic runs or historical result pages beside the replacement.
-Measurement tools and methodology remain available for reproduction.
+The reports below present the measurements available for each series. Each
+report identifies the source snapshot it measured through its recorded source
+hashes and commit references.
 
 A paired report's baseline and candidate are two conditions of the same
-measurement. Keep both conditions, their observations and validation evidence
-inside the latest report; removing one would remove the comparison's control.
+measurement. Both conditions, their observations and validation evidence are
+included so the comparison can be assessed as a whole.
 
-Every report identifies the source snapshot it actually measured. Its source
-hashes and immutable commit references take precedence over the current checkout
-when reproducing it. A later implementation change does not turn an older
-measurement into a measurement of the new code.
+Later implementation changes are not represented unless they are included in
+the source snapshot identified by a report.
 
-Unfinished campaigns and unpushed replacement reports stay outside the published
-results and Pages navigation.
+## Available reports
 
-## Latest published reports
-
-| Measurement series | Latest pushed report | Recorded data |
+| Measurement series | Report | Recorded data |
 |---|---|---|
 | Native parser APIs across seven engines | [Public sample parser adoption](public-rollin-2026-10-24/README.md) | [Paired process observations and validation](public-rollin-2026-10-24/report.json) |
 | Equivalent decoded configuration maps | [Go multiline and allocation results](multiline-allocation-2026-10-24/README.md) | [Paired comparison observations](multiline-allocation-2026-10-24/comparison.json), [raw output](multiline-allocation-2026-10-24/comparison.txt) |
@@ -53,12 +41,11 @@ TypeScript shares the JavaScript engine. It retains 840 timed process
 observations and 84 independent complete-output validations. The Go reports
 retain 720 configuration-format observations, 560 API-stage observations and
 320 focused assembly observations, giving 1,600 Go observations in total.
-These are the samples in the published campaigns, rather than claims about
-every possible workload or later implementation revision.
+These measurements describe the recorded workloads and source snapshots; they
+do not establish performance for every workload or later implementation.
 
 The report pages contain the result tables, variation, source identity,
-toolchains, environment and exact reproduction commands. This overview does
-not repeat older tables.
+toolchains, environment and reproduction commands.
 
 ## Measurement scope
 
@@ -81,11 +68,9 @@ toolchains, process sampling and independent expected output.
 
 ## Reproduction and tooling
 
-Use the source snapshots, flags and commands recorded in the latest report.
-Prepare binaries and verify complete output before timing. Run measured jobs
-serially, without overlapping builds, tests or other benchmark suites. Write
-intermediate reports to temporary storage and publish them only after the
-campaign and its validation have completed.
+Use the source snapshot, flags and commands recorded in the corresponding
+report. Prepare binaries and verify complete output before timing. Run measured
+jobs serially, without overlapping builds, tests or other benchmark suites.
 
 - [Paired native runner](run-paired-native.py) compares baseline and candidate
   engines using the [native fixtures](native-2026-10-24/fixtures.py),
@@ -95,19 +80,17 @@ campaign and its validation have completed.
   [isolated Go measurement support](run-go.py) and the
   [configuration comparison module](comparison/README.md).
 - [Focused assembly harness](assembly/assembly_test.go) provides reusable
-  measurements for block construction and loading. The latest Go report records
-  the same instrumentation overlaid on both production snapshots.
+  measurements for block construction and loading. The Go report records the
+  same instrumentation overlaid on both production snapshots.
 - [Paired Go result validation](paired-go-results.py) supplies shared observation
-  and summary checks for the latest report's table renderer. Validation reads
+  and summary checks for the report table renderer. Validation reads
   retained results without rerunning measurements.
 - [Single-input fixture generator](fixture.mjs),
   [suite controller](suite.py) and [process-memory wrapper](measure.py)
-  remain available for independent local measurements.
+  support additional measurements.
 
-Do not overwrite report metadata or relabel a measurement after changing its
-source. A replacement needs its own validated observations and recorded
-provenance, followed by a coordinated push of the new report and removal of the
-superseded result version.
+New measurements require a source snapshot, validated observations and recorded
+provenance.
 
 ## Interpreting time and memory
 
@@ -126,7 +109,7 @@ garbage collection, host activity and thermal conditions can affect a finite
 campaign. These measurements do not measure electrical energy and do not
 establish that one language or parser is universally faster.
 
-## Validation and CI
+## Validation
 
 The native runner checks complete syntax and decoded occurrence output against
 independent expectations before timing. The configuration comparison checks
@@ -134,7 +117,5 @@ complete decoded maps. Go consumer fixtures check ordered values and selections
 before measuring their named stages.
 
 [Shared conformance checks](../conformance/README.md), native API tests and Go
-consumer tests remain separate correctness evidence. CI validates the rendered
-tables of the published reports and runs small harness smoke checks; it does
-not enforce timing, allocation or process-memory thresholds. Source preparation
-and Pages publication happen through the repository's Runner workflows.
+consumer tests provide separate correctness evidence. Benchmark harnesses do
+not enforce timing, allocation or process-memory thresholds.
