@@ -33,9 +33,12 @@ normalisation is not performed.
 
 The new ports stop at common string decoding. They retain annotations such as
 `list(int)` as text and do not establish a standard type catalogue, conversion
-profile or retrieval API. The existing Go sample additionally provides its
-illustrative consumer and `demo` type profile; that capability is unchanged and
-is documented in the [Go guide](go/README.md).
+profile or retrieval API. The Go sample additionally provides its illustrative
+consumer, `demo` type profile and
+[prefix-selection API](go/README.md#selecting-values-by-key-prefix).
+The shared [prefix-selection rules](../docs/config-format.md#91-prefix-selection)
+belong to that consumer layer; the syntax-only ports and shared syntax/decoding
+corpus do not provide or test retrieval APIs.
 
 Each engine offers a collecting syntax API, an incremental visitor API and a
 separate common string decoder. A collection succeeds as a whole or reports a

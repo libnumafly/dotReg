@@ -102,13 +102,25 @@ export const pages = [
     source: 'implementations/benchmarks/README.md',
     slug: 'implementations/benchmarks',
     title: 'Time and memory measurements',
-    description: 'Reproduce common fixture measurements and interpret process memory carefully.',
+    description: 'Current-specification parser, consumer and equivalent-format measurements, with recorded conditions and source hashes.',
+  },
+  {
+    source: 'implementations/benchmarks/comparison/README.md',
+    slug: 'implementations/benchmarks/comparison',
+    title: 'Configuration format comparison',
+    description: 'Compare decoded string configurations in dotReg, JSON, TOML, YAML and INI under the same Go runtime.',
+  },
+  {
+    source: 'implementations/benchmarks/native-2026-10-24/README.md',
+    slug: 'implementations/benchmarks/native-2026-10-24',
+    title: 'Native parser workload matrix',
+    description: 'Current-specification dotReg workloads, five process samples and time and memory observations across seven engines.',
   },
   {
     source: 'implementations/go/README.md',
     slug: 'implementations/go',
     title: 'Go sample implementation',
-    description: 'Run the sample parser and CLI, use its API and understand provisional choices.',
+    description: 'Run the Go parser and CLI, retrieve values by key or prefix and understand provisional choices.',
   },
   {
     source: 'implementations/go/PERFORMANCE.md',

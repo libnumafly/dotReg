@@ -1,0 +1,15 @@
+{
+  "environment": {
+    "note": "Record CPU, memory, OS, power policy and background workload here."
+  },
+  "engines": [
+    {
+      "language": "go",
+      "runtime": "Replace with exact go version output",
+      "build": "go -C implementations/go build -trimpath -o TEMP/configbench ./cmd/configbench; build configsample too",
+      "command": ["TEMP/configbench"],
+      "cli": ["TEMP/configsample"],
+      "sources": ["implementations/go/parser.go", "implementations/go/value.go", "implementations/go/cmd/configbench/main.go"]
+    }
+  ]
+}

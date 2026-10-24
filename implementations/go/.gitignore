@@ -1,8 +1,11 @@
 # Build and test output for this sample module
 /bin/
 /dist/
+/.artifacts/
 /configsample
 /configsample.exe
+/configbench
+/configbench.exe
 *.test
 *.test.exe
 /coverage/

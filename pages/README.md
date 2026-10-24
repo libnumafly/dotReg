@@ -51,6 +51,8 @@ The site imports these repository files rather than maintaining separate copies:
 | `../implementations/rust/README.md` | `implementations/rust/` |
 | `../implementations/cpp/README.md` | `implementations/cpp/` |
 | `../implementations/benchmarks/README.md` | `implementations/benchmarks/` |
+| `../implementations/benchmarks/comparison/README.md` | `implementations/benchmarks/comparison/` |
+| `../implementations/benchmarks/native-2026-10-24/README.md` | `implementations/benchmarks/native-2026-10-24/` |
 | `../implementations/go/PERFORMANCE.md` | `implementations/go/performance/` |
 | `../examples/sample.txt` | `examples/` and the original `.txt` download |
 | `../LICENSE` | `license/` and the original text download |
@@ -85,7 +87,8 @@ and add its sidebar entry in `astro.config.mjs`.
 `.github/workflows/docs.yml` builds pull requests without deploying them. Pushes
 to `main` and manual runs build and publish `pages/dist/`. The [Go workflow](../.github/workflows/ci.yml)
 checks the existing Go implementation; the [parser samples workflow](../.github/workflows/parsers.yml)
-checks all eight language entries. Dependencies are pinned in `package-lock.json`,
+checks all eight language entries and the comparison harness's semantic equivalence
+and smoke workloads. Dependencies are pinned in `package-lock.json`,
 and Dependabot checks the website's npm dependencies weekly.
 
 The site is configured with `site: https://libnumafly.github.io` and

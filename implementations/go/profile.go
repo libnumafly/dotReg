@@ -46,14 +46,15 @@ func DemoProfile() Profile {
 	}
 }
 
-// Config retains every occurrence in source order for each key, including equal
-// values, with its unset state and optional declared type. It is immutable after
-// Build; custom converted values are owned by the application and should
-// themselves be treated as immutable.
+// Config retains every occurrence in source order, including equal values,
+// with its unset state and optional declared type. It is immutable after Build;
+// custom converted values are owned by the application and should themselves be
+// treated as immutable.
 type Config struct {
 	profile Profile
 	values  map[string]setting
 	more    map[string][]setting
+	order   []settingRef
 }
 
 type setting struct {
@@ -80,7 +81,19 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 		}
 		copyProfile.Types[name] = converter
 	}
-	cfg := &Config{profile: copyProfile, values: make(map[string]setting)}
+	// Reserve source-order references only for values. This pass does not
+	// decode or validate entries, so conversion and failure order stay intact.
+	valueCount := 0
+	for i := range entries {
+		if entries[i].Kind == Value {
+			valueCount++
+		}
+	}
+	cfg := &Config{
+		profile: copyProfile,
+		values:  make(map[string]setting),
+		order:   make([]settingRef, 0, valueCount),
+	}
 	for _, entry := range entries {
 		if entry.Kind == Heading {
 			continue
@@ -105,8 +118,10 @@ func Build(entries []Entry, profile Profile) (*Config, error) {
 				cfg.more = make(map[string][]setting)
 			}
 			cfg.more[key] = append(cfg.more[key], item)
+			cfg.order = append(cfg.order, settingRef{pathID: key, index: len(cfg.more[key])})
 		} else {
 			cfg.values[key] = item
+			cfg.order = append(cfg.order, settingRef{pathID: key})
 		}
 	}
 	return cfg, nil

@@ -1,6 +1,6 @@
 # Conformance checklist
 
-This page collects the checks an implementation can use to verify its parser. The [configuration format specification](config-format.md) remains the source of the rules; this checklist does not add new behavior.
+This page collects checks for syntax processing, common string decoding and consumer behaviour. The [configuration format specification](config-format.md) remains the source of the rules; this checklist does not add new behaviour. Consumer-layer checks apply to implementations that provide that layer; they do not require a syntax-only parser or the shared syntax corpus to provide retrieval APIs.
 
 Implementation conformance is checked against the rules defined in the configuration format specification and the following aspects.
 
@@ -27,6 +27,7 @@ Implementation conformance is checked against the rules defined in the configura
 | Type expression mismatch errors | Reporting a mismatch when the declaration differs from the retrieval request, regardless of convertibility; the same error when an undeclared value cannot be converted as requested at retrieval |
 | String interpretation of unset | Treating an unset value received from the parser as equivalent to a zero-length string when a string is requested without a type expression mismatch with a declaration; also retaining the unset state in syntax results |
 | Repeated values | Preserving every occurrence in source order, including repeated identical values, across fully qualified and relative notation, quotes and type annotations; retaining each occurrence's type and unset state; no overwriting, deduplication or syntax-level rejection of repeated keys; distinct element boundaries; no value occurrence from a heading; fresh state for each read |
+| Prefix selection (consumer layer) | [Section 9.1](config-format.md#91-prefix-selection): exact decoded-element prefixes, case and Unicode identity, inclusion of the prefix's own values and descendants at all depths, exclusion of headings, global source order and duplicates, full and relative paths with preserved boundaries, relative path `[]` for the prefix itself versus `[""]` for an empty-named child, original values and type/unset/line metadata without further conversion, an untyped unset prefix value as an empty string with unset true, mixed declared types, empty-prefix selection of all values, distinction from `[""]`, literal `*`, and an empty collection when no values match |
 | Character encoding and length | UTF-8, BOM, LF, CRLF, final lines without a line ending, rejection of lone CR; no format-defined fixed upper limits on physical lines, keys, expanded paths, hierarchy depth or the entire file |
 | Output and failure | Source order and physical line numbers; empty input; stopping on a notification recipient's error; no partial results from a collecting interface; no right-hand sides in diagnostics |
 

@@ -45,6 +45,8 @@ export default defineConfig({
           { label: 'Rust sample', slug: 'implementations/rust' },
           { label: 'C++ sample', slug: 'implementations/cpp' },
           { label: 'Time and memory measurements', slug: 'implementations/benchmarks' },
+          { label: 'Configuration format comparison', slug: 'implementations/benchmarks/comparison' },
+          { label: 'Native parser workload matrix', slug: 'implementations/benchmarks/native-2026-10-24' },
           { label: 'Historical measurements', slug: 'implementations/go/performance' },
         ] },
         { label: 'Licence', slug: 'license' },

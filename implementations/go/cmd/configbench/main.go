@@ -37,18 +37,21 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	once := func() (int, error) {
+	type counts struct{ entries, decodedBytes int }
+	once := func() (counts, error) {
 		if _, err := file.Seek(0, 0); err != nil {
-			return 0, err
+			return counts{}, err
 		}
-		count := 0
+		count := counts{}
 		visit := func(e dotreg.Entry) error {
 			if e.Kind == dotreg.Value {
-				if _, err := dotreg.DecodeString(e); err != nil {
+				text, err := dotreg.DecodeString(e)
+				if err != nil {
 					return err
 				}
+				count.decodedBytes += len(text.Value)
 			}
-			count++
+			count.entries++
 			return nil
 		}
 		if mode == "stream" {
@@ -57,35 +60,41 @@ func run() error {
 		}
 		entries, err := dotreg.Parse(file)
 		if err != nil {
-			return 0, err
+			return counts{}, err
 		}
 		for _, e := range entries {
 			if err := visit(e); err != nil {
-				return 0, err
+				return counts{}, err
 			}
 		}
 		return count, nil
 	}
-	for i := 0; i < 2; i++ {
-		if _, err := once(); err != nil {
-			return err
-		}
+	expected, err := once()
+	if err != nil {
+		return err
+	}
+	if second, err := once(); err != nil || second != expected {
+		return fmt.Errorf("inconsistent warm-up")
 	}
 	var before, after runtime.MemStats
 	runtime.ReadMemStats(&before)
 	start := time.Now()
-	entries := 0
+	result := counts{}
 	for i := 0; i < iterations; i++ {
-		entries, err = once()
+		result, err = once()
 		if err != nil {
 			return err
+		}
+		if result != expected {
+			return fmt.Errorf("inconsistent pass")
 		}
 	}
 	elapsed := time.Since(start).Seconds()
 	runtime.ReadMemStats(&after)
 	return json.NewEncoder(os.Stdout).Encode(map[string]any{
 		"language": "go", "mode": mode, "iterations": iterations, "input_bytes": info.Size(),
-		"entries": entries, "elapsed_seconds": elapsed, "allocated_bytes": after.TotalAlloc - before.TotalAlloc,
+		"entries": result.entries, "decoded_utf8_bytes": result.decodedBytes,
+		"elapsed_seconds": elapsed, "allocated_bytes": after.TotalAlloc - before.TotalAlloc,
 		"memory_method": "runtime.MemStats.TotalAlloc delta; allocation volume, not peak memory",
 	})
 }

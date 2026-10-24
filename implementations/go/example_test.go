@@ -87,3 +87,39 @@ func ExampleConfig_GetAll() {
 	// green
 	// multiple_values 4
 }
+
+func ExampleConfig_SelectPrefix() {
+	entries, err := dotreg.Parse(strings.NewReader(
+		"@dotReg 1\n\nip.filter:\nip.filter.\n" +
+			"  .100099: pass * * * * *\n" +
+			"  .101000: reject 10.0.0.0/8 * * * *\n",
+	))
+	if err != nil {
+		panic(err)
+	}
+	config, err := dotreg.Build(entries, dotreg.DemoProfile())
+	if err != nil {
+		panic(err)
+	}
+	filters, err := config.SelectPrefix([]string{"ip", "filter"})
+	if err != nil {
+		panic(err)
+	}
+	for _, filter := range filters {
+		if len(filter.RelativePath) == 0 {
+			fmt.Printf("<base>: unset=%t\n", filter.Unset)
+			continue
+		}
+		fmt.Printf("%s: %s\n", filter.RelativePath[0], filter.Value)
+	}
+	first, err := config.Get(filters[1].Path, "string")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(filters[1].Path, first)
+	// Output:
+	// <base>: unset=true
+	// 100099: pass * * * * *
+	// 101000: reject 10.0.0.0/8 * * * *
+	// [ip filter 100099] pass * * * * *
+}

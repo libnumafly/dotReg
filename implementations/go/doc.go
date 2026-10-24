@@ -13,7 +13,9 @@
 // DecodeString performs common string decoding. Build applies an
 // application-defined Profile independently to each occurrence. Config offers
 // collection and indexed typed lookup; singular lookup rejects multiple values.
-// Each occurrence retains its own unset state and type declaration.
+// SelectPrefix selects values at or below a prefix of decoded key elements in
+// global source order, retaining full and relative paths without additional
+// conversion. Each occurrence retains its unset state and type declaration.
 //
 // Standard type names and the stable public API are not yet defined.
 // See this sample module's README.md for supported syntax and

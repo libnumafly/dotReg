@@ -1,0 +1,221 @@
+{
+  "generator_version": 1,
+  "cases": [
+    {
+      "name": "small",
+      "sections": 4,
+      "values_per_section": 8,
+      "style": "ascii",
+      "values": 32,
+      "logical_payload_bytes": 1600,
+      "semantic_sha256": "d89facbddf470b63c246e5a87d2dca85b76dbac0a8d5c530b0234ac6cbc93b74",
+      "files": {
+        "dotreg": {
+          "path": "small/config.dotreg",
+          "encoded_bytes": 1471,
+          "sha256": "62d243775b1c0737ab04259e11426c4ddbe170f38674ee67bed90449fd0e268d"
+        },
+        "ini": {
+          "path": "small/config.ini",
+          "encoded_bytes": 1432,
+          "sha256": "a7908ec732b6b250ec8854434a396251111e40583b4f745a75e1d0d0b67577c1"
+        },
+        "json": {
+          "path": "small/config.json",
+          "encoded_bytes": 1727,
+          "sha256": "85a6a11cac11de3010ad80967d9d8ddb6946f6cb2774e1c7d90ef5891723da4a"
+        },
+        "toml": {
+          "path": "small/config.toml",
+          "encoded_bytes": 1496,
+          "sha256": "190d706b82722f41367fd907befed57ce15669f4d7494ff1b78f4bbf62980b62"
+        },
+        "yaml": {
+          "path": "small/config.yaml",
+          "encoded_bytes": 1460,
+          "sha256": "0dbbaf243b765668013eb2af284611b0e4f4b9f940954e68e292fe20bd2de27c"
+        }
+      }
+    },
+    {
+      "name": "medium",
+      "sections": 32,
+      "values_per_section": 16,
+      "style": "ascii",
+      "values": 512,
+      "logical_payload_bytes": 25600,
+      "semantic_sha256": "5b264acb336f0a67d14736ee0796e7eed946ff3dbe05cb95e031ac05075cad00",
+      "files": {
+        "dotreg": {
+          "path": "medium/config.dotreg",
+          "encoded_bytes": 22955,
+          "sha256": "2c614fa0f5d72f05ff7691f4d868e2eac335006642e893a7e8abd585129928fe"
+        },
+        "ini": {
+          "path": "medium/config.ini",
+          "encoded_bytes": 22464,
+          "sha256": "c08f9cbf939fc46bf3d23fb9e0f40931347e7368c2007e48ca6c425f874ae5f3"
+        },
+        "json": {
+          "path": "medium/config.json",
+          "encoded_bytes": 26851,
+          "sha256": "0b92e83a54e393264d8f2e707a95e33f31851cf27330db5dfc8fb1d28cc3c492"
+        },
+        "toml": {
+          "path": "medium/config.toml",
+          "encoded_bytes": 23488,
+          "sha256": "83932cd039e70a885765e69ca2ee852f7f3a11cbb3fbba1c676555b506371abf"
+        },
+        "yaml": {
+          "path": "medium/config.yaml",
+          "encoded_bytes": 22944,
+          "sha256": "69ced2048ac3d3332c682edd61afd17eb29c798855aa1087b005b024a9274878"
+        }
+      }
+    },
+    {
+      "name": "large",
+      "sections": 128,
+      "values_per_section": 64,
+      "style": "ascii",
+      "values": 8192,
+      "logical_payload_bytes": 409600,
+      "semantic_sha256": "0a9b4f7dd7fc388476c053b3f98285ca5934e6cd1dfcae155988f82e3cd28c4c",
+      "files": {
+        "dotreg": {
+          "path": "large/config.dotreg",
+          "encoded_bytes": 362123,
+          "sha256": "cc4c67b26ca3e583a472a68dd4c3e9e906884636b431f7f3483c0ab31398d086"
+        },
+        "ini": {
+          "path": "large/config.ini",
+          "encoded_bytes": 354048,
+          "sha256": "1e348a60c5d10437c1f1a3276f43446deccca1fbf288ec033f55289ce0fc5b34"
+        },
+        "json": {
+          "path": "large/config.json",
+          "encoded_bytes": 420739,
+          "sha256": "4e6352b0baaf7a4968095a16beee47ce045729f8c85636ac493d9e1d2c52c5e0"
+        },
+        "toml": {
+          "path": "large/config.toml",
+          "encoded_bytes": 370432,
+          "sha256": "d4a57d7b688735e9ace339d9d2ce30ca2c8cf06c0cc7fb260f756e2b6bcb3394"
+        },
+        "yaml": {
+          "path": "large/config.yaml",
+          "encoded_bytes": 362112,
+          "sha256": "e00b61dbcf7e52a771b784e31ac2427b4364fc2322ff8803fadb50a70e547e82"
+        }
+      }
+    },
+    {
+      "name": "unicode",
+      "sections": 32,
+      "values_per_section": 16,
+      "style": "unicode",
+      "values": 512,
+      "logical_payload_bytes": 39424,
+      "semantic_sha256": "abdf6d23c1e50f855c42e489ddf641c50364d3a914e248badddc2510347f7e19",
+      "files": {
+        "dotreg": {
+          "path": "unicode/config.dotreg",
+          "encoded_bytes": 33899,
+          "sha256": "7f79aa784e646facaa52c917908f012181f17f3038a0d148e530b36701cb7c18"
+        },
+        "ini": {
+          "path": "unicode/config.ini",
+          "encoded_bytes": 33408,
+          "sha256": "aa164e96d45598f742ef92cda3483ce1480aaa58cb76f3a2a6b31a05921bfd7d"
+        },
+        "json": {
+          "path": "unicode/config.json",
+          "encoded_bytes": 37795,
+          "sha256": "ba20d5f7eb7ad3a3fc5e4e6f0df68f58cfe1dc5be6a808e1d55c7fa812d82b0f"
+        },
+        "toml": {
+          "path": "unicode/config.toml",
+          "encoded_bytes": 35520,
+          "sha256": "2084549d0d409898a388c75c510ce50a2d6495ef57a7e90d4b1f737dff5f89d6"
+        },
+        "yaml": {
+          "path": "unicode/config.yaml",
+          "encoded_bytes": 33888,
+          "sha256": "9256fe26b268036b0021f46981a58985e3755513a039a09fe0522a8e9daf1305"
+        }
+      }
+    },
+    {
+      "name": "escaped",
+      "sections": 32,
+      "values_per_section": 16,
+      "style": "escaped",
+      "values": 512,
+      "logical_payload_bytes": 34304,
+      "semantic_sha256": "d985b2745f40fba9fa3da5f5b573123a1e801d23b78a8717c2c62e5e052fd8eb",
+      "files": {
+        "dotreg": {
+          "path": "escaped/config.dotreg",
+          "encoded_bytes": 35243,
+          "sha256": "ea1b5174746e87a67b7b05ca7cee2ea56cd89becbb30ebc60b84c96c8e4e5ca3"
+        },
+        "ini": {
+          "path": "escaped/config.ini",
+          "encoded_bytes": 34240,
+          "sha256": "2536610424670f87837e71c6b43370cbe066c1b2b5109dac8aa399419a2afe67"
+        },
+        "json": {
+          "path": "escaped/config.json",
+          "encoded_bytes": 38115,
+          "sha256": "d1cf996416cfd4f8ffcdb24d370c7fa26a6ef38b72b77ecc00161cb42b9b4470"
+        },
+        "toml": {
+          "path": "escaped/config.toml",
+          "encoded_bytes": 34752,
+          "sha256": "8a0ecbe84116c687daffc9e57da8113809ac2315f3a2a02d9c6051a501dd9b6d"
+        },
+        "yaml": {
+          "path": "escaped/config.yaml",
+          "encoded_bytes": 35232,
+          "sha256": "2b1f04097a8f35e31f2541fcd96740a47ede7c5b6f533eebc2063166d9f0079f"
+        }
+      }
+    },
+    {
+      "name": "multiline",
+      "sections": 32,
+      "values_per_section": 16,
+      "style": "multiline",
+      "values": 512,
+      "logical_payload_bytes": 37888,
+      "semantic_sha256": "6567932d361bdf431c646d5ca6681a5d60affb3868bfde1f94dc3bdf9d573706",
+      "files": {
+        "dotreg": {
+          "path": "multiline/config.dotreg",
+          "encoded_bytes": 43435,
+          "sha256": "c1bcbea8123f83e82e54a6eeab4a87f36f3d354e169c92e3c93d9aa4b5183d37"
+        },
+        "ini": {
+          "path": "multiline/config.ini",
+          "encoded_bytes": 37824,
+          "sha256": "6e678489ece77aada673e971dd55dbe2f90e34fbb0cf474fea99980c4065f65a"
+        },
+        "json": {
+          "path": "multiline/config.json",
+          "encoded_bytes": 40163,
+          "sha256": "9f8e0d39355e56ad7cfd11cf53bb8d7523518b67bd115722b3b05781e804275b"
+        },
+        "toml": {
+          "path": "multiline/config.toml",
+          "encoded_bytes": 38336,
+          "sha256": "ecf98df7e53b89affc5b67822f2dd56a3a142133d4ee8ee4d7fd33975eec700e"
+        },
+        "yaml": {
+          "path": "multiline/config.yaml",
+          "encoded_bytes": 42912,
+          "sha256": "c466f4d22e5f898bc797b48342a23e8d3c92d6e408f7755eae77581a6d93be12"
+        }
+      }
+    }
+  ]
+}

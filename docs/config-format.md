@@ -36,6 +36,7 @@ dotReg writes settings as `key: value` lines. Dots separate key elements. Headin
   - [8.3 Triple-quoted multiline values](#83-triple-quoted-multiline-values)
   - [8.4 Literal pipe blocks](#84-literal-pipe-blocks)
 - [9. Repeated values and read state](#9-repeated-values-and-read-state)
+  - [9.1 Prefix selection](#91-prefix-selection)
 - [10. Character encoding, line endings and length](#10-character-encoding-line-endings-and-length)
 - [11. Responsibilities of syntax processing and consuming applications](#11-responsibilities-of-syntax-processing-and-consuming-applications)
   - [11.1 Rules defined by consuming applications](#111-rules-defined-by-consuming-applications)
@@ -878,7 +879,42 @@ Adding a type annotation does not change key identity, which is based on the res
 
 Assignments to `A.B` and `A."B"` belong to the same key and are both retained. `"A\.B"` and `"A.B"`, and `A."B\.C"` and `A."B.C"`, likewise identify the same key within each pair. `A."B.C"` and `A.B.C` have different element sequences and remain separate keys. Multiple occurrences of the key `""` are retained normally; an empty name does not mean that the key was omitted.
 
-A consuming application may require a particular key to have one value, limit its occurrence count or impose other cardinality rules through its configuration schema. Such a constraint belongs to application validation, rather than the general syntax. Concrete collection-retrieval APIs, indexed retrieval and handling of mixed declared types during aggregate retrieval remain outside the format's settled API contract.
+A consuming application may require a particular key to have one value, limit its occurrence count or impose other cardinality rules through its configuration schema. Such a constraint belongs to application validation, rather than the general syntax. Prefix selection follows section 9.1. Concrete API names and native result representations, indexed retrieval and aggregate retrieval that requests one common type remain undecided.
+
+### 9.1 Prefix selection
+
+Prefix selection retrieves all value occurrences at a specified key path and below it. It belongs to the consumer's retrieval layer and introduces no file syntax or parser operation. The selection rules are established here; concrete API names and native result representations remain provisional.
+
+Supply the prefix as a sequence of decoded key elements. A value matches when its path equals that sequence or starts with it. Compare elements exactly, including case, without Unicode normalisation. Do not compare a dotted display string or reinterpret decoded dots as separators. For example, `["A", "B"]` selects `A.B` itself, `A.B.C` and `A.B.C.D`, but excludes `A.Beta.C` and `A."B.C"`.
+
+Select the prefix's own values and all descendants, at any depth, and retain their original global source order. Keep repeated occurrences, including identical values; do not sort, group, overwrite or deduplicate them. A heading alone is not a value occurrence and is excluded, including a heading that matches the prefix exactly.
+
+For example, this body fragment records numbered filters:
+
+```text
+ip.filter:
+ip.filter.
+  .100099: pass * * * * *
+  ."": unnamed
+  .101000: reject 10.0.0.0/8 * * * *
+  .100099: pass * * * * *
+```
+
+Selecting prefix `["ip", "filter"]` returns these five occurrences in that order. The empty header records an unset value for the prefix itself; the heading does not record another occurrence.
+
+| Full key elements | Relative key elements | Decoded value | Unset |
+|---|---|---|---|
+| `["ip", "filter"]` | `[]` | Empty string | `true` |
+| `["ip", "filter", "100099"]` | `["100099"]` | `pass * * * * *` | `false` |
+| `["ip", "filter", ""]` | `[""]` | `unnamed` | `false` |
+| `["ip", "filter", "101000"]` | `["101000"]` | `reject 10.0.0.0/8 * * * *` | `false` |
+| `["ip", "filter", "100099"]` | `["100099"]` | `pass * * * * *` | `false` |
+
+Each selected occurrence makes available its full path, its relative path with the prefix removed, its value, its type annotation and whether one was present, its unset state, and its one-based physical value-header line number. Preserve the element boundaries of both paths. The prefix's own value has an empty relative path `[]`; its child with an explicit empty name has relative path `[""]`. These are distinct results.
+
+Selection does not request a common type or initiate conversion. Values with a declaration retain the value converted to that declared type under section 8.1; values without a declaration remain their common decoded strings. Mixed declared types are allowed in a result. Preserve each occurrence's unset state and declaration independently, without converting unset values merely because they were selected. An untyped unset value, including one at the prefix itself, has an empty-string value and an unset state of true. A caller that needs a particular type uses ordinary retrieval and its mismatch rules.
+
+An empty prefix sequence selects every value occurrence. This differs from the one-element prefix `[""]`, which selects the explicit empty-name key's own values and descendants. `*` is an ordinary key element, not a wildcard: `["A", "B", "*"]` selects that literal key's own values and descendants. A prefix with no matches succeeds with an empty collection.
 
 ## 10. Character encoding, line endings and length
 
@@ -902,7 +938,7 @@ An implementation or consuming application may impose resource constraints accor
 |-----------------|------------------------------------------------------------------------------------------------|
 | General syntax processing | Validating required file properties and their separator before body processing; processing physical lines, character encoding, indentation and headings; interpreting quoted key elements, decoding their escapes and retaining their boundaries; resolving and validating paths; preserving every value occurrence, line number and source order without overwriting or deduplication; separating keys and type expressions; recognising value forms; removing block markers and margins while retaining undecoded bodies and their internal source line endings; identifying each occurrence's unset state |
 | Common string decoding | Removing ordinary surrounding quotes before delivering a value; decoding the basic and Unicode escapes in section 3.4 in ordinary quoted values and triple-quoted bodies; preserving unquoted single-line values and pipe bodies literally under their whitespace rules; not trimming again after decoding; distinguishing unset from an explicit empty string |
-| Type conversion and retrieval | Retaining values with strings as the basis; converting only to the declared type expression; matching the requested type expression at retrieval; converting at retrieval when there is no declaration; reporting type expression mismatch errors; interpreting unset as equivalent to an empty string when string retrieval is permitted |
+| Type conversion and retrieval | Retaining values with strings as the basis; converting only to the declared type expression; matching the requested type expression at retrieval; converting at retrieval when there is no declaration; reporting type expression mismatch errors; interpreting unset as equivalent to an empty string when string retrieval is permitted; selecting value occurrences at a decoded key prefix and below it under section 9.1 without further conversion |
 | Value decoders and profiles | Assigning meaning to type expressions and defining individual conversion rules for numbers, booleans, enums, lists and other types. Their input is the result of common string decoding |
 | The application's configuration schema | Validating known keys and headings, required fields, whether unset and empty strings are allowed, ranges, lengths, control characters, file ownership boundaries, and consistency between keys and between files |
 

@@ -8,10 +8,10 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 
 | Document | Read it to… |
 |---|---|
-| [Getting started](getting-started.md) | Learn the required file declaration, value lines, repeated values, headings, strings and unset values through small examples |
+| [Getting started](getting-started.md) | Learn the required file declaration, value lines, repeated values, headings, grouped retrieval, strings and unset values through small examples |
 | [Configuration file format](config-format.md) | Consult the reference specification for syntax, processing stages and application responsibilities |
 | [Type profiles and candidate types](type-profile.md) | Look up established type-specific representations and distinguish them from candidate type names and examples |
-| [Conformance checklist](conformance.md) | Check an implementation's parser against the established format rules |
+| [Conformance checklist](conformance.md) | Check syntax, decoding and any provided consumer layer against the established rules |
 | [Undecided matters](open-issues.md) | Check which parts of the format remain open |
 | [Example configuration](../examples/sample.txt) | Explore repeated values, quoted names, escapes, both multiline forms and the Go sample's experimental type annotations |
 | [Go sample guide](../implementations/go/README.md) | Run the optional parser and CLI, use its API, or inspect its supported scope and provisional choices |
@@ -38,6 +38,7 @@ For a first read, follow [Getting started](getting-started.md). For a particular
 - [Type annotations](config-format.md#6-type-annotations).
 - [String decoding and unset values](config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
 - [Repeated values and read state](config-format.md#9-repeated-values-and-read-state).
+- [Retrieving values by key prefix](config-format.md#91-prefix-selection).
 - [Triple-quoted multiline values](config-format.md#83-triple-quoted-multiline-values) and [literal pipe blocks](config-format.md#84-literal-pipe-blocks).
 - [Processing and application responsibilities](config-format.md#11-responsibilities-of-syntax-processing-and-consuming-applications).
 

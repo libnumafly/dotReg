@@ -10,6 +10,7 @@ This guide introduces the notation. The [reference specification](config-format.
 - [Start with a full key](#start-with-a-full-key)
 - [Group related settings](#group-related-settings)
 - [Keep repeated values](#keep-repeated-values)
+- [Retrieve a group of settings](#retrieve-a-group-of-settings)
 - [Write strings naturally](#write-strings-naturally)
 - [Write multiline strings](#write-multiline-strings)
 - [Distinguish unset from empty](#distinguish-unset-from-empty)
@@ -76,6 +77,12 @@ A.Tag:red
 ```
 
 The values of `A.Tag` are `red`, `green`, `red`. An application can require a key to appear only once through its configuration schema. See [repeated values and read state](config-format.md#9-repeated-values-and-read-state). The [Go sample](../implementations/go/README.md#using-the-library) also shows collection and indexed retrieval.
+
+## Retrieve a group of settings
+
+A consumer can retrieve every value at a key prefix and below it. For example, selecting `["ip", "filter"]` collects `ip.filter` itself and numbered keys such as `ip.filter.100099` and `ip.filter.101000`, including deeper descendants. The result preserves source order, repeated values, each value's declared type and unset state. It provides both full keys and keys relative to the selected prefix. The prefix's own values have relative path `[]`; an empty-named child's path is `[""]`.
+
+The prefix is a sequence of key elements, so `ip.filter` does not accidentally match `ip.filters`. A heading alone contributes no value, and `*` has no wildcard meaning. See [prefix selection](config-format.md#91-prefix-selection) for the rules and a numbered-filter example, and [the Go guide](../implementations/go/README.md#selecting-values-by-key-prefix) for library usage. The other sample ports currently stop at syntax processing and common string decoding.
 
 ## Write strings naturally
 

@@ -132,6 +132,10 @@ assert.deepEqual(
   'The downloadable licence must match its source byte for byte',
 );
 assert(documents.get(path.join(outputRoot, 'specification/index.html'))?.ids.has('12-undecided-matters'), 'The undecided matters section must remain reachable');
+assert(documents.get(path.join(outputRoot, 'specification/index.html'))?.ids.has('91-prefix-selection'), 'The prefix selection rules must remain reachable');
+const goGuide = documents.get(path.join(outputRoot, 'implementations/go/index.html'));
+assert(goGuide?.ids.has('selecting-values-by-key-prefix'), 'The Go prefix selection guide must remain reachable');
+assert(goGuide?.ids.has('selecting-descendants-by-key-prefix'), 'The former Go prefix selection anchor must remain reachable');
 assert(documents.has(path.join(outputRoot, 'open-issues/index.html')), 'The undecided matters page must remain reachable');
 const typeProfile = documents.get(path.join(outputRoot, 'type-profile/index.html'));
 assert(typeProfile?.ids.has('established-base64-representation'), 'The established base64 representation must remain reachable');

@@ -1,0 +1,2241 @@
+# Serial Go benchmark rounds; exact selection, flags and source hashes in the JSON report.
+
+# sample=1 order_seed=20261024 sequence=1 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:35:30.142543+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	      91	   2238176 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=2 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:35:30.397343+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1026	    221209 ns/op	  82.81 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=3 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:35:30.667668+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      39	   6324626 ns/op	  36.92 MB/s	      8192 values/op	 8213839 B/op	   57511 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=4 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:35:31.173674+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    2442	     82621 ns/op	 415.81 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=5 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:35:31.399374+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    4094	     58659 ns/op	 579.02 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=6 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:35:31.852185+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	67251379	         3.510 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=7 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:35:32.137445+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	    1071	    255415 ns/op	  57.22 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=8 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:35:32.446243+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   30416	      7862 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=9 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:35:32.797984+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     199	   1188842 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=10 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:35:33.221416+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1230	    197459 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=11 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:35:33.529970+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2137	    113509 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=12 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:35:33.832193+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3220	     67560 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=13 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:35:34.108611+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7360	     35064 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=14 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:35:34.595786+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2289	    110499 ns/op	 163.17 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=15 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:35:35.077828+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3049	     65793 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=16 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:35:35.330464+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4408	     52597 ns/op	 623.00 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=17 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:35:35.767323+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   16383	     14726 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=18 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:35:36.204784+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  282242	       858.1 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=19 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:35:36.509949+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2037	    113505 ns/op	 161.38 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=20 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:35:36.778140+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   51543	      4568 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=21 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:35:37.110517+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1324	    157344 ns/op	 116.42 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=22 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:35:37.363704+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2421	     97899 ns/op	 144.95 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=23 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:35:37.842567+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     114	   2137562 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=24 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:35:38.348909+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   29644	      7368 ns/op	4447.05 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=25 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:35:38.672989+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1011	    226787 ns/op	4623.68 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=26 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:35:38.960652+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2071	    110381 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=27 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:35:39.252189+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3926	     59682 ns/op	 575.47 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=1 order_seed=20261024 sequence=28 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:35:39.530701+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   52084	      4531 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=29 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:35:39.856902+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1269	    185427 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=30 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:35:40.157836+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  277317	       882.9 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=31 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:35:40.457055+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   30558	      7737 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=32 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:35:40.815621+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	      96	   2097976 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=33 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:35:41.091148+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7320	     32611 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=34 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:35:41.499808+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3868	     56742 ns/op	 598.59 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=35 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:35:41.751504+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2166	    102284 ns/op	 176.27 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=36 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:35:42.007111+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33697	      7058 ns/op	4642.79 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=37 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:35:42.346199+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     206	   1112215 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=38 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:35:42.752559+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2056	    116219 ns/op	 157.62 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=39 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:35:43.036173+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4832	     50056 ns/op	 654.63 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=40 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:35:43.485710+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2054	    112069 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=41 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:35:43.790018+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2200	    113023 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=42 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:35:44.096101+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3973	     54809 ns/op	 626.63 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=43 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:35:44.353899+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2270	     97505 ns/op	 145.53 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=44 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:35:44.611633+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   50336	      4566 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=45 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:35:44.939152+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3230	     70846 ns/op	 484.93 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=46 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:35:45.206177+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	    1077	    224771 ns/op	  65.03 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=47 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:35:45.502832+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	67065332	         3.516 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=48 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:35:45.796922+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1063	    219415 ns/op	4779.03 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=49 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:35:46.084937+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3930	     60256 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=50 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:35:46.579893+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   51320	      4457 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=51 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:35:46.908063+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     106	   2163964 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=52 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:35:47.397282+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1266	    164621 ns/op	 111.27 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=53 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:35:47.658168+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1039	    246238 ns/op	  74.39 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=54 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:35:47.960960+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   16216	     15218 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=55 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:35:48.413539+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      43	   5483935 ns/op	  42.58 MB/s	      8192 values/op	 8213839 B/op	   57511 allocs/op
+PASS
+
+# sample=2 order_seed=20261025 sequence=56 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:35:48.709177+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3909	     61312 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=57 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:35:49.206447+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   51206	      4596 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=58 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:35:49.530704+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1329	    163914 ns/op	 111.75 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=59 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:35:49.803212+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     109	   2160087 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=60 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:35:50.299571+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3266	     62995 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=61 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:35:50.564872+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   30559	      7733 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=62 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:35:50.923382+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2064	    113799 ns/op	 160.97 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=63 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:35:51.210845+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   51448	      4482 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=64 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:35:51.533167+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2109	    103522 ns/op	 174.17 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=65 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:35:51.798709+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3446	     60628 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=66 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:35:52.064315+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1220	    189703 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=67 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:35:52.377566+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2200	    111179 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=68 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:35:52.678929+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33536	      7155 ns/op	4579.91 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=69 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:35:53.017333+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     213	   1290600 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=70 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:35:53.471493+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	67063458	         3.539 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=71 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:35:53.767374+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    4058	     55022 ns/op	 624.21 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=72 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:35:54.024889+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4819	     50442 ns/op	 649.62 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=73 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:35:54.494406+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	    1080	    227679 ns/op	  64.20 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=74 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:35:54.792685+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   16323	     14710 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=75 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:35:55.236833+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2329	     97560 ns/op	 145.45 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=76 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:35:55.509502+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1074	    213103 ns/op	4920.58 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=77 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:35:55.797828+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  281792	       863.8 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=78 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:35:56.096133+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      37	   5455114 ns/op	  42.80 MB/s	      8192 values/op	 8213839 B/op	   57511 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=79 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:35:56.361605+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7219	     32797 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=80 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:35:56.829808+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3090	     70519 ns/op	 487.17 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=81 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:35:57.093233+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     106	   2459939 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=82 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:35:57.595076+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	     913	    244141 ns/op	  75.03 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=83 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:35:57.873927+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2186	    112455 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=3 order_seed=20261026 sequence=84 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:35:58.191833+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3722	     60316 ns/op	 563.12 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=85 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:35:58.451317+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      33	   6428015 ns/op	  36.32 MB/s	      8192 values/op	 8213840 B/op	   57511 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=86 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:35:58.729493+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	     894	    251274 ns/op	  58.17 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=87 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:35:59.017678+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   14918	     16174 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=88 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:35:59.470924+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	     898	    223067 ns/op	4700.79 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=89 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:35:59.735159+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4828	     51184 ns/op	 640.21 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=90 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:36:00.205195+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   32715	      7079 ns/op	4629.00 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=91 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:00.534459+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3963	     59843 ns/op	 573.91 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=92 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:36:00.820589+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   51262	      4566 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=93 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:36:01.142606+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     184	   1118735 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=94 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:36:01.549769+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     110	   2185698 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=95 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:36:02.033523+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1192	    195603 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=96 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:36:02.341379+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   46682	      4783 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=97 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:36:02.667534+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    1965	    106225 ns/op	 169.73 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=98 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:36:02.913475+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3460	     76757 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=99 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:36:03.252683+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	      90	   2321934 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=100 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:36:03.538755+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7287	     34202 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=101 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:36:04.034178+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  276109	       869.3 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=102 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:36:04.330337+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2332	     98467 ns/op	 144.11 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=103 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:36:04.626887+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1010	    244288 ns/op	  74.99 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=104 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:04.924945+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    4065	     58252 ns/op	 583.07 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=105 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:36:05.400777+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3370	     61721 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=106 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:36:05.658744+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2139	    122305 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=107 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:36:05.987710+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   26370	      8028 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=108 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:06.346840+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1294	    160927 ns/op	 113.83 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=109 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:06.607902+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	58579447	         3.819 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=110 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:36:06.892533+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2064	    112034 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=111 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:36:07.195943+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2038	    114458 ns/op	 160.04 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=4 order_seed=20261027 sequence=112 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:36:07.473895+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3096	     73458 ns/op	 467.68 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=113 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:36:07.745778+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     108	   2203183 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=114 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:36:08.263380+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3460	     67017 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=115 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:36:08.549262+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   52123	      4625 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=116 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:36:08.902142+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1015	    219733 ns/op	4772.11 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=117 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:09.176806+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3967	     56885 ns/op	 603.77 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=118 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:36:09.439834+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4672	     51570 ns/op	 635.40 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=119 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:09.893518+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	67520044	         3.570 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=120 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:36:10.189897+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     106	   2263624 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=121 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:36:10.690838+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3356	     63010 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=122 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:36:10.971335+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	     904	    245818 ns/op	  59.46 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=123 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:36:11.259221+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      42	   5390888 ns/op	  43.31 MB/s	      8192 values/op	 8213840 B/op	   57511 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=124 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:36:11.752901+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33730	      7324 ns/op	4473.97 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=125 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:12.097285+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3766	     58752 ns/op	 578.11 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=126 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:36:12.361152+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1064	    217626 ns/op	  84.17 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=127 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:36:12.659383+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2457	    111005 ns/op	 127.83 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=128 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:36:13.182792+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2047	    106899 ns/op	 168.66 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=129 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:36:13.451686+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3170	     71698 ns/op	 479.16 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=130 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:36:13.721167+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1282	    190828 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=131 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:36:14.034639+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    6601	     33204 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=132 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:36:14.503473+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2073	    114694 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=133 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:14.814897+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1274	    175496 ns/op	 104.38 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=134 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:36:15.112029+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   16152	     14756 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=135 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:36:15.548980+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2030	    114177 ns/op	 160.44 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=136 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:36:15.844061+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   52399	      4493 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=137 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:36:16.173948+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    1810	    112938 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=138 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:36:16.455610+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     188	   1149978 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=139 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:36:16.878457+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  234817	       960.6 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=5 order_seed=20261028 sequence=140 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:36:17.158649+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   28770	      8905 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=141 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:36:17.549448+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    1827	    126652 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=142 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:36:17.866652+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     100	   2397335 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=143 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:36:18.356643+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   48320	      5242 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=144 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:36:18.709411+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2014	    118145 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=145 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:36:19.018035+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    1992	    117182 ns/op	 156.32 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=146 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:36:19.300763+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2323	     98386 ns/op	 144.23 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=147 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:36:19.579918+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      40	   5418052 ns/op	  43.10 MB/s	      8192 values/op	 8213839 B/op	   57511 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=148 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:36:19.874008+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   16106	     14933 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=149 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:36:20.330367+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    2852	     74727 ns/op	 459.74 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=150 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:36:20.581321+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   30099	      7986 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=151 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:36:20.965929+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7330	     32689 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=152 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:21.455192+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3646	     61595 ns/op	 551.43 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=153 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:36:21.728342+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4840	     50924 ns/op	 643.47 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=154 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:22.197730+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1448	    155211 ns/op	 118.02 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=155 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:22.683158+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	66964285	         3.703 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=156 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:36:22.999249+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   50997	      4638 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=157 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:36:23.326145+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2193	    103916 ns/op	 173.50 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=158 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:36:23.800127+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	     946	    226005 ns/op	4639.68 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=159 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:36:24.093574+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3447	     62637 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=160 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:36:24.361461+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     204	   1145813 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=161 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:24.800568+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3681	     58574 ns/op	 586.36 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=162 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:36:25.065953+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33850	      7224 ns/op	4536.11 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=163 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:36:25.428792+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1186	    198842 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=164 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:36:25.738022+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	     879	    249673 ns/op	  58.54 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=165 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:36:26.018691+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     110	   2174885 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=166 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:36:26.518300+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1018	    239821 ns/op	  76.38 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=167 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:36:26.818209+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3639	     62518 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=6 order_seed=20261029 sequence=168 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:36:27.315079+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  241612	       934.9 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=169 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:36:27.604050+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	      99	   2155328 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=170 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:36:28.103948+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3420	     64432 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=171 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:36:28.388095+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1234	    195399 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=172 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:36:28.705809+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2215	    114165 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=173 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:36:29.019112+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      37	   5698819 ns/op	  40.97 MB/s	      8192 values/op	 8213839 B/op	   57511 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=174 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:29.305968+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3937	     56394 ns/op	 609.02 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=175 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:36:29.565823+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7310	     33032 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=176 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:36:30.081519+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3139	     74524 ns/op	 460.99 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=177 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:36:30.363240+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2343	     99120 ns/op	 143.16 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=178 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:36:30.654259+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     208	   1192369 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=179 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:36:31.081879+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	     985	    231076 ns/op	  63.25 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=180 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:36:31.391300+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2172	    114125 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=181 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:36:31.709660+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     106	   2176529 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=182 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:36:32.221466+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1024	    231597 ns/op	4527.65 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=183 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:32.510563+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1442	    154207 ns/op	 118.79 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=184 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:36:33.002715+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   31663	      7124 ns/op	4599.60 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=185 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:36:33.331765+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   15888	     14863 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=186 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:33.801345+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    4071	     59057 ns/op	 575.12 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=187 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:36:34.299479+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   30074	      7827 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=188 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:36:34.677310+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    1908	    107051 ns/op	 168.42 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=189 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:36:34.941187+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   53043	      4474 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=190 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:36:35.284591+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   51402	      4737 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=191 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:36:35.628296+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2028	    114335 ns/op	 160.21 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=192 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:36:35.915253+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3370	     82282 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=193 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:36:36.252660+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4747	     51083 ns/op	 641.47 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=194 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:36.736550+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	59655488	         3.572 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=195 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:36:37.018797+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	     978	    231335 ns/op	  79.18 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=7 order_seed=20261030 sequence=196 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:36:37.302160+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  273890	       906.9 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=197 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:36:37.628960+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4797	     49243 ns/op	 665.44 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=198 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:36:38.096521+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     194	   1178924 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=199 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:36:38.528664+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  243795	       876.9 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=200 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:36:38.813897+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   30994	      8019 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=201 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:36:39.205518+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2136	    103977 ns/op	 173.40 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=202 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:36:39.472276+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	    1052	    246656 ns/op	  59.26 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=203 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:36:39.800688+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     108	   2197404 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=204 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:36:40.300528+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3817	     61996 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=205 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:40.811003+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3799	     58742 ns/op	 578.21 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=206 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:36:41.092474+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3004	     72204 ns/op	 475.80 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=207 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:36:41.362246+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2384	     99173 ns/op	 143.08 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=208 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:36:41.640567+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3270	     70284 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=209 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:41.940585+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	63596374	         3.536 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=210 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:36:42.253155+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2091	    115150 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=211 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:36:42.778543+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     111	   2444237 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=212 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:43.325616+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3811	     62136 ns/op	 552.74 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=213 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:36:43.597827+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   53398	      4623 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=214 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:36:43.957252+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    6896	     34110 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=215 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:36:44.441456+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1183	    192517 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=216 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:44.752933+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1213	    188601 ns/op	  97.13 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=217 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:36:45.061151+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2050	    114749 ns/op	 159.63 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=218 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:36:45.360765+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   49154	      4680 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=219 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:36:45.705150+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1071	    221190 ns/op	4740.68 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=220 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:36:46.206735+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      44	   5470868 ns/op	  42.68 MB/s	      8192 values/op	 8213840 B/op	   57511 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=221 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:36:46.705862+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    1987	    113793 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=222 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:36:47.026182+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   15877	     15101 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=223 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:36:47.488801+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	     939	    234776 ns/op	  78.02 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=8 order_seed=20261031 sequence=224 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:36:47.783295+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33784	      7215 ns/op	4541.81 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=225 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:36:48.144476+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   51182	      4661 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=226 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:48.497352+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3966	     56768 ns/op	 605.01 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=227 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:36:48.768618+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   29932	      8305 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=228 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:36:49.144097+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  254500	       927.6 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=229 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:36:49.467865+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   15394	     16339 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=230 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:49.942017+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	69017080	         3.599 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=231 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:36:50.253370+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2089	    113708 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=232 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:36:50.565559+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    2096	    106674 ns/op	 169.02 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=233 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:36:50.846978+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7039	     33440 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=234 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:36:51.332414+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3411	     64937 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=235 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:36:51.627575+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33702	      7107 ns/op	4610.40 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=236 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:36:51.972082+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1256	    194840 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=237 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:36:52.311675+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2126	    121209 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=238 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:36:52.645218+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4783	     50156 ns/op	 653.33 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=239 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:36:53.135293+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     192	   1228016 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=240 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:36:53.580428+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1014	    216792 ns/op	  84.50 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=241 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:36:53.865483+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2312	    109079 ns/op	 130.09 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=242 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:36:54.184346+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	    1032	    242022 ns/op	  60.39 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=243 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:36:54.487907+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      36	   5844761 ns/op	  39.95 MB/s	      8192 values/op	 8213838 B/op	   57511 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=244 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:36:54.981959+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    1774	    119401 ns/op	 153.42 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=245 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:36:55.254428+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     102	   2230555 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=246 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:36:55.754132+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3804	     66389 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=247 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:36:56.273585+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3147	     73661 ns/op	 466.40 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=248 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:36:56.547200+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   51877	      4572 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=249 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:56.920836+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3598	     58694 ns/op	 578.68 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=250 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:36:57.176473+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1030	    226961 ns/op	4620.13 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=251 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:57.486829+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1408	    167942 ns/op	 109.07 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=9 order_seed=20261032 sequence=252 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:36:57.987488+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     109	   2109972 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=253 operation=BenchmarkSelectPrefix/EmptyConfig started_at_utc=2026-10-24T02:36:58.502984+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/EmptyConfig         	57913659	         3.661 ns/op	         0 selected-values/op	         0 stored-values/op	       0 B/op	       0 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=254 operation=BenchmarkParseDecode512 started_at_utc=2026-10-24T02:36:58.788718+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseDecode512 	    1423	    163352 ns/op	 112.14 MB/s	  221120 B/op	    2875 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=255 operation=BenchmarkParseEach/TriplePlain32KiB started_at_utc=2026-10-24T02:36:59.279737+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TriplePlain32KiB         	    3769	     58463 ns/op	 580.96 MB/s	  266312 B/op	     623 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=256 operation=BenchmarkParseEach/PipeLiteral32KiB started_at_utc=2026-10-24T02:36:59.557084+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/PipeLiteral32KiB         	    3955	     56640 ns/op	 606.37 MB/s	  194768 B/op	     807 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=257 operation=BenchmarkParseBuildOrdered/Occurrences8192 started_at_utc=2026-10-24T02:36:59.827856+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences8192         	      36	   5758814 ns/op	  40.55 MB/s	      8192 values/op	 8213839 B/op	   57511 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=258 operation=BenchmarkSelectPrefix/Occurrences8192/All started_at_utc=2026-10-24T02:37:00.112512+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/All         	     100	   2163704 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=259 operation=BenchmarkParseEach/BareMixed512 started_at_utc=2026-10-24T02:37:00.613611+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/BareMixed512         	    2388	     98369 ns/op	 144.25 MB/s	   78960 B/op	    2089 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=260 operation=BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants started_at_utc=2026-10-24T02:37:01.097369+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/BaseAndDescendants         	    7221	     32956 ns/op	       320.0 selected-values/op	       512.0 stored-values/op	  103728 B/op	    1290 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=261 operation=BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants started_at_utc=2026-10-24T02:37:01.599514+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/BaseAndDescendants         	     188	   1152618 ns/op	      5120 selected-values/op	      8192 stored-values/op	 2383152 B/op	   20497 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=262 operation=BenchmarkParseEach/QuotedMixed512 started_at_utc=2026-10-24T02:37:02.020196+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/QuotedMixed512         	    2040	    114207 ns/op	 160.39 MB/s	   87216 B/op	    2609 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=263 operation=BenchmarkParseBuild512 started_at_utc=2026-10-24T02:37:02.317107+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuild512 	    1016	    213657 ns/op	  85.74 MB/s	  445464 B/op	    3536 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=264 operation=BenchmarkSelectPrefix/Occurrences512/NoMatch started_at_utc=2026-10-24T02:37:02.614451+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/NoMatch         	  276764	       887.2 ns/op	         0 selected-values/op	       512.0 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=265 operation=BenchmarkParseBuildOrdered/Occurrences512 started_at_utc=2026-10-24T02:37:02.932557+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseBuildOrdered/Occurrences512         	    1015	    230014 ns/op	  63.54 MB/s	       512.0 values/op	  366792 B/op	    3694 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=266 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix started_at_utc=2026-10-24T02:37:03.239598+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyPrefix         	     104	   2247366 ns/op	      8192 selected-values/op	      8192 stored-values/op	 4422944 B/op	   35346 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=267 operation=BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant started_at_utc=2026-10-24T02:37:03.753240+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/SelectiveDescendant         	   51931	      4628 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   11576 B/op	     135 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=268 operation=BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary started_at_utc=2026-10-24T02:37:04.098150+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/QuotedElementBoundary         	    2133	    111248 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  204088 B/op	    2571 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=269 operation=BenchmarkSelectPrefix/Occurrences512/EmptyName started_at_utc=2026-10-24T02:37:04.425665+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyName         	   29928	      7968 ns/op	        64.00 selected-values/op	       512.0 stored-values/op	   22312 B/op	     264 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=270 operation=BenchmarkSelectPrefix/Occurrences512/All started_at_utc=2026-10-24T02:37:04.813746+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/All         	    3300	     61292 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=271 operation=BenchmarkDecodeTriple32KiB/Plain started_at_utc=2026-10-24T02:37:05.090381+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Plain         	   33456	      7142 ns/op	4588.04 MB/s	       0 B/op	       0 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=272 operation=BenchmarkParseEach/LongRaw1MiB started_at_utc=2026-10-24T02:37:05.441518+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/LongRaw1MiB         	    1040	    219923 ns/op	4768.00 MB/s	 2125368 B/op	     273 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=273 operation=BenchmarkSelectPrefix/Occurrences512/EmptyPrefix started_at_utc=2026-10-24T02:37:05.755279+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/EmptyPrefix         	    3240	     69968 ns/op	       512.0 selected-values/op	       512.0 stored-values/op	  205600 B/op	    2218 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=274 operation=BenchmarkParseEach/TripleEscaped32KiB started_at_utc=2026-10-24T02:37:06.067375+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkParseEach/TripleEscaped32KiB         	    3010	     76751 ns/op	 447.61 MB/s	  264984 B/op	     818 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=275 operation=BenchmarkBuildUntyped512 started_at_utc=2026-10-24T02:37:06.363803+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkBuildUntyped512 	    1875	    107823 ns/op	 167.22 MB/s	  231512 B/op	    1301 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=276 operation=BenchmarkSelectPrefix/Occurrences8192/EmptyName started_at_utc=2026-10-24T02:37:06.614844+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/EmptyName         	    1192	    191293 ns/op	      1024 selected-values/op	      8192 stored-values/op	  343336 B/op	    4108 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=277 operation=BenchmarkDecodeTriple32KiB/Escaped started_at_utc=2026-10-24T02:37:06.943364+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkDecodeTriple32KiB/Escaped         	    4788	     51829 ns/op	 632.23 MB/s	  113400 B/op	      19 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=278 operation=BenchmarkSelectPrefix/Occurrences8192/NoMatch started_at_utc=2026-10-24T02:37:07.441333+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/NoMatch         	   14869	     15086 ns/op	         0 selected-values/op	      8192 stored-values/op	      16 B/op	       1 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=279 operation=BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary started_at_utc=2026-10-24T02:37:07.909451+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences512/QuotedElementBoundary         	   46252	      4485 ns/op	        32.00 selected-values/op	       512.0 stored-values/op	   12088 B/op	     167 allocs/op
+PASS
+
+# sample=10 order_seed=20261033 sequence=280 operation=BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant started_at_utc=2026-10-24T02:37:08.240081+00:00
+goos: windows
+goarch: amd64
+pkg: github.com/libnumafly/dotReg/implementations/go
+cpu: 13th Gen Intel(R) Core(TM) i7-1370P
+BenchmarkSelectPrefix/Occurrences8192/SelectiveDescendant         	    2059	    113271 ns/op	       512.0 selected-values/op	      8192 stored-values/op	  195896 B/op	    2059 allocs/op
+PASS

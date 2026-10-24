@@ -11,6 +11,7 @@ Standard type names and the public API remain undecided. The Go package is `dotr
 - [File properties](#file-properties)
 - [Running the sample](#running-the-sample)
 - [Using the library](#using-the-library)
+  - [Selecting values by key prefix](#selecting-values-by-key-prefix)
 - [Single-line strings](#single-line-strings)
 - [Multiline values](#multiline-values)
 - [Type conversion and the caller's configuration schema](#type-conversion-and-the-callers-configuration-schema)
@@ -91,6 +92,7 @@ The `raw` mode can retain an unterminated ordinary quote in a single-line value 
 | `Config.Get([]string, string) (any, error)` | Retrieve exactly one occurrence; report `ErrMultipleValues` if the key has more than one |
 | `Config.GetAll([]string, string) ([]any, error)` | Retrieve every occurrence in source order as the requested type; return no partial values if any occurrence fails |
 | `Config.GetAt([]string, int, string) (any, error)` | Retrieve a zero-based occurrence within a key's source-ordered values |
+| `Config.SelectPrefix([]string) ([]SelectedValue, error)` | Select values at the prefix and below it in global source order, retaining full and relative paths and per-occurrence metadata without further conversion |
 | `Config.IsUnset([]string) (bool, error)` | Query the unset state of exactly one occurrence; report `ErrMultipleValues` if there is more than one |
 | `Config.IsUnsetAll([]string) ([]bool, error)` | Query every occurrence's unset state in source order without retrieving or converting values |
 
@@ -136,13 +138,64 @@ unset, err := config.IsUnsetAll([]string{"A", "Tag"}) // []bool{false, false, fa
 
 `Get` and `IsUnset` require exactly one occurrence. They return `ErrMultipleValues` (`multiple_values`) for two or more, with the second occurrence's header line in the diagnostic; they do not silently select the first or last. A missing key returns `ErrMissing`. `GetAt` uses a zero-based index within that key, and returns `ErrMissing` for a missing key, a negative index or an out-of-range index.
 
-`GetAll` applies the requested type to each occurrence independently, following the declaration rules below. If any occurrence has a different declared type or cannot be converted as requested, it returns a type mismatch error and no partial values. `IsUnsetAll` only reports states and does not perform type conversion. These API names, singular-retrieval errors and aggregate-failure choices belong to this provisional Go sample; they do not establish the notation's public API or a universal aggregate policy for mixed declared types.
+`GetAll` applies the requested type to each occurrence independently, following the declaration rules below. If any occurrence has a different declared type or cannot be converted as requested, it returns a type mismatch error and no partial values. `IsUnsetAll` only reports states and does not perform type conversion. These API names, singular-retrieval errors and common-type aggregate-failure choices belong to this provisional Go sample; they do not establish the notation's public API or a universal policy for aggregate requests for one type. Prefix selection instead follows the established rules described below and keeps mixed declared types without requesting conversion.
 
 Requesting the annotated `A.Code` as `int` returns `ErrTypeMismatch`, regardless of whether conversion would be possible. The unannotated `A.Count` can be retrieved as `"42"` when requesting `string`, or as `int64(42)` when requesting `int`. Retrieval conversions are not cached; the original string and unset state are retained.
 
 `A.Missing` and `A.Empty` both return a zero-length string when requested as `string`. `IsUnset` returns `true` and `false`, respectively. To address a key with an empty name, pass `[]string{""}`. An empty path, whether `nil` or `[]string{}`, does not mean a key with an empty name.
 
 The notation does not perform Unicode normalisation. Key elements are compared exactly after quote and escape decoding, using the same rule for grouping occurrences, retrieval and matching against a configuration schema. For example, the precomposed character `が` (U+304C) and the sequence `か` plus a combining voiced sound mark (U+304B U+3099) are different names. Type expressions and values are not implicitly normalised either.
+
+<a id="selecting-descendants-by-key-prefix"></a>
+
+### Selecting values by key prefix
+
+`SelectPrefix` implements [section 9.1 of the specification](../../docs/config-format.md#91-prefix-selection). Pass decoded key elements to select the prefix's own values and all descendant values at any depth. A heading alone contributes no value. Matches retain their original global source order and repeated occurrences, with no sorting or deduplication.
+
+For this body fragment:
+
+```text
+ip.filter:
+ip.filter.
+  .100099: pass * * * * *
+  ."": unnamed
+  .101000: reject 10.0.0.0/8 * * * *
+  .100099: pass * * * * *
+```
+
+build the configuration as above, then select the group:
+
+```go
+filters, err := config.SelectPrefix([]string{"ip", "filter"})
+if err != nil {
+    return err
+}
+for _, filter := range filters {
+    fmt.Printf("%q: %#v (unset=%t)\n", filter.RelativePath, filter.Value, filter.Unset)
+}
+// []: "" (unset=true)
+// ["100099"]: "pass * * * * *" (unset=false)
+// [""]: "unnamed" (unset=false)
+// ["101000"]: "reject 10.0.0.0/8 * * * *" (unset=false)
+// ["100099"]: "pass * * * * *" (unset=false)
+```
+
+The returned `SelectedValue` has these fields:
+
+| Field | Meaning |
+|---|---|
+| `Path []string` | Full decoded key elements |
+| `RelativePath []string` | Key elements after removing the selected prefix; `[]` for the prefix itself and `[""]` for an empty-named child |
+| `Value any` | The declared converted value, or the decoded string when no type is declared |
+| `Type string` / `HasType bool` | The occurrence's original type annotation and whether one was present |
+| `Unset bool` | The occurrence's original unset state |
+| `Line int` | One-based physical value-header line, counting declarations and blank lines |
+
+Selection performs no new conversion and can return mixed declared types. It preserves unset separately from an explicit empty string. In the example, the prefix's untyped unset occurrence has `Value == ""` and `Unset == true`. `GetAll` instead addresses one exact key and requests a common type; use ordinary retrieval when a selected value needs conversion to a particular requested type.
+
+Matching uses exact decoded elements, including case and Unicode identity. `[]string{"ip", "filter"}` excludes `ip.filters.100099` and `ip."filter.100099"`. An empty prefix (`nil` or `[]string{}`) selects all values, whereas `[]string{""}` selects the explicit empty-name key's own values and descendants. `*` is a literal element rather than a wildcard; its prefix selects that literal key's own values and descendants.
+
+A valid `Config` with no matches returns an empty slice and no error. A nil `*Config` returns `ErrMissing` with line zero. The returned result slice and all full and relative path slices are independent of the supplied prefix, the configuration and other results; editing them cannot change later selections. A custom profile's `Value` follows the same ownership rules as values returned by existing `Config` retrieval methods: mutable objects are not deep-copied. The method name, `SelectedValue` representation and diagnostic details are provisional Go API choices; the shared selection behaviour is established by the specification.
 
 ## Single-line strings
 
@@ -255,7 +308,7 @@ The following choices are specific to this implementation where the specificatio
 | Remaining whitespace around type annotations | Alignment tabs immediately before the type expression or after the closing parenthesis are unsupported; this is distinct from normal trimming of outer SP and HT on value lines |
 | Unicode whitespace and control-character detection in unquoted keys | Use Go's `unicode.IsSpace` and `unicode.IsControl`; do not apply this prohibition to quoted keys |
 | Future escape extensions | Reject additional forms as undefined; implement decoding of the adopted basic and Unicode forms as agreed rules |
-| API and error classification | Use this sample's singular, collection and indexed retrieval APIs and `Code`; singular methods report `ErrMultipleValues`, and `GetAll` fails without partial results; the public API and formal diagnostic format remain undecided |
+| API and error classification | Use this sample's singular, collection, indexed and prefix-selection APIs and `Code`; singular methods report `ErrMultipleValues`, and `GetAll` fails without partial results; concrete public API names, native result representations and the formal diagnostic format remain undecided, while prefix-selection behaviour follows section 9.1 |
 | Type-expression identity and conversion failure | Match type names exactly without resolving aliases; report conversion failure for an annotated type during `Build` |
 
 Unsupported type-expression syntax is generally reported as `ErrUnsupported`, syntax that violates agreed rules as `ErrSyntax`, and invalid quoted-value syntax or escapes as `ErrString`. Undefined escapes in quoted forms are not reinterpreted as ordinary characters. A backslash or later quote in a single-line literal value is already an ordinary character, rather than active syntax.
