@@ -75,13 +75,18 @@ public final class DotReg {
                     parent = scopes.get(depth - 1);
                     key = key.substring(1);
                 } else scopes.clear();
-                Node node = parent;
-                if (!(relative && key.isEmpty() && entry.kind.equals("value")))
-                    node = new Node(parent, parsePath(key, physical.number));
-                entry = new Entry(entry.line, entry.kind, node.elements(), entry.raw,
+                List<String> path;
+                if (entry.kind.equals("heading")) {
+                    Node node = new Node(parent, parsePath(key, physical.number));
+                    path = node.elements();
+                    scopes.add(node);
+                } else {
+                    path = parent == null ? new ArrayList<>() : parent.elements();
+                    if (!(relative && key.isEmpty())) parsePath(key, physical.number, path);
+                }
+                entry = new Entry(entry.line, entry.kind, path, entry.raw,
                         entry.unset, entry.type, entry.hasType, entry.form);
-                if (entry.kind.equals("heading")) scopes.add(node);
-                else {
+                if (!entry.kind.equals("heading")) {
                     Body completed = lines.body(entry, indent, eof);
                     entry = completed.entry;
                     eof = completed.eof;
@@ -316,7 +321,10 @@ public final class DotReg {
     }
 
     private static List<String> parsePath(String key, int line) throws ParseException {
-        List<String> path = new ArrayList<>();
+        return parsePath(key, line, new ArrayList<>());
+    }
+
+    private static List<String> parsePath(String key, int line, List<String> path) throws ParseException {
         int start = 0;
         while (true) {
             if (start >= key.length()) throw problem(line, "syntax");

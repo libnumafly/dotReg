@@ -100,10 +100,13 @@ incrementally and full retention is unnecessary.
 
 The implementations scan physical lines in source order and use immutable
 parent/suffix nodes for active headings. This avoids retaining a full expanded
-ancestor path at every heading level. Delivered paths are materialised when
-needed. Escaped strings and block bodies use spans, builders or append buffers
-appropriate to the language, avoiding repeated reconstruction of growing
-immutable strings. Literal text can be reused where the language permits it.
+ancestor path at every heading level. Value paths are materialised directly in
+their own exported containers, without constructing a heading node for each
+value. Heading nodes remain separate from those containers, including when a
+relative empty-key value copies its parent's path. Escaped strings and block
+bodies use spans, builders or append buffers appropriate to the language,
+avoiding repeated reconstruction of growing immutable strings. Literal text can
+be reused where the language permits it.
 
 Streaming retention follows active heading suffixes, the current resolved entry,
 the reader buffer and at most one physical boundary line. An unfinished
@@ -119,6 +122,14 @@ The [benchmark guide](benchmarks/README.md) describes the common fixture, warmed
 Those measurements distinguish parsing and decoding from per-entry JSON output
 and record their toolchains and environment. Runtime baseline memory, garbage
 collection and workload shape matter when comparing results.
+
+The [public sample tuning report](benchmarks/public-rollin-2026-10-24/README.md)
+records adoption of the direct value-path construction in Python, JavaScript,
+Java, C#, Rust and C++; TypeScript shares JavaScript's implementation. Go's
+earlier parser changes were already included in the public Go sample and have
+their own [paired tuning report](benchmarks/tuning-2026-10-24/README.md). The
+original benchmark tables retain their recorded source snapshots; use these
+follow-ups for the adopted changes and their measured scope.
 
 ## Provisional choices and verification
 

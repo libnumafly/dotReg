@@ -28,6 +28,25 @@ class ParserTests(unittest.TestCase):
         dotreg.parse_each(document("A.\n  .B.\n    .C:x\n  .D:y"), visitor)
         self.assertEqual(visited, [["A"], ["A", "B"], ["A", "B", "C"], ["A", "D"]])
 
+    def test_direct_value_paths_are_independent_across_scope_changes(self):
+        retained, visited = [], []
+
+        def visitor(entry):
+            retained.append(entry.path)
+            visited.append(entry.path[:])
+            entry.path[:] = ["changed"]
+
+        dotreg.parse_each(document(
+            'Root.Zero:zero\nA.B.\n  .:one\n  .C.D:two\n'
+            '  ."C.D"."":three\n  .E.\n    .:four\n    .F:five\n'
+            '  .G:six\nZ:seven\n"":eight\n'), visitor)
+        self.assertEqual(visited, [
+            ["Root", "Zero"], ["A", "B"], ["A", "B"], ["A", "B", "C", "D"],
+            ["A", "B", "C.D", ""], ["A", "B", "E"], ["A", "B", "E"],
+            ["A", "B", "E", "F"], ["A", "B", "G"], ["Z"], [""]])
+        self.assertEqual(len({id(path) for path in retained}), len(retained))
+        self.assertEqual(retained, [["changed"]] * len(retained))
+
     def test_visitor_stop_does_not_validate_later_entry(self):
         calls = []
         dotreg.parse_each(document(b"A:good\n\xff:bad"), lambda entry: calls.append(entry) or False)

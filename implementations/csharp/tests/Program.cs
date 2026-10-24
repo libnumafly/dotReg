@@ -161,6 +161,23 @@ var tests = new (string Name, Action Run)[]
             else { Sequence(new[] { "A", "B", "C" }, entry.Path); Equal(false, ReferenceEquals(original, entry.Path)); }
         });
     }),
+    ("value paths own relative suffixes and self paths", () =>
+    {
+        var paths = new List<string[]>();
+        var exported = new List<string[]>();
+        Parser.ParseEach(Source("A.B.\n  .C.D:first\n  .:self\n  .\"\":empty\n  .E:next\nZ.Y:root"), entry =>
+        {
+            paths.Add(entry.Path.ToArray());
+            foreach (var previous in exported) Equal(false, ReferenceEquals(previous, entry.Path));
+            exported.Add(entry.Path);
+            entry.Path[0] = "changed";
+            entry.Path = [];
+        });
+        var expected = new[] { new[] { "A", "B" }, new[] { "A", "B", "C", "D" },
+            new[] { "A", "B" }, new[] { "A", "B", "" }, new[] { "A", "B", "E" }, new[] { "Z", "Y" } };
+        Equal(expected.Length, paths.Count);
+        for (var i = 0; i < expected.Length; i++) Sequence(expected[i], paths[i]);
+    }),
     ("short reads and source ownership", () =>
     {
         using var source = new ShortStream(Encoding.UTF8.GetBytes("@dotReg 1\r\n\r\n\"店舗😀\":value"));

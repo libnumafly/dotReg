@@ -77,11 +77,22 @@ public static class Parser
                     key = key[1..];
                 }
                 else scopes.Clear();
-                var self = relative && key.Length == 0 && entry.Kind == "value";
-                var node = self ? parent! : new PathNode(parent, ParsePath(key, entry.Line));
-                entry.Path = node.Elements();
-                if (entry.Kind == "heading") scopes.Add(node);
-                else eof = lines.ValueBody(entry, indent, eof);
+                if (entry.Kind == "heading")
+                {
+                    var node = new PathNode(parent, ParsePath(key, entry.Line).ToArray());
+                    entry.Path = node.Elements();
+                    scopes.Add(node);
+                }
+                else
+                {
+                    if (relative && key.Length == 0) entry.Path = parent!.Elements();
+                    else
+                    {
+                        var suffix = ParsePath(key, entry.Line);
+                        entry.Path = parent is null ? suffix.ToArray() : parent.Elements(suffix);
+                    }
+                    eof = lines.ValueBody(entry, indent, eof);
+                }
                 visit(entry);
             }
             if (eof) return;
@@ -185,7 +196,7 @@ public static class Parser
         throw Syntax(line);
     }
 
-    private static string[] ParsePath(string key, int line)
+    private static List<string> ParsePath(string key, int line)
     {
         var elements = new List<string>();
         for (var i = 0;;)
@@ -210,7 +221,7 @@ public static class Parser
                 i = end;
             }
             elements.Add(element);
-            if (i == key.Length) return elements.ToArray();
+            if (i == key.Length) return elements;
             i++; // Unquoted element separator.
         }
     }
@@ -336,10 +347,11 @@ public static class Parser
     private sealed class PathNode(PathNode? parent, string[] suffix)
     {
         private readonly int count = suffix.Length + (parent?.count ?? 0);
-        public string[] Elements()
+        public string[] Elements(List<string>? tail = null)
         {
-            var result = new string[count];
-            var end = result.Length;
+            var result = new string[count + (tail?.Count ?? 0)];
+            tail?.CopyTo(result, count);
+            var end = count;
             for (PathNode? node = this; node is not null; node = node.Parent)
             {
                 end -= node.Suffix.Length;

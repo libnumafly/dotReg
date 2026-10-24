@@ -42,7 +42,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify the published tuning tables
-        run: python ../tuning-2026-10-24/render.py --check
+        run: |
+          python ../tuning-2026-10-24/render.py --check
+          python ../public-rollin-2026-10-24/render.py --check
       - name: Check semantic equivalence
         run: go test -count=1 ./...
       - name: Verify the recorded fixture manifest

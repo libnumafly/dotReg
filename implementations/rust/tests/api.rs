@@ -14,6 +14,42 @@ fn mutation_cannot_change_headings_and_occurrences_are_retained() {
 }
 
 #[test]
+fn mixed_value_paths_own_quoted_empty_and_inherited_elements() {
+    let mut source = Cursor::new(br#"@dotReg 1
+
+Root."".
+  ."A\.B"."":one
+  ."A\.B"."":two
+  .:self
+  .Child.
+    ."leaf.name":three
+Other."":absolute
+"#);
+    let mut entries = Vec::new();
+    parse_each(&mut source, |mut entry| {
+        let path = entry.path.clone();
+        entry.path[0] = "recipient mutation".into();
+        entry.path.push("extra".into());
+        entries.push((path, entry));
+        Ok::<_, ()>(())
+    }).unwrap();
+    let paths: Vec<_> = entries.iter().map(|(path, _)| path.clone()).collect();
+    assert_eq!(paths, vec![
+        vec!["Root", ""], vec!["Root", "", "A.B", ""], vec!["Root", "", "A.B", ""],
+        vec!["Root", ""], vec!["Root", "", "Child"], vec!["Root", "", "Child", "leaf.name"],
+        vec!["Other", ""],
+    ]);
+    assert_eq!(entries[1].1.raw, "one");
+    assert_eq!(entries[2].1.raw, "two");
+    assert_eq!(entries[3].1.raw, "self");
+    assert_eq!(entries[6].1.raw, "absolute");
+    for (_, entry) in &entries {
+        assert_eq!(entry.path[0], "recipient mutation");
+        assert_eq!(entry.path.last().unwrap(), "extra");
+    }
+}
+
+#[test]
 fn stop_preserves_identity_before_validating_lookahead() {
     let sentinel = Box::new(17);
     let identity = &*sentinel as *const i32;

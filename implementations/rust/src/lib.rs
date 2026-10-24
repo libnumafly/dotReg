@@ -142,10 +142,13 @@ impl<R: BufRead> Lines<'_, R> {
 struct Node { parent: Option<Rc<Node>>, suffix: Vec<String>, count: usize }
 impl Node {
     fn elements(&self) -> Vec<String> {
+        self.elements_with_capacity(0)
+    }
+    fn elements_with_capacity(&self, extra: usize) -> Vec<String> {
         let mut parts = Vec::new();
         let mut current = Some(self);
         while let Some(node) = current { parts.push(&node.suffix); current = node.parent.as_deref(); }
-        let mut result = Vec::with_capacity(self.count);
+        let mut result = Vec::with_capacity(self.count + extra);
         for suffix in parts.into_iter().rev() { result.extend(suffix.iter().cloned()); }
         result
     }
@@ -183,14 +186,18 @@ pub fn parse_each<R: BufRead, E, F: FnMut(Entry) -> Result<(), E>>(
                 Some(Rc::clone(&scopes.0[depth - 1]))
             } else { scopes.truncate(0); None };
             let self_assignment = relative && key.is_empty() && entry.kind == "value";
-            let node = if self_assignment { parent.unwrap() } else {
+            if entry.kind == "heading" {
                 let suffix = parse_path(key, physical.line)?;
                 let count = suffix.len() + parent.as_ref().map_or(0, |p| p.count);
-                Rc::new(Node { parent, suffix, count })
-            };
-            entry.path = node.elements();
-            if entry.kind == "heading" { scopes.0.push(node); }
-            else { eof = lines.value_body(&mut entry, indent, eof)?; }
+                let node = Rc::new(Node { parent, suffix, count });
+                entry.path = node.elements();
+                scopes.0.push(node);
+            } else {
+                entry.path = parent.as_ref().map_or_else(Vec::new,
+                    |p| p.elements_with_capacity(usize::from(!self_assignment)));
+                if !self_assignment { append_path(key, physical.line, &mut entry.path)?; }
+                eof = lines.value_body(&mut entry, indent, eof)?;
+            }
             visit(entry).map_err(Failure::Visitor)?;
         }
         if eof { return Ok(()); }
@@ -241,8 +248,13 @@ fn split_line(body: &str, line: usize) -> Result<(Entry, &str), ParseError> {
     if let Some(key) = body.strip_suffix('.') { Ok((e, key)) } else { Err(error(line)) }
 }
 
-fn parse_path(mut key: &str, line: usize) -> Result<Vec<String>, ParseError> {
+fn parse_path(key: &str, line: usize) -> Result<Vec<String>, ParseError> {
     let mut path = Vec::new();
+    append_path(key, line, &mut path)?;
+    Ok(path)
+}
+
+fn append_path(mut key: &str, line: usize, path: &mut Vec<String>) -> Result<(), ParseError> {
     loop {
         if key.is_empty() { return Err(error(line)); }
         let element;
@@ -260,7 +272,7 @@ fn parse_path(mut key: &str, line: usize) -> Result<Vec<String>, ParseError> {
             element = raw.to_owned(); key = &key[end..];
         }
         path.push(element);
-        if key.is_empty() { return Ok(path); }
+        if key.is_empty() { return Ok(()); }
         key = &key[1..];
     }
 }

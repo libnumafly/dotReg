@@ -51,6 +51,7 @@ The site imports these repository files rather than maintaining separate copies:
 | `../implementations/rust/README.md` | `implementations/rust/` |
 | `../implementations/cpp/README.md` | `implementations/cpp/` |
 | `../implementations/benchmarks/README.md` | `implementations/benchmarks/` |
+| `../implementations/benchmarks/public-rollin-2026-10-24/README.md` | `implementations/benchmarks/public-rollin-2026-10-24/` |
 | `../implementations/benchmarks/tuning-2026-10-24/README.md` | `implementations/benchmarks/tuning-2026-10-24/` |
 | `../implementations/benchmarks/comparison/README.md` | `implementations/benchmarks/comparison/` |
 | `../implementations/benchmarks/native-2026-10-24/README.md` | `implementations/benchmarks/native-2026-10-24/` |
@@ -89,8 +90,11 @@ and add its sidebar entry in `astro.config.mjs`.
 to `main` and manual runs build and publish `pages/dist/`. The [Go workflow](../.github/workflows/ci.yml)
 checks the existing Go implementation; the [parser samples workflow](../.github/workflows/parsers.yml)
 checks all eight language entries and the comparison harness's semantic equivalence
-and smoke workloads, and verifies the published tuning tables against their
-recorded observations. Dependencies are pinned in `package-lock.json`,
+and smoke workloads, and verifies the published tuning and public sample adoption
+tables against their recorded observations. The adoption table check is
+`python implementations/benchmarks/public-rollin-2026-10-24/render.py --check`;
+it validates the recorded tables without running measurements.
+Dependencies are pinned in `package-lock.json`,
 and Dependabot checks the website's npm dependencies weekly.
 
 The site is configured with `site: https://libnumafly.github.io` and

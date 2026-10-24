@@ -14,6 +14,22 @@ test('fresh owned paths, repeats, Unicode escapes and no normalisation', async (
   assert.deepEqual(decodeString(entries[1]), { value: '', unset: true });
   assert.deepEqual(await parse(file('')), []);
 });
+test('direct value paths remain independent across scope changes', async () => {
+  const retained = [], seen = [];
+  await parseEach(file('Root.Zero:zero\nA.B.\n  .:one\n  .C.D:two\n' +
+    '  ."C.D"."":three\n  .E.\n    .:four\n    .F:five\n' +
+    '  .G:six\nZ:seven\n"":eight\n'), e => {
+    retained.push(e.path); seen.push([...e.path]);
+    e.path.splice(0, e.path.length, 'changed');
+  });
+  assert.deepEqual(seen, [
+    ['Root', 'Zero'], ['A', 'B'], ['A', 'B'], ['A', 'B', 'C', 'D'],
+    ['A', 'B', 'C.D', ''], ['A', 'B', 'E'], ['A', 'B', 'E'],
+    ['A', 'B', 'E', 'F'], ['A', 'B', 'G'], ['Z'], [''],
+  ]);
+  assert.equal(new Set(retained).size, retained.length);
+  assert.deepEqual(retained, retained.map(() => ['changed']));
+});
 test('callback is awaited, stops before next syntax and preserves error identity', async () => {
   const sentinel = new Error('recipient'); let calls = 0;
   await assert.rejects(parseEach(file('A:\ninvalid\n'), async () => {

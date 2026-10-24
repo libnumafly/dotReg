@@ -76,6 +76,19 @@ public final class DotRegTest {
         fails(() -> DotReg.parse(null));
         fails(() -> DotReg.parseEach(document("A:x"), null));
     }
+    private static void ownedValuePaths() throws Exception {
+        List<List<String>> paths = new ArrayList<>();
+        List<List<String>> exported = new ArrayList<>();
+        DotReg.parseEach(document("A.B.\n  .C.D:first\n  .:self\n  .\"\":empty\n  .E:next\nZ.Y:root"), entry -> {
+            paths.add(new ArrayList<>(entry.path()));
+            for (List<String> previous : exported) assert previous != entry.path();
+            exported.add(entry.path());
+            entry.path().clear(); entry.path().add("changed");
+            return true;
+        });
+        assert paths.equals(List.of(List.of("A", "B"), List.of("A", "B", "C", "D"),
+                List.of("A", "B"), List.of("A", "B", ""), List.of("A", "B", "E"), List.of("Z", "Y")));
+    }
     private static void multilineAndUnicode() throws Exception {
         List<DotReg.Entry> entries = DotReg.parse(document("A:\"\"\"\r\n  first\\nsecond\r\n    tail\n  \"\"\"\r\nB:\n |one\r\n |\nC: last"));
         assert entries.get(0).raw().equals("first\\nsecond\r\n  tail");
@@ -132,7 +145,7 @@ public final class DotRegTest {
         assert assertions = true;
         if (!assertions) throw new IllegalStateException("run with -ea");
         entriesAndScopes(); stopAndErrors(); multilineAndUnicode(); invalidInputsAndFreshState();
-        borrowedSlicesAndSpanningLines();
+        borrowedSlicesAndSpanningLines(); ownedValuePaths();
         System.out.println("Java API tests passed");
     }
 }

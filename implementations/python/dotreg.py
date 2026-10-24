@@ -45,8 +45,10 @@ class _Node:
     suffix: tuple[str, ...]
     count: int
 
-    def elements(self) -> list[str]:
-        path = [""] * self.count
+    def elements(self, suffix: list[str] | None = None) -> list[str]:
+        path = [""] * (self.count + (len(suffix) if suffix else 0))
+        if suffix:
+            path[self.count:] = suffix
         end, node = self.count, self
         while node is not None:
             start = end - len(node.suffix)
@@ -313,7 +315,7 @@ def _split(body: str, line: int) -> tuple[Entry, str]:
     raise ParseError(line)
 
 
-def _path(key: str, line: int) -> tuple[str, ...]:
+def _path(key: str, line: int) -> list[str]:
     parts: list[str] = []
     i = 0
     while True:
@@ -336,7 +338,7 @@ def _path(key: str, line: int) -> tuple[str, ...]:
                 raise ParseError(line)
         parts.append(element)
         if end == len(key):
-            return tuple(parts)
+            return parts
         i = end + 1
 
 
@@ -373,15 +375,14 @@ def parse_each(source: BinaryIO, visitor: Callable[[Entry], object]) -> None:
                 parent, key = scopes[depth - 1], key[1:]
             else:
                 scopes.clear()
-            node = parent
-            if not (relative and not key and entry.kind == "value"):
-                suffix = _path(key, physical.number)
-                node = _Node(parent, suffix, len(suffix) + (parent.count if parent else 0))
-            assert node is not None
-            entry.path = node.elements()
             if entry.kind == "heading":
+                suffix = tuple(_path(key, physical.number))
+                node = _Node(parent, suffix, len(suffix) + (parent.count if parent else 0))
+                entry.path = node.elements()
                 scopes.append(node)
             else:
+                suffix = None if relative and not key else _path(key, physical.number)
+                entry.path = parent.elements(suffix) if parent else suffix
                 eof = lines.body(entry, indent, eof)
             if visitor(entry) is False:
                 return

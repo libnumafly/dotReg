@@ -260,9 +260,12 @@ class Lines {
   }
 }
 
-function elements(node) {
-  const result = new Array(node.count);
-  let end = result.length;
+function elements(node, suffix = null) {
+  const result = new Array(node.count + (suffix?.length ?? 0));
+  if (suffix) {
+    for (let i = 0; i < suffix.length; i++) result[node.count + i] = suffix[i];
+  }
+  let end = node.count;
   for (let n = node; n; n = n.parent) {
     end -= n.suffix.length;
     for (let i = 0; i < n.suffix.length; i++) result[end + i] = n.suffix[i];
@@ -294,14 +297,16 @@ export async function parseEach(source, visit) {
         if (depth > scopes.length || !key.startsWith('.')) fail(p.number);
         scopes.length = depth; parent = scopes[depth - 1]; key = key.slice(1);
       } else scopes.length = 0;
-      let node = parent;
-      if (!(relative && key === '' && e.kind === 'value')) {
+      if (e.kind === 'heading') {
         const suffix = parsePath(key, p.number);
-        node = { parent, suffix, count: (parent?.count ?? 0) + suffix.length };
+        const node = { parent, suffix, count: (parent?.count ?? 0) + suffix.length };
+        e.path = elements(node);
+        scopes.push(node);
+      } else {
+        const suffix = relative && key === '' ? null : parsePath(key, p.number);
+        e.path = parent ? elements(parent, suffix) : suffix;
+        eof = await lines.valueBody(e, indent, eof);
       }
-      e.path = elements(node);
-      if (e.kind === 'heading') scopes.push(node);
-      else eof = await lines.valueBody(e, indent, eof);
       if (await visit(e) === false) return;
     }
     if (eof) return;

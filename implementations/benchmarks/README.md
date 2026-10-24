@@ -5,11 +5,14 @@ and its [sample implementations](../README.md). The campaign dated 24 October
 2026 has three measurement tiers. They answer different questions and use
 different output contracts, so their timings are presented separately.
 
-**The latest [Go parser tuning follow-up](tuning-2026-10-24/README.md) remeasures
-the original and optimised implementations together against the same inputs and
-libraries.** The tables on this overview page retain the initial campaign before
-that tuning, including the seven-engine native comparison. The follow-up reports
-the current Go parser results and controlled before/after changes separately.
+**The [public sample tuning report](public-rollin-2026-10-24/README.md) records
+adoption of direct value-path construction across the other native engines.**
+Go's earlier parser changes were already part of its public sample; the
+[Go parser tuning follow-up](tuning-2026-10-24/README.md) compares its original
+and optimised implementations against the same inputs and libraries. The tables
+on this overview page retain the initial campaign before either follow-up,
+including the original seven-engine native comparison. Each follow-up identifies
+its own source snapshots and measured changes.
 
 | Tier | Question | Timed result |
 |---|---|---|
@@ -26,6 +29,7 @@ parser timings and the other-format comparison.
 
 ## Contents
 
+- [Public sample adoption](#public-sample-adoption)
 - [Recorded data and measured source](#recorded-data-and-measured-source)
 - [Native parser APIs](#native-parser-apis)
 - [Equivalent configuration formats](#equivalent-configuration-formats)
@@ -35,10 +39,31 @@ parser timings and the other-format comparison.
 - [Validation and CI](#validation-and-ci)
 - [Historical single-fixture baseline](#historical-single-fixture-baseline)
 
+## Public sample adoption
+
+The [public sample tuning report](public-rollin-2026-10-24/README.md) covers
+direct value-path construction in Python, JavaScript, Java, C#, Rust and C++.
+TypeScript uses the same JavaScript engine. Values receive independent exported
+paths, while persistent parent/suffix nodes continue to represent active
+headings. Empty-key values retain a separate copy of the resolved parent path.
+This change preserves path-element boundaries, occurrence order, recipient
+mutation isolation and the existing lookahead validation contract.
+
+That report compares the original and adopted sample snapshots in one native
+campaign, retaining source and binary hashes, independent complete-output
+validation, observations and reproduction settings. The already published Go
+sample provides the unchanged engine in that campaign. The
+[earlier Go follow-up](tuning-2026-10-24/README.md) separately covers its parser
+changes and comparison with other configuration libraries.
+
+The initial tables below and their raw reports remain historical snapshots of
+the source identified in those reports. New measurements are published in the
+follow-ups, preserving the provenance and interpretation of the earlier results.
+
 ## Recorded data and measured source
 
-The following files retain the observations, runtime details, source hashes,
-fixture hashes and reproduction settings:
+The following files retain the initial campaign's observations, runtime details,
+source hashes, fixture hashes and reproduction settings:
 
 - Native suite: [method and workload guide](native-2026-10-24/README.md),
   [all process samples and summaries](native-2026-10-24/report.json).
@@ -87,8 +112,8 @@ of the protocol change and are excluded from the reported performance ranking.
 
 ## Native parser APIs
 
-The native suite runs Go, Python, JavaScript, Java, C#, Rust and C++ against the
-same valid UTF-8/LF documents, including the required `@dotReg 1` declaration
+The initial native suite runs Go, Python, JavaScript, Java, C#, Rust and C++
+against the same valid UTF-8/LF documents, including the required `@dotReg 1` declaration
 and blank separator. Each parser's complete syntax and decoded output is checked
 against independently constructed expected entries before measurement.
 

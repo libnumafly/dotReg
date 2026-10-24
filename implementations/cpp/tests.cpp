@@ -9,6 +9,20 @@ static void mutation_and_repetition() {
     dotreg::parse_each(source, [&](dotreg::Entry e) { paths.push_back(e.path); e.path[0] = "changed"; });
     require(paths == std::vector<std::vector<std::string>>{{"A", "B"}, {"A", "B", "C"}, {"A", "B", "C"}, {"A", "B"}});
 }
+static void mixed_value_paths() {
+    std::istringstream source("@dotReg 1\n\nRoot.\"\".\n  .\"A\\.B\".\"\":one\n  .\"A\\.B\".\"\":two\n  .:self\n  .Child.\n    .\"leaf.name\":three\nOther.\"\":absolute\n");
+    std::vector<std::vector<std::string>> paths;
+    std::vector<dotreg::Entry> entries;
+    dotreg::parse_each(source, [&](dotreg::Entry e) {
+        paths.push_back(e.path); e.path[0] = "recipient mutation"; e.path.push_back("extra");
+        entries.push_back(std::move(e));
+    });
+    require(paths == std::vector<std::vector<std::string>>{
+        {"Root", ""}, {"Root", "", "A.B", ""}, {"Root", "", "A.B", ""},
+        {"Root", ""}, {"Root", "", "Child"}, {"Root", "", "Child", "leaf.name"}, {"Other", ""}});
+    require(entries[1].raw == "one" && entries[2].raw == "two" && entries[3].raw == "self" && entries[6].raw == "absolute");
+    for (const auto& e : entries) require(e.path[0] == "recipient mutation" && e.path.back() == "extra");
+}
 static void visitor_identity_and_lookahead() {
     std::istringstream source("@dotReg 1\n\nA:\n\xff\n");
     int sentinel = 17, calls = 0; bool stopped = false;
@@ -70,7 +84,7 @@ static void deep_paths() {
     dotreg::parse_each(source, [&](dotreg::Entry e) { require(e.path.size() == ++count); }); require(count == 1500);
 }
 int main() {
-    mutation_and_repetition(); visitor_identity_and_lookahead(); source_errors_and_required_arguments();
+    mutation_and_repetition(); mixed_value_paths(); visitor_identity_and_lookahead(); source_errors_and_required_arguments();
     multiline(); unicode_and_decoding(); invalid_sources(); deep_paths();
-    std::cout << "7 C++ API tests passed\n";
+    std::cout << "8 C++ API tests passed\n";
 }

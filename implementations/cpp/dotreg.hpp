@@ -232,8 +232,7 @@ inline std::pair<Entry, std::string_view> split_line(std::string_view body, std:
     if (!body.empty() && body.back() == '.') return {std::move(e), body.substr(0, body.size() - 1)};
     throw ParseError(line);
 }
-inline std::vector<std::string> path(std::string_view key, std::size_t line) {
-    std::vector<std::string> result;
+inline void append_path(std::string_view key, std::size_t line, std::vector<std::string>& result) {
     for (;;) {
         if (key.empty()) throw ParseError(line);
         std::string element;
@@ -250,15 +249,18 @@ inline std::vector<std::string> path(std::string_view key, std::size_t line) {
             }
             element = raw; key.remove_prefix(end);
         }
-        result.push_back(std::move(element)); if (key.empty()) return result; key.remove_prefix(1);
+        result.push_back(std::move(element)); if (key.empty()) return; key.remove_prefix(1);
     }
+}
+inline std::vector<std::string> path(std::string_view key, std::size_t line) {
+    std::vector<std::string> result; append_path(key, line, result); return result;
 }
 struct Node {
     std::shared_ptr<const Node> parent; std::vector<std::string> suffix; std::size_t count;
-    std::vector<std::string> elements() const {
+    std::vector<std::string> elements(std::size_t extra = 0) const {
         std::vector<const Node*> parts;
         for (auto node = this; node; node = node->parent.get()) parts.push_back(node);
-        std::vector<std::string> result; result.reserve(count);
+        std::vector<std::string> result; result.reserve(count + extra);
         for (auto it = parts.rbegin(); it != parts.rend(); ++it) result.insert(result.end(), (*it)->suffix.begin(), (*it)->suffix.end());
         return result;
     }
@@ -291,15 +293,17 @@ inline void parse_each(std::istream* input, const Visitor& visit) {
                 auto depth = indent / 2; if (depth > scopes.nodes.size()) throw ParseError(physical.number);
                 scopes.truncate(depth); parent = scopes.nodes[depth - 1]; key.remove_prefix(1);
             } else scopes.truncate(0);
-            std::shared_ptr<const detail::Node> node;
-            if (relative && key.empty() && e.kind == "value") node = parent;
-            else {
+            if (e.kind == "heading") {
                 auto suffix = detail::path(key, physical.number); auto count = suffix.size() + (parent ? parent->count : 0);
-                node = std::make_shared<detail::Node>(detail::Node{parent, std::move(suffix), count});
+                auto node = std::make_shared<detail::Node>(detail::Node{parent, std::move(suffix), count});
+                e.path = node->elements();
+                scopes.nodes.push_back(std::move(node));
+            } else {
+                bool self_assignment = relative && key.empty();
+                if (parent) e.path = parent->elements(self_assignment ? 0 : 1);
+                if (!self_assignment) detail::append_path(key, physical.number, e.path);
+                eof = lines.value_body(e, indent, eof);
             }
-            e.path = node->elements();
-            if (e.kind == "heading") scopes.nodes.push_back(node);
-            else eof = lines.value_body(e, indent, eof);
             visit(std::move(e));
         }
         if (eof) return;
