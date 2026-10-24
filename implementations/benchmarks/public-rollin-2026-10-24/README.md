@@ -1,12 +1,16 @@
 # Public sample parser adoption
 
-This follow-up transfers one established Go optimisation to the other public
-sample parsers: persistent parent/suffix nodes are needed for active headings,
+This published campaign transfers one established Go optimisation to the other
+public sample parsers: persistent parent/suffix nodes are needed for active headings,
 but an ordinary value can construct its independent output path without a
 temporary scope node. The change covers Python, JavaScript, Java, C#, Rust and
 C++; TypeScript shares the JavaScript engine. The public Go parser already
 contains this change and the additional improvements described in the
 [Go tuning report](../tuning-2026-10-24/README.md).
+
+The [benchmark overview](../README.md) links to the latest published results
+for each suite. The [native methodology guide](../native-2026-10-24/README.md)
+describes the workload and reproduction tools used by this campaign.
 
 The purpose is to remove intermediate objects and copies while preserving the
 current [specification](../../../docs/config-format.md), APIs, entry order,
@@ -303,8 +307,8 @@ The baseline is commit `6c7fa4cd4ef0c6c8019b82664d6d5997bfb5246a`, including
 the already tuned Go parser. The candidate differs in the six parser engines
 and their native regression tests. Both use the same specification, fixed
 [fixture generator](../native-2026-10-24/fixtures.py), native benchmark
-harnesses and [memory wrapper](../measure.py). The initial native report and
-the earlier Go tuning reports remain unchanged historical snapshots.
+harnesses and [memory wrapper](../measure.py). This paired report retains all
+baseline and candidate observations together.
 
 The six UTF-8/LF inputs retain the required declaration and blank separator:
 
@@ -343,8 +347,8 @@ collecting retains syntax entries before decoding. CLI JSON output, independent
 validation, compilation and report generation are outside the native timer.
 Two warm-ups and finite pass counts do not guarantee JIT steady state.
 
-The host is the same Windows 11 Enterprise 10.0.26200 AMD64 machine used in the
-previous campaign: Intel Core i7-1370P, 14 physical cores, 20 logical processors,
+The host is Windows 11 Enterprise 10.0.26200 AMD64 on an
+Intel Core i7-1370P, 14 physical cores, 20 logical processors,
 16,819,617,792 bytes of physical memory. The existing custom power scheme was
 retained. Preparation records timestamped host, battery and power observations;
 desktop/OS activity and thermal state were not continuously controlled. Exact

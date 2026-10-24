@@ -328,11 +328,12 @@ go build ./...
 
 The tests cover required declarations and their blank separator, malformed, repeated and unsupported declarations, physical line numbers, accepted and rejected body input, heading state, key-element boundaries, first-character selection of literal or quoted single-line values, literal later quotes and backslashes, basic and Unicode escapes, rejection of unknown quoted escapes and invalid surrogates, the absence of Unicode normalisation, triple-quoted margins and closing markers, literal pipe detection, preservation of source and terminal line endings, explicit empty blocks, ordered repeated values including identical values, per-occurrence unset and type state, singular and collection retrieval, type mismatches, callback-requested stops, input errors, and long physical lines and expanded paths. Fuzz seeds also run as part of the usual `go test` invocation.
 
-Current measurements and reproduction instructions are in the
-[benchmark overview](../benchmarks/README.md) and the
-[controlled Go tuning comparison](../benchmarks/tuning-2026-10-24/README.md).
-[PERFORMANCE.md](PERFORMANCE.md) retains the earlier refactor measurements,
-including their historical syntax and allocation trade-offs.
+The latest measurements pushed to the repository and their reproduction
+instructions are in the [benchmark overview](../benchmarks/README.md) and the
+[published Go tuning report](../benchmarks/tuning-2026-10-24/README.md).
+The published report identifies its measured source snapshots; local parser
+changes and unpushed measurements do not replace those results. Superseded
+standalone results are removed when their replacement is published.
 
 To generate arbitrary inputs during fuzzing:
 

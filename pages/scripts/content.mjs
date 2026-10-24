@@ -119,25 +119,19 @@ export const pages = [
   {
     source: 'implementations/benchmarks/comparison/README.md',
     slug: 'implementations/benchmarks/comparison',
-    title: 'Configuration format comparison',
-    description: 'Compare decoded string configurations in dotReg, JSON, TOML, YAML and INI under the same Go runtime.',
+    title: 'Configuration comparison methodology',
+    description: 'Equivalent decoded string maps, pinned libraries and reproduction tools for the Go format comparison.',
   },
   {
     source: 'implementations/benchmarks/native-2026-10-24/README.md',
     slug: 'implementations/benchmarks/native-2026-10-24',
-    title: 'Native parser workload matrix',
-    description: 'Current-specification dotReg workloads, five process samples and time and memory observations across seven engines.',
+    title: 'Native workload methodology',
+    description: 'Shared dotReg fixtures, independent output validation and reproducible native time and process-memory measurements.',
   },
   {
     source: 'implementations/go/README.md',
     slug: 'implementations/go',
     title: 'Go sample implementation',
     description: 'Run the Go parser and CLI, retrieve values by key or prefix and understand provisional choices.',
-  },
-  {
-    source: 'implementations/go/PERFORMANCE.md',
-    slug: 'implementations/go/performance',
-    title: 'Historical parser measurements',
-    description: 'Historical Go parser measurements, their method and their limitations.',
   },
 ];

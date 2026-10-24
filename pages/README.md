@@ -55,7 +55,6 @@ The site imports these repository files rather than maintaining separate copies:
 | `../implementations/benchmarks/tuning-2026-10-24/README.md` | `implementations/benchmarks/tuning-2026-10-24/` |
 | `../implementations/benchmarks/comparison/README.md` | `implementations/benchmarks/comparison/` |
 | `../implementations/benchmarks/native-2026-10-24/README.md` | `implementations/benchmarks/native-2026-10-24/` |
-| `../implementations/go/PERFORMANCE.md` | `implementations/go/performance/` |
 | `../examples/sample.txt` | `examples/` and the original `.txt` download |
 | `../LICENSE` | `license/` and the original text download |
 
@@ -70,12 +69,20 @@ and copied downloads are ignored by Git; do not edit them directly.
 
 `scripts/remark-repository-links.mjs` rewrites links at render time. Links to
 published documents point to their site routes, including the existing heading
-anchors. Links to implementation source and historical benchmark artifacts
+anchors. Links to implementation source and benchmark reports
 point to the corresponding files on GitHub. The source Markdown continues to
 work when read on GitHub.
 
 When adding a document, register its source and route in `scripts/content.mjs`
 and add its sidebar entry in `astro.config.mjs`.
+
+Publish only the most recent report already pushed to `origin/main` for each
+distinct measurement series. Completed local measurements and unpushed source
+changes do not replace that published result.
+Replace superseded result tables, raw data and navigation together, while
+retaining the methodology and reproduction tools needed for the current reports.
+Unfinished campaigns and unpushed replacement reports stay outside the published
+results and Pages navigation.
 
 ## Publish with GitHub Pages
 

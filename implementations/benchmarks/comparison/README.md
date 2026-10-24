@@ -1,8 +1,8 @@
-# Decoded configuration comparison
+# Configuration comparison methodology
 
-The latest [Go parser tuning results](../tuning-2026-10-24/README.md) compare the
-original and optimised implementations in one balanced campaign. The tables on
-this page retain the initial measurement snapshot before those changes.
+This guide describes the common-map workloads, library options and reproduction
+commands used for the [latest published Go parser tuning report](../tuning-2026-10-24/README.md).
+Measured results and their raw observations are published only in that report.
 
 This isolated Go module compares the current dotReg Go sample with JSON, TOML,
 YAML and INI libraries. Every operation starts with preloaded UTF-8 bytes and
@@ -15,119 +15,8 @@ map[string]map[string]string // section -> key -> decoded string
 These are measurements of particular library versions, APIs and inputs. A
 format's full expressive power, other implementations, invalid-input handling,
 application schema validation and file system performance are outside this
-comparison. Results belong in the [benchmark report](../README.md).
-
-## Recorded results
-
-The accepted isolated run used go1.27.0 on Windows amd64, from
-24 October 2026 11:32:35 +09:00 to 11:34:51 +09:00.
-All 360 observations are retained in [the JSON report](results-2026-10-24.json)
-and [raw test-binary output](results-2026-10-24.txt), with ten observations per
-case/operation pair. The source and binary SHA-256 manifest identifies the
-measured working-tree snapshot. Tables below are generated from that JSON.
-
-Times are microseconds per complete decoded-map load. Ranges are the minimum
-and maximum of the ten observations, not confidence intervals. Allocation
-columns show median Go heap bytes and allocation counts per load; they are
-allocation traffic rather than retained memory or peak RSS.
-
-### small: 32 settings
-
-Logical payload: 1,600 UTF-8 bytes. Encoded input sizes and exact hashes are in
-[the fixture manifest](fixtures-manifest.json).
-
-| Operation | Median µs/load | Min–max µs/load | B/op | allocs/op |
-|---|---:|---:|---:|---:|
-| dotReg direct | 10.384 | 9.594–11.941 | 10,888 | 163 |
-| dotReg collected | 11.863 | 11.159–14.052 | 18,840 | 169 |
-| JSON | 6.322 | 5.744–7.839 | 3,104 | 89 |
-| TOML | 7.875 | 6.637–8.526 | 3,144 | 75 |
-| YAML | 42.066 | 39.545–53.421 | 27,840 | 512 |
-| INI | 8.483 | 8.240–9.770 | 19,336 | 202 |
-
-### medium: 512 settings
-
-Logical payload: 25,600 UTF-8 bytes. Encoded input sizes and exact hashes are in
-[the fixture manifest](fixtures-manifest.json).
-
-| Operation | Median µs/load | Min–max µs/load | B/op | allocs/op |
-|---|---:|---:|---:|---:|
-| dotReg direct | 167.583 | 160.167–198.363 | 153,136 | 2,446 |
-| dotReg collected | 166.794 | 161.037–206.643 | 283,968 | 2,456 |
-| JSON | 109.177 | 98.878–116.805 | 93,867 | 1,356 |
-| TOML | 158.515 | 132.578–163.241 | 96,404 | 1,258 |
-| YAML | 680.583 | 591.797–714.757 | 379,400 | 7,374 |
-| INI | 184.978 | 180.123–194.545 | 361,672 | 2,990 |
-
-### large: 8,192 settings
-
-Logical payload: 409,600 UTF-8 bytes. Encoded input sizes and exact hashes are in
-[the fixture manifest](fixtures-manifest.json).
-
-| Operation | Median µs/load | Min–max µs/load | B/op | allocs/op |
-|---|---:|---:|---:|---:|
-| dotReg direct | 3004.032 | 2885.174–3192.089 | 2,409,841 | 34,834 |
-| dotReg collected | 4077.407 | 3877.673–4366.555 | 6,931,592 | 34,853 |
-| JSON | 1931.474 | 1864.193–2044.927 | 1,546,522 | 18,192 |
-| TOML | 3602.831 | 3456.641–3799.720 | 1,605,888 | 17,806 |
-| YAML | 12255.411 | 11870.665–12798.572 | 5,880,783.5 | 110,004 |
-| INI | 4243.847 | 4136.669–4727.060 | 5,851,694 | 38,201 |
-
-### unicode: 512 settings
-
-Logical payload: 39,424 UTF-8 bytes. Encoded input sizes and exact hashes are in
-[the fixture manifest](fixtures-manifest.json).
-
-| Operation | Median µs/load | Min–max µs/load | B/op | allocs/op |
-|---|---:|---:|---:|---:|
-| dotReg direct | 220.557 | 209.965–240.611 | 169,776 | 2,446 |
-| dotReg collected | 219.218 | 208.370–232.744 | 300,608 | 2,456 |
-| JSON | 162.489 | 152.345–173.365 | 106,412 | 1,356 |
-| TOML | 194.723 | 174.296–214.417 | 104,596 | 1,258 |
-| YAML | 774.067 | 693.801–839.090 | 506,632 | 10,446 |
-| INI | 202.741 | 197.133–230.724 | 386,760 | 2,990 |
-
-### escaped: 512 settings
-
-Logical payload: 34,304 UTF-8 bytes. Encoded input sizes and exact hashes are in
-[the fixture manifest](fixtures-manifest.json).
-
-| Operation | Median µs/load | Min–max µs/load | B/op | allocs/op |
-|---|---:|---:|---:|---:|
-| dotReg direct | 254.708 | 246.777–292.819 | 230,960 | 4,494 |
-| dotReg collected | 254.536 | 247.732–270.455 | 361,792 | 4,504 |
-| JSON | 189.710 | 180.194–202.473 | 143,021.5 | 1,868 |
-| TOML | 186.841 | 177.247–219.411 | 145,557 | 1,770 |
-| YAML | 805.803 | 762.494–919.377 | 543,240 | 11,470 |
-| INI | 193.309 | 187.738–201.978 | 402,632 | 2,990 |
-
-### multiline: 512 settings
-
-Logical payload: 37,888 UTF-8 bytes. Encoded input sizes and exact hashes are in
-[the fixture manifest](fixtures-manifest.json).
-
-| Operation | Median µs/load | Min–max µs/load | B/op | allocs/op |
-|---|---:|---:|---:|---:|
-| dotReg direct | 284.766 | 278.974–325.217 | 263,728 | 5,518 |
-| dotReg collected | 286.000 | 277.374–309.406 | 394,560 | 5,528 |
-| JSON | 194.409 | 185.673–205.891 | 143,021 | 1,868 |
-| TOML | 156.352 | 149.496–173.177 | 112,788 | 1,258 |
-| YAML | 700.375 | 676.105–795.047 | 420,360 | 7,374 |
-| INI | 279.747 | 266.314–292.450 | 439,496 | 6,062 |
-
-JSON has the lowest median load time for the three ASCII sizes and the
-Unicode case; TOML has the lowest for the escaped and multiline inputs. This
-ranking describes the selected implementations and serialisations. It does
-not establish an intrinsic ordering of formats or predict other workloads.
-dotReg direct has lower byte-allocation traffic than dotReg collected in all
-six cases. Their ranges overlap in every 512-setting case, so the small timing
-differences there should not be treated as a stable performance advantage.
-For 8,192 settings, the observed direct/collected timing ranges are separated.
-
-The measured child processes lasted 0.274–0.605 seconds of total wall time,
-including untimed setup and calibration. The operation timer excludes those
-costs. This remains a short-process warmed measurement, with a 200 ms timing
-target, rather than a demonstration of universal steady-state behaviour.
+comparison. The [benchmark guide](../README.md) explains how this workload
+differs from native file-input measurements.
 
 ## Reproduction
 
@@ -149,10 +38,10 @@ SHA-256 hashes and a semantic fingerprint; regenerating with this source must
 reproduce it. The fingerprint is SHA-256 over Go `encoding/json.Marshal` of the
 expected map, whose map keys are sorted by the standard library.
 
-For the accepted measurement protocol, build once and run serially. Every one
+For an isolated measurement campaign, build once and run serially. Every one
 of the 36 scenario/operation pairs receives its own fresh process in each of
-ten balanced rounds, giving **360 measured processes**. The external driver
-uses the recorded seed to shuffle all pairs in each round, then selects exactly
+ten balanced rounds, giving **360 measured processes** for this configuration.
+The external driver uses the recorded seed to shuffle all pairs in each round, then selects exactly
 one operation in each child. Keep other CPU-intensive work idle.
 
 Run the following command from the repository root after building above:
@@ -161,8 +50,6 @@ Run the following command from the repository root after building above:
 $comparisonOutputDirectory = Join-Path $env:TEMP 'dotreg-comparison-2026-10-24'
 New-Item -ItemType Directory -Path $comparisonOutputDirectory -Force | Out-Null
 python implementations/benchmarks/run-go.py --binary implementations/benchmarks/comparison/.artifacts/comparison.test.exe --module implementations/benchmarks/comparison --bench '^BenchmarkConfig$' --scope common-map --order seeded --isolate --samples 10 --benchtime 200ms --seed 20261024 --manifest implementations/benchmarks/comparison/fixtures-manifest.json --output (Join-Path $comparisonOutputDirectory 'results.json') --raw (Join-Path $comparisonOutputDirectory 'results.txt')
-Copy-Item -LiteralPath (Join-Path $comparisonOutputDirectory 'results.json') -Destination implementations/benchmarks/comparison/results-2026-10-24.json
-Copy-Item -LiteralPath (Join-Path $comparisonOutputDirectory 'results.txt') -Destination implementations/benchmarks/comparison/results-2026-10-24.txt
 ```
 
 The runner records the toolchain, environment, commands, seeds and source
@@ -172,18 +59,17 @@ operation names; each measured child must report exactly the selected
 operation. Adaptive iteration counts are chosen by Go's `testing.B`; the
 200 ms target is per operation per observation. These are short, warmed parses
 with Go's adaptive calibration, not a guarantee of universal steady-state
-behaviour. Compiler and process startup time are excluded. Reports are written
-to local temporary storage and copied into the synchronised repository only
-after the run; report writing and copying are outside the benchmark timer.
+behaviour. Compiler and process startup time are excluded. Keep reports and
+raw output in local temporary storage while a campaign is in progress. Report
+writing and any later publication are outside the benchmark timer.
 
-Earlier full-round batch processes showed substantial slowdowns associated
-with later operation positions across different parsers. The cause remains
-unidentified. The complete comparison was rerun with the isolated protocol,
-without mixing protocols or selectively removing individual observations.
-The earlier [batch JSON](diagnostic-batch-2026-10-24.json),
-[raw batch output](diagnostic-batch-2026-10-24.txt) and
-[original batch driver](../diagnostic-batch-driver.py) are retained as method
-diagnostics only. They are excluded from the reported performance ranking.
+A local reproduction does not update the published results automatically.
+Before replacing the latest report pushed to the repository, finish every
+planned round, verify exact workload semantics and source/input hashes, and
+regenerate and check its tables from the complete raw observations. Unpushed
+experiments remain outside the published results. For a before/after comparison,
+follow the balanced paired protocol and validation requirements in the
+[Go tuning report](../tuning-2026-10-24/README.md#paired-measurement-protocol).
 
 For an external process-memory observer, build and run the single-operation
 CLI. The command reads its input once before timing and checks exact semantics

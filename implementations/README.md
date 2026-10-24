@@ -123,13 +123,13 @@ Those measurements distinguish parsing and decoding from per-entry JSON output
 and record their toolchains and environment. Runtime baseline memory, garbage
 collection and workload shape matter when comparing results.
 
-The [public sample tuning report](benchmarks/public-rollin-2026-10-24/README.md)
-records adoption of the direct value-path construction in Python, JavaScript,
-Java, C#, Rust and C++; TypeScript shares JavaScript's implementation. Go's
-earlier parser changes were already included in the public Go sample and have
-their own [paired tuning report](benchmarks/tuning-2026-10-24/README.md). The
-original benchmark tables retain their recorded source snapshots; use these
-follow-ups for the adopted changes and their measured scope.
+The latest results pushed to the repository are the
+[native sample report](benchmarks/public-rollin-2026-10-24/README.md) and the
+[Go format-comparison and API report](benchmarks/tuning-2026-10-24/README.md).
+Each identifies its own measured source snapshots and scope. Only the latest
+pushed report per measurement series is published; local experiments and
+unpublished replacement measurements do not change those results. A paired
+report retains its baseline and candidate together as the controlled comparison.
 
 ## Provisional choices and verification
 

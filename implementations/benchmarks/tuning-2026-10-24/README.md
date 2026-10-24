@@ -1,16 +1,16 @@
 # Go parser tuning measurements
 
-This follow-up measures changes to the general Go parser and common string
-decoder against the implementation used for the [published configuration-format
-comparison](../comparison/README.md). The aim is to reduce the time and memory
-needed to load equivalent settings while retaining the current
+This published campaign measures changes to the general Go parser and common
+string decoder against the baseline identified below. The aim is to reduce
+the time and allocation traffic needed to load equivalent settings while retaining the current
 [specification](../../../docs/config-format.md), public APIs, output ownership,
 source order and diagnostics.
 
-The [benchmark overview](../README.md) explains the original three measurement
-tiers. This follow-up covers the decoded common-map comparison and the Go API
-stages. It does not rerun the other language implementations or their process
-memory measurements.
+The [benchmark overview](../README.md) links to the latest published results
+for each measurement suite. This report covers the decoded common-map comparison
+and the Go API stages. The [comparison guide](../comparison/README.md) explains
+the equivalent-format method. Native parser and process-memory measurements
+have their own output contract and report.
 
 ## Findings
 
@@ -251,12 +251,8 @@ to these files:
 
 The baseline is an exported snapshot of commit
 [`d825e2aead924671c3fe01ec07d5ad2d6df25bd6`](https://github.com/libnumafly/dotReg/commit/d825e2aead924671c3fe01ec07d5ad2d6df25bd6).
-That commit adds the project logo after
-[`d57788b518ae28240e2d2e65b3fd1527c21b43da`](https://github.com/libnumafly/dotReg/commit/d57788b518ae28240e2d2e65b3fd1527c21b43da),
-which published the current-specification measurements. Its specification, Go
-implementation, benchmark fixtures, comparison adapters and pinned dependencies
-are unchanged from `d57788b`; the logo update does not change the measured
-parser baseline.
+Its specification, Go implementation, benchmark fixtures, comparison adapters
+and pinned dependencies are recorded in the baseline source manifest.
 
 **The per-variant SHA-256 manifests identify the measured sources.** The
 baseline commit is a convenient reconstruction point; the candidate is the
@@ -266,10 +262,8 @@ hashes, Go environment, Python version, system observations and exact execution
 flags. The controller rejects a campaign if the specification differs between
 variants, or if a recorded source, binary or controller changes during the run.
 
-The original [format-comparison results](../comparison/results-2026-10-24.json)
-and [Go API results](../go-api-2026-10-24.json) remain intact. The paired campaign
-remeasures both implementations together; it does not calculate tuning gains by
-comparing a new campaign with those earlier observations.
+The paired reports retain every baseline and candidate observation from the
+same campaign. Tuning gains are calculated from those paired measurements.
 
 ## Implementation changes
 
@@ -302,8 +296,7 @@ An exploratory candidate also used an extra escape-sizing pass for block
 bodies. Separate API measurements showed an escaped-block CPU-time regression,
 so that change was rejected before the final candidate was measured. Both final
 paired campaigns are rerun in full after this revision; exploratory candidate
-observations are not mixed into their results. The original published reports
-remain unchanged.
+observations are not mixed into their results.
 
 The ordered consumer, profile conversion and prefix-selection contracts are
 retained. The common-map comparison uses `ParseEach` or `Parse` followed by
@@ -347,9 +340,8 @@ wall time. It rejects missing or duplicate operations, incomplete sample counts
 and inconsistent metric sets. JSON and raw-output writes occur between child
 processes, outside all Go operation timers. No outliers are removed.
 
-Fresh processes address the late-operation slowdown observed in the original
-batch experiment. Their setup and calibration costs remain visible in process
-wall times but are excluded from `ns/op`. These short warmed measurements do
+Each observation starts in a fresh process. Setup and calibration costs remain
+visible in process wall times but are excluded from `ns/op`. These short warmed measurements do
 not establish a universal steady state. Operating-system scheduling, desktop
 activity, clock rates and thermal state can still affect observations; the
 jointly shuffled rounds reduce systematic association with one variant.
@@ -381,10 +373,10 @@ input-byte throughput claim.
 
 `B/op` and `allocs/op` are Go heap allocation traffic per operation. They are
 neither retained memory nor process peak RSS. This campaign does not measure
-electricity consumption. The earlier
-[native report](../native-2026-10-24/README.md) contains separate process-memory
-observations for its original source snapshot; those values should not be
-presented as process-memory measurements of the tuned implementation.
+electricity consumption. The latest published
+[native report](../public-rollin-2026-10-24/README.md) contains process-memory
+observations for its own recorded source snapshots and native workloads.
+Those figures describe a separate measurement contract from these Go API stages.
 
 ## Compatibility checks
 
