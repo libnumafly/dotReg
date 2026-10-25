@@ -1,6 +1,6 @@
 # dotReg
 
-**Readable configuration, built on dotted keys.**
+**Readable.configuration.built.on.dotted:keys.**
 
 dotReg is a line-oriented configuration notation. Write full keys directly, or group them beneath a shared heading. Values start as text; your application decides how to interpret them.
 

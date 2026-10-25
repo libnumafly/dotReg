@@ -15,7 +15,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'dotReg',
-      description: 'Readable configuration, built on dotted keys.',
+      description: 'Readable.configuration.built.on.dotted:keys.',
       logo: { src: './src/assets/mark.svg', alt: '' },
       favicon: '/favicon.svg',
       customCss: ['./src/styles/custom.css'],
