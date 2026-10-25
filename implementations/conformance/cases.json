@@ -1,0 +1,2859 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "empty body",
+      "input": "@dotReg 0.1\n\n",
+      "entries": []
+    },
+    {
+      "name": "BOM CRLF declaration and tab separator",
+      "input": "﻿@dotReg\t0.1 \t\r\n\t \r\nA:001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "final whitespace separator without newline",
+      "input": "@dotReg 0.1\n \t",
+      "entries": []
+    },
+    {
+      "name": "empty file",
+      "input": "",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "declaration only",
+      "input": "@dotReg 0.1",
+      "error": {
+        "stage": "parse",
+        "line": 2,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "no physical separator",
+      "input": "@dotReg 0.1\n",
+      "error": {
+        "stage": "parse",
+        "line": 2,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "no declaration",
+      "input": "A:x\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "leading blank",
+      "input": "\n@dotReg 0.1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "property comment",
+      "input": "# secret\n@dotReg 0.1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "indented declaration",
+      "input": " @dotReg 0.1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "missing property value",
+      "input": "@dotReg \n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "version 1 is unsupported",
+      "input": "@dotReg 1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "unknown property",
+      "input": "@Other 1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "duplicate declaration",
+      "input": "@dotReg 0.1\n@dotReg 0.1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 2,
+        "code": "duplicate"
+      }
+    },
+    {
+      "name": "quoted version",
+      "input": "@dotReg \"0.1\"\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "property inline comment",
+      "input": "@dotReg 0.1 #comment\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "second BOM",
+      "input": "﻿﻿@dotReg 0.1\n\n",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "literal \"001\"",
+      "input": "@dotReg 0.1\n\nA:001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "literal \"true\"",
+      "input": "@dotReg 0.1\n\nA:true",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "true",
+          "unset": false,
+          "has_type": false,
+          "decoded": "true"
+        }
+      ]
+    },
+    {
+      "name": "literal \"null\"",
+      "input": "@dotReg 0.1\n\nA:null",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "null",
+          "unset": false,
+          "has_type": false,
+          "decoded": "null"
+        }
+      ]
+    },
+    {
+      "name": "literal \"a:b:#c\"",
+      "input": "@dotReg 0.1\n\nA:a:b:#c",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "a:b:#c",
+          "unset": false,
+          "has_type": false,
+          "decoded": "a:b:#c"
+        }
+      ]
+    },
+    {
+      "name": "literal \"say \\\"hello\"",
+      "input": "@dotReg 0.1\n\nA:say \"hello",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "say \"hello",
+          "unset": false,
+          "has_type": false,
+          "decoded": "say \"hello"
+        }
+      ]
+    },
+    {
+      "name": "literal \"say \\\"\\\"\\\" \\\\q\"",
+      "input": "@dotReg 0.1\n\nA:say \"\"\" \\q",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "say \"\"\" \\q",
+          "unset": false,
+          "has_type": false,
+          "decoded": "say \"\"\" \\q"
+        }
+      ]
+    },
+    {
+      "name": "literal \"C:\\\\temp\\\\new\"",
+      "input": "@dotReg 0.1\n\nA:C:\\temp\\new",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "C:\\temp\\new",
+          "unset": false,
+          "has_type": false,
+          "decoded": "C:\\temp\\new"
+        }
+      ]
+    },
+    {
+      "name": "literal \"\\\\q\"",
+      "input": "@dotReg 0.1\n\nA:\\q",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\\q",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\\q"
+        }
+      ]
+    },
+    {
+      "name": "literal \"end\\\\\"",
+      "input": "@dotReg 0.1\n\nA:end\\",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "end\\",
+          "unset": false,
+          "has_type": false,
+          "decoded": "end\\"
+        }
+      ]
+    },
+    {
+      "name": "literal \"(a(b))\"",
+      "input": "@dotReg 0.1\n\nA:(a(b))",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "(a(b))",
+          "unset": false,
+          "has_type": false,
+          "decoded": "(a(b))"
+        }
+      ]
+    },
+    {
+      "name": "literal \"|\"",
+      "input": "@dotReg 0.1\n\nA:|",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "|",
+          "unset": false,
+          "has_type": false,
+          "decoded": "|"
+        }
+      ]
+    },
+    {
+      "name": "literal \" \"",
+      "input": "@dotReg 0.1\n\nA: ",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": " ",
+          "unset": false,
+          "has_type": false,
+          "decoded": " "
+        }
+      ]
+    },
+    {
+      "name": "ASCII outer trim only",
+      "input": "@dotReg 0.1\n\nA: \t a  b  \t",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "a  b ",
+          "unset": false,
+          "has_type": false,
+          "decoded": "a  b "
+        }
+      ]
+    },
+    {
+      "name": "unset",
+      "input": "@dotReg 0.1\n\nA: \t",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": true,
+          "has_type": false,
+          "decoded": ""
+        }
+      ]
+    },
+    {
+      "name": "explicit empty quote",
+      "input": "@dotReg 0.1\n\nA:\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": ""
+        }
+      ]
+    },
+    {
+      "name": "quoted whitespace retained",
+      "input": "@dotReg 0.1\n\nA: \"  value \\t \" ",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"  value \\t \"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "  value \t "
+        }
+      ]
+    },
+    {
+      "name": "value escape \\.",
+      "input": "@dotReg 0.1\n\nA:\"\\.\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\.\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "."
+        }
+      ]
+    },
+    {
+      "name": "key escape \\.",
+      "input": "@dotReg 0.1\n\n\"\\.\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "."
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\\"",
+      "input": "@dotReg 0.1\n\nA:\"\\\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\\"\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\""
+        }
+      ]
+    },
+    {
+      "name": "key escape \\\"",
+      "input": "@dotReg 0.1\n\n\"\\\"\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\""
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\\\",
+      "input": "@dotReg 0.1\n\nA:\"\\\\\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\\\\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\\"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\\\",
+      "input": "@dotReg 0.1\n\n\"\\\\\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\\"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\/",
+      "input": "@dotReg 0.1\n\nA:\"\\/\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\/\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "/"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\/",
+      "input": "@dotReg 0.1\n\n\"\\/\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "/"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\b",
+      "input": "@dotReg 0.1\n\nA:\"\\b\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\b\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\b"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\b",
+      "input": "@dotReg 0.1\n\n\"\\b\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\b"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\f",
+      "input": "@dotReg 0.1\n\nA:\"\\f\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\f\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\f"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\f",
+      "input": "@dotReg 0.1\n\n\"\\f\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\f"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\n",
+      "input": "@dotReg 0.1\n\nA:\"\\n\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\n\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\n"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\n",
+      "input": "@dotReg 0.1\n\n\"\\n\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\n"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\r",
+      "input": "@dotReg 0.1\n\nA:\"\\r\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\r\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\r"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\r",
+      "input": "@dotReg 0.1\n\n\"\\r\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\r"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\t",
+      "input": "@dotReg 0.1\n\nA:\"\\t\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\t\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\t"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\t",
+      "input": "@dotReg 0.1\n\n\"\\t\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\t"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u0041",
+      "input": "@dotReg 0.1\n\nA:\"\\u0041\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u0041\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "A"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u0041",
+      "input": "@dotReg 0.1\n\n\"\\u0041\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{41}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{41}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{41}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "A"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{41}",
+      "input": "@dotReg 0.1\n\n\"\\u{41}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{000041}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{000041}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{000041}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "A"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{000041}",
+      "input": "@dotReg 0.1\n\n\"\\u{000041}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\uD83D\\uDE00",
+      "input": "@dotReg 0.1\n\nA:\"\\uD83D\\uDE00\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\uD83D\\uDE00\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "😀"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\uD83D\\uDE00",
+      "input": "@dotReg 0.1\n\n\"\\uD83D\\uDE00\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "😀"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{1f600}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{1f600}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{1f600}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "😀"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{1f600}",
+      "input": "@dotReg 0.1\n\n\"\\u{1f600}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "😀"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{0}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{0}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{0}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\u0000"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{0}",
+      "input": "@dotReg 0.1\n\n\"\\u{0}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "\u0000"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{10FFFF}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{10FFFF}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{10FFFF}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "􏿿"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{10FFFF}",
+      "input": "@dotReg 0.1\n\n\"\\u{10FFFF}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "􏿿"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{FFFF}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{FFFF}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{FFFF}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "￿"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{FFFF}",
+      "input": "@dotReg 0.1\n\n\"\\u{FFFF}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "￿"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "value escape \\u{0378}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{0378}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{0378}\"",
+          "unset": false,
+          "has_type": false,
+          "decoded": "͸"
+        }
+      ]
+    },
+    {
+      "name": "key escape \\u{0378}",
+      "input": "@dotReg 0.1\n\n\"\\u{0378}\":x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "͸"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "path \"A.B\"",
+      "input": "@dotReg 0.1\n\nA.B:001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"\\\"A.B\\\"\"",
+      "input": "@dotReg 0.1\n\n\"A.B\":001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A.B"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"A.\\\"\\\".B\"",
+      "input": "@dotReg 0.1\n\nA.\"\".B:001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A",
+            "",
+            "B"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"\\\"\\\"\"",
+      "input": "@dotReg 0.1\n\n\"\":001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            ""
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"\\\"A:B()#\\\"\"",
+      "input": "@dotReg 0.1\n\n\"A:B()#\":001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A:B()#"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"\\\"A\\tB\\\"\"",
+      "input": "@dotReg 0.1\n\n\"A\tB\":001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A\tB"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"\\\"A\\u0000B\\\"\"",
+      "input": "@dotReg 0.1\n\n\"A\u0000B\":001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A\u0000B"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"店舗.名称\"",
+      "input": "@dotReg 0.1\n\n店舗.名称:001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "店舗",
+            "名称"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "path \"01.1A.A_B-2\"",
+      "input": "@dotReg 0.1\n\n01.1A.A_B-2:001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "01",
+            "1A",
+            "A_B-2"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": false,
+          "decoded": "001"
+        }
+      ]
+    },
+    {
+      "name": "parent and descendants coexist",
+      "input": "@dotReg 0.1\n\nA:r\nA.B:p\nA.B.C:c",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "r",
+          "unset": false,
+          "has_type": false,
+          "decoded": "r"
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "p",
+          "unset": false,
+          "has_type": false,
+          "decoded": "p"
+        },
+        {
+          "line": 5,
+          "kind": "value",
+          "path": [
+            "A",
+            "B",
+            "C"
+          ],
+          "raw": "c",
+          "unset": false,
+          "has_type": false,
+          "decoded": "c"
+        }
+      ]
+    },
+    {
+      "name": "no Unicode normalisation",
+      "input": "@dotReg 0.1\n\nが:a\nが:b",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "が"
+          ],
+          "raw": "a",
+          "unset": false,
+          "has_type": false,
+          "decoded": "a"
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "が"
+          ],
+          "raw": "b",
+          "unset": false,
+          "has_type": false,
+          "decoded": "b"
+        }
+      ]
+    },
+    {
+      "name": "headings self repeated and dedent",
+      "input": "@dotReg 0.1\n\nA.\n  .B.\n    .:one\n    .C:x\n  .D:y\n  .D:y",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "heading",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false
+        },
+        {
+          "line": 4,
+          "kind": "heading",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false
+        },
+        {
+          "line": 5,
+          "kind": "value",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "one",
+          "unset": false,
+          "has_type": false,
+          "decoded": "one"
+        },
+        {
+          "line": 6,
+          "kind": "value",
+          "path": [
+            "A",
+            "B",
+            "C"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        },
+        {
+          "line": 7,
+          "kind": "value",
+          "path": [
+            "A",
+            "D"
+          ],
+          "raw": "y",
+          "unset": false,
+          "has_type": false,
+          "decoded": "y"
+        },
+        {
+          "line": 8,
+          "kind": "value",
+          "path": [
+            "A",
+            "D"
+          ],
+          "raw": "y",
+          "unset": false,
+          "has_type": false,
+          "decoded": "y"
+        }
+      ]
+    },
+    {
+      "name": "dotted heading is one written level",
+      "input": "@dotReg 0.1\n\nA.B.\n  .C:x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "heading",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "A",
+            "B",
+            "C"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "quoted heading and empty child",
+      "input": "@dotReg 0.1\n\n\"A.B\".\n  .\"\":x\n  .:y",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "heading",
+          "path": [
+            "A.B"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "A.B",
+            ""
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        },
+        {
+          "line": 5,
+          "kind": "value",
+          "path": [
+            "A.B"
+          ],
+          "raw": "y",
+          "unset": false,
+          "has_type": false,
+          "decoded": "y"
+        }
+      ]
+    },
+    {
+      "name": "comments blank indentation exempt",
+      "input": "@dotReg 0.1\n\nA.\n \t # comment\n\t\n  .B:x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "heading",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false
+        },
+        {
+          "line": 6,
+          "kind": "value",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "ordinary property name in body",
+      "input": "@dotReg 0.1\n\n@Name: value",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "@Name"
+          ],
+          "raw": "value",
+          "unset": false,
+          "has_type": false,
+          "decoded": "value"
+        }
+      ]
+    },
+    {
+      "name": "opaque compound annotation",
+      "input": "@dotReg 0.1\n\nA (map(string,list(int))) : 001",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "001",
+          "unset": false,
+          "has_type": true,
+          "decoded": "001",
+          "type": "map(string,list(int))"
+        }
+      ]
+    },
+    {
+      "name": "repeats retain different annotations and unset",
+      "input": "@dotReg 0.1\n\nA(int):1\nA:\nA(string):\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "1",
+          "unset": false,
+          "has_type": true,
+          "decoded": "1",
+          "type": "int"
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": true,
+          "has_type": false,
+          "decoded": ""
+        },
+        {
+          "line": 5,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\"",
+          "unset": false,
+          "has_type": true,
+          "decoded": "",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "empty triple",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n\"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false,
+          "decoded": "",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "triple margin and escapes",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n   one\\n\n     two\n   \"\"\" \t",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "one\\n\n  two",
+          "unset": false,
+          "has_type": false,
+          "decoded": "one\n\n  two",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "triple empty physical line exempt",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n\n  x\n  \"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\nx",
+          "unset": false,
+          "has_type": false,
+          "decoded": "\nx",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "triple trailing newline",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n x\n\n \"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x\n",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x\n",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "triple literal quotes",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\nsay \"hello\" and \"\"\"data\n\"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "say \"hello\" and \"\"\"data",
+          "unset": false,
+          "has_type": false,
+          "decoded": "say \"hello\" and \"\"\"data",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "triple declaration is data",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n@dotReg 99\n\"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "@dotReg 99",
+          "unset": false,
+          "has_type": false,
+          "decoded": "@dotReg 99",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "mixed block EOL retained",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\r\none\r\ntwo\nthree\r\n\"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "one\r\ntwo\nthree",
+          "unset": false,
+          "has_type": false,
+          "decoded": "one\r\ntwo\nthree",
+          "form": "triple_quoted"
+        }
+      ]
+    },
+    {
+      "name": "pipe literal varied odd margins",
+      "input": "@dotReg 0.1\n\nA:\n | C:\\new\\q \t\n   ||two\nB:x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": " C:\\new\\q \t\n|two",
+          "unset": false,
+          "has_type": false,
+          "decoded": " C:\\new\\q \t\n|two",
+          "form": "pipe"
+        },
+        {
+          "line": 6,
+          "kind": "value",
+          "path": [
+            "B"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "empty pipe",
+      "input": "@dotReg 0.1\n\nA:\n |",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false,
+          "decoded": "",
+          "form": "pipe"
+        }
+      ]
+    },
+    {
+      "name": "pipe trailing newline",
+      "input": "@dotReg 0.1\n\nA:\n |x\n |",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x\n",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x\n",
+          "form": "pipe"
+        }
+      ]
+    },
+    {
+      "name": "pipe ends before comment",
+      "input": "@dotReg 0.1\n\nA:\n |x\n#end\nB:y",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x",
+          "form": "pipe"
+        },
+        {
+          "line": 6,
+          "kind": "value",
+          "path": [
+            "B"
+          ],
+          "raw": "y",
+          "unset": false,
+          "has_type": false,
+          "decoded": "y"
+        }
+      ]
+    },
+    {
+      "name": "same level pipe is ordinary key",
+      "input": "@dotReg 0.1\n\nA:\n|:x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": true,
+          "has_type": false,
+          "decoded": ""
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "|"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "x"
+        }
+      ]
+    },
+    {
+      "name": "relative typed self pipe",
+      "input": "@dotReg 0.1\n\nA.\n  .(text):\n   |x\n  .B:y",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "heading",
+          "path": [
+            "A"
+          ],
+          "raw": "",
+          "unset": false,
+          "has_type": false
+        },
+        {
+          "line": 4,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "x",
+          "unset": false,
+          "has_type": true,
+          "decoded": "x",
+          "form": "pipe",
+          "type": "text"
+        },
+        {
+          "line": 6,
+          "kind": "value",
+          "path": [
+            "A",
+            "B"
+          ],
+          "raw": "y",
+          "unset": false,
+          "has_type": false,
+          "decoded": "y"
+        }
+      ]
+    },
+    {
+      "name": "invalid key \"\"",
+      "input": "@dotReg 0.1\n\n:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A..B\"",
+      "input": "@dotReg 0.1\n\nA..B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A.\"",
+      "input": "@dotReg 0.1\n\nA.:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A\\\\.B\"",
+      "input": "@dotReg 0.1\n\nA\\.B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A#B\"",
+      "input": "@dotReg 0.1\n\nA#B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A B\"",
+      "input": "@dotReg 0.1\n\nA B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A\\tB\"",
+      "input": "@dotReg 0.1\n\nA\tB:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A\\u0000B\"",
+      "input": "@dotReg 0.1\n\nA\u0000B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A B\"",
+      "input": "@dotReg 0.1\n\nA B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"AB\"",
+      "input": "@dotReg 0.1\n\nAB:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A　B\"",
+      "input": "@dotReg 0.1\n\nA　B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A)B\"",
+      "input": "@dotReg 0.1\n\nA)B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A\\\"B\\\"\"",
+      "input": "@dotReg 0.1\n\nA\"B\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"\\\"A\\\"B\"",
+      "input": "@dotReg 0.1\n\n\"A\"B:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"\\\"A\"",
+      "input": "@dotReg 0.1\n\n\"A:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid key \"A.\\\"B\\\"C\"",
+      "input": "@dotReg 0.1\n\nA.\"B\"C:SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "relative top level",
+      "input": "@dotReg 0.1\n\n.A:x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "indented absolute",
+      "input": "@dotReg 0.1\n\n  A:x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "odd indent",
+      "input": "@dotReg 0.1\n\n A:x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "tab indent",
+      "input": "@dotReg 0.1\n\n\t.A:x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "missing heading",
+      "input": "@dotReg 0.1\n\n  .A:x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "skipped level",
+      "input": "@dotReg 0.1\n\nA.\n    .B:x",
+      "error": {
+        "stage": "parse",
+        "line": 4,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "absolute closes headings",
+      "input": "@dotReg 0.1\n\nA.\nB:x\n  .C:x",
+      "error": {
+        "stage": "parse",
+        "line": 5,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "value dedent closes heading",
+      "input": "@dotReg 0.1\n\nA.\n  .B.\n  .C:x\n    .D:x",
+      "error": {
+        "stage": "parse",
+        "line": 6,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "missing trailing heading element",
+      "input": "@dotReg 0.1\n\nA..",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "body declaration",
+      "input": "@dotReg 0.1\n\n@dotReg 0.1",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "unclosed type",
+      "input": "@dotReg 0.1\n\nA(list(int):x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "internal type space",
+      "input": "@dotReg 0.1\n\nA(list( int)):x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "heading annotation",
+      "input": "@dotReg 0.1\n\nA(int).",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "type tail",
+      "input": "@dotReg 0.1\n\nA(int)other:x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "lone CR",
+      "input": "@dotReg 0.1\n\nA:secret\rdata",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "triple missing close",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\nx",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "triple insufficient margin",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n x\n  \"\"\"",
+      "error": {
+        "stage": "parse",
+        "line": 4,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "no pipe across blank",
+      "input": "@dotReg 0.1\n\nA:\n\n |x",
+      "error": {
+        "stage": "parse",
+        "line": 5,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "no pipe across comment",
+      "input": "@dotReg 0.1\n\nA:\n#comment\n |x",
+      "error": {
+        "stage": "parse",
+        "line": 5,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "pipe stops at blank",
+      "input": "@dotReg 0.1\n\nA:\n |x\n\n |y",
+      "error": {
+        "stage": "parse",
+        "line": 6,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "indented absolute pipe",
+      "input": "@dotReg 0.1\n\nA.\n  .B:\n  |:x",
+      "error": {
+        "stage": "parse",
+        "line": 5,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "empty type",
+      "input": "@dotReg 0.1\n\nA():x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "type quote",
+      "input": "@dotReg 0.1\n\nA(\"x\"):y",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "type backslash",
+      "input": "@dotReg 0.1\n\nA(x\\y):z",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "tab before type",
+      "input": "@dotReg 0.1\n\nA\t(int):1",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "tab after type",
+      "input": "@dotReg 0.1\n\nA(int)\t:1",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "unsupported"
+      }
+    },
+    {
+      "name": "invalid value escape \\q",
+      "input": "@dotReg 0.1\n\nA:\"\\q\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\q\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\q",
+      "input": "@dotReg 0.1\n\n\"\\q\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{}",
+      "input": "@dotReg 0.1\n\n\"\\u{}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{1234567}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{1234567}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{1234567}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{1234567}",
+      "input": "@dotReg 0.1\n\n\"\\u{1234567}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{110000}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{110000}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{110000}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{110000}",
+      "input": "@dotReg 0.1\n\n\"\\u{110000}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{D800}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{D800}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{D800}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{D800}",
+      "input": "@dotReg 0.1\n\n\"\\u{D800}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{xyz}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{xyz}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{xyz}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{xyz}",
+      "input": "@dotReg 0.1\n\n\"\\u{xyz}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{1_2}",
+      "input": "@dotReg 0.1\n\nA:\"\\u{1_2}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{1_2}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{1_2}",
+      "input": "@dotReg 0.1\n\n\"\\u{1_2}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{12",
+      "input": "@dotReg 0.1\n\nA:\"\\u{12\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{12\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{12",
+      "input": "@dotReg 0.1\n\n\"\\u{12\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u12",
+      "input": "@dotReg 0.1\n\nA:\"\\u12\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u12\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u12",
+      "input": "@dotReg 0.1\n\n\"\\u12\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\uD800",
+      "input": "@dotReg 0.1\n\nA:\"\\uD800\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\uD800\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\uD800",
+      "input": "@dotReg 0.1\n\n\"\\uD800\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\uDC00",
+      "input": "@dotReg 0.1\n\nA:\"\\uDC00\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\uDC00\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\uDC00",
+      "input": "@dotReg 0.1\n\n\"\\uDC00\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\uDC00\\uD800",
+      "input": "@dotReg 0.1\n\nA:\"\\uDC00\\uD800\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\uDC00\\uD800\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\uDC00\\uD800",
+      "input": "@dotReg 0.1\n\n\"\\uDC00\\uD800\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\uD800\\u{DC00}",
+      "input": "@dotReg 0.1\n\nA:\"\\uD800\\u{DC00}\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\uD800\\u{DC00}\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\uD800\\u{DC00}",
+      "input": "@dotReg 0.1\n\n\"\\uD800\\u{DC00}\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\u{D800}\\uDC00",
+      "input": "@dotReg 0.1\n\nA:\"\\u{D800}\\uDC00\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\u{D800}\\uDC00\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\u{D800}\\uDC00",
+      "input": "@dotReg 0.1\n\n\"\\u{D800}\\uDC00\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid value escape \\uD800\\u0041",
+      "input": "@dotReg 0.1\n\nA:\"\\uD800\\u0041\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\\uD800\\u0041\"",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid key escape \\uD800\\u0041",
+      "input": "@dotReg 0.1\n\n\"\\uD800\\u0041\":SECRET",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid quoted value \"\\\"unfinished\"",
+      "input": "@dotReg 0.1\n\nA:\"unfinished",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"unfinished",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid quoted value \"\\\"ok\\\"trailing\"",
+      "input": "@dotReg 0.1\n\nA:\"ok\"trailing",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"ok\"trailing",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid quoted value \"\\\"\\\"\\\"inline\"",
+      "input": "@dotReg 0.1\n\nA:\"\"\"inline",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"\"\"inline",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid quoted value \"\\\"ends\\\\\"",
+      "input": "@dotReg 0.1\n\nA:\"ends\\",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\"ends\\",
+          "unset": false,
+          "has_type": false
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "triple decode failure after structural success",
+      "input": "@dotReg 0.1\n\nA:\"\"\"\n\\q\n\"\"\"",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "A"
+          ],
+          "raw": "\\q",
+          "unset": false,
+          "has_type": false,
+          "form": "triple_quoted"
+        }
+      ],
+      "error": {
+        "stage": "decode",
+        "line": 3,
+        "code": "string"
+      }
+    },
+    {
+      "name": "invalid UTF8 ff",
+      "input_hex": "40646f7452656720302e310a0a413aff",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 c080",
+      "input_hex": "40646f7452656720302e310a0a413ac080",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 eda080",
+      "input_hex": "40646f7452656720302e310a0a413aeda080",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 f4908080",
+      "input_hex": "40646f7452656720302e310a0a413af4908080",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 e282",
+      "input_hex": "40646f7452656720302e310a0a413ae282",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 in qualifying pipe body",
+      "input_hex": "40646f7452656720302e310a0a413a0a207cff",
+      "error": {
+        "stage": "parse",
+        "line": 4,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "collecting CLI validates syntax before decoding",
+      "input": "@dotReg 0.1\n\nA:\"\\q\"\ninvalid",
+      "error": {
+        "stage": "parse",
+        "line": 4,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 in comment",
+      "input_hex": "40646f7452656720302e310a0a23ff",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 in triple",
+      "input_hex": "40646f7452656720302e310a0a413a2222220aff",
+      "error": {
+        "stage": "parse",
+        "line": 4,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "invalid UTF8 in declaration",
+      "input_hex": "40646f7452656720ff",
+      "error": {
+        "stage": "parse",
+        "line": 1,
+        "code": "syntax"
+      }
+    },
+    {
+      "name": "BOM outside initial declaration is data",
+      "input": "@dotReg 0.1\n\n﻿A:﻿x",
+      "entries": [
+        {
+          "line": 3,
+          "kind": "value",
+          "path": [
+            "﻿A"
+          ],
+          "raw": "﻿x",
+          "unset": false,
+          "has_type": false,
+          "decoded": "﻿x"
+        }
+      ]
+    },
+    {
+      "name": "Unicode type whitespace",
+      "input": "@dotReg 0.1\n\nA(list(int)):x",
+      "error": {
+        "stage": "parse",
+        "line": 3,
+        "code": "syntax"
+      }
+    }
+  ]
+}

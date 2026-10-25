@@ -1,0 +1,666 @@
+package dotreg
+
+import (
+	"bufio"
+	"io"
+	"reflect"
+	"strconv"
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+const (
+	bom         = "\xef\xbb\xbf"
+	indentWidth = 2
+)
+
+type Kind string
+
+const (
+	Value   Kind = "value"
+	Heading Kind = "heading"
+)
+
+// ValueForm identifies a multiline value. The zero value is single-line syntax.
+type ValueForm string
+
+const (
+	TripleQuoted ValueForm = "triple_quoted"
+	PipeBlock    ValueForm = "pipe"
+)
+
+// Entry is a syntax result. Raw preserves undecoded quotes and escapes.
+// For multiline forms, Raw excludes markers and their indentation margins,
+// retaining the original line endings between body lines. Line is the opener.
+// Path holds decoded elements; joining them with dots loses information.
+type Entry struct {
+	Line    int       `json:"line"`
+	Kind    Kind      `json:"kind"`
+	Path    []string  `json:"path"`
+	Raw     string    `json:"raw"`
+	Unset   bool      `json:"unset"`
+	Type    string    `json:"type,omitempty"`
+	HasType bool      `json:"has_type"`
+	Form    ValueForm `json:"form,omitempty"`
+}
+
+// Parse validates file properties and collects body entries without partial
+// results on failure.
+// Call DecodeString or Build before delivering settings to an application.
+func Parse(r io.Reader) ([]Entry, error) {
+	entries := make([]Entry, 0)
+	err := ParseEach(r, func(e Entry) error {
+		entries = append(entries, e)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return entries, nil
+}
+
+// ParseEach visits headings and every value occurrence in source order.
+// Required file properties and their blank separator are checked first.
+// Multiline bodies are consumed before their value is visited. A visitor error
+// is returned unchanged, before validating or parsing the next logical entry.
+// The reader may buffer bytes ahead. Each call starts with fresh scopes.
+func ParseEach(r io.Reader, visit func(Entry) error) error {
+	if nilReader(r) || visit == nil {
+		return problem(0, ErrInput)
+	}
+	lines := sourceLines{reader: bufio.NewReader(r), nextLine: 1}
+	if eof, err := lines.properties(); err != nil {
+		return err
+	} else if eof {
+		return nil
+	}
+	var scopes []*pathNode
+	for {
+		physical := lines.next()
+		if err := physical.validate(); err != nil {
+			return err
+		}
+		source, eof, line := physical.text, physical.eof, physical.number
+		trimmed := trimSpaceTab(source)
+		if trimmed != "" && !strings.HasPrefix(trimmed, "#") {
+			indent := leadingSpaces(source)
+			body := trimRightSpaceTab(source[indent:])
+			if body[0] == '\t' || indent%indentWidth != 0 {
+				return problem(line, ErrSyntax)
+			}
+			relative := strings.HasPrefix(body, ".")
+			if relative != (indent > 0) {
+				return problem(line, ErrSyntax)
+			}
+			e, key, err := splitLine(body, line)
+			if err != nil {
+				return err
+			}
+			var parent *pathNode
+			if relative {
+				depth := indent / indentWidth
+				if depth > len(scopes) {
+					return problem(line, ErrSyntax)
+				}
+				if !strings.HasPrefix(key, ".") {
+					return problem(line, ErrSyntax)
+				}
+				// Even a value line closes deeper scopes when it dedents.
+				clear(scopes[depth:])
+				scopes = scopes[:depth]
+				parent = scopes[depth-1]
+				key = key[1:] // The relative marker, not a key element.
+			} else {
+				clear(scopes)
+				scopes = scopes[:0]
+			}
+			self := relative && key == "" && e.Kind == Value
+			if e.Kind == Heading {
+				suffix, err := parsePath(key, line)
+				if err != nil {
+					return err
+				}
+				// Store a persistent path, separate from the visitor's slice.
+				node := extendPath(parent, suffix)
+				e.Path = node.elements()
+				scopes = append(scopes, node)
+			} else {
+				if self {
+					e.Path = parent.elements()
+				} else {
+					// Values need only the visitor's owned path, not a persistent
+					// scope node and a temporary suffix. Reserve one suffix
+					// element, growing only as further elements are validated.
+					parentCount := 0
+					if parent != nil {
+						parentCount = parent.count
+					}
+					path := make([]string, parentCount, parentCount+1)
+					if parent != nil {
+						parent.copyElements(path)
+					}
+					e.Path, err = appendPath(path, key, line)
+					if err != nil {
+						return err
+					}
+				}
+				eof, err = lines.valueBody(&e, indent, eof)
+				if err != nil {
+					return err
+				}
+			}
+			if err := visit(e); err != nil {
+				return err
+			}
+		}
+		if eof {
+			return nil
+		}
+	}
+}
+
+func nilReader(r io.Reader) bool {
+	if r == nil {
+		return true
+	}
+	v := reflect.ValueOf(r)
+	switch v.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
+// sourceLines keeps one unvalidated lookahead line. A non-pipe line's errors
+// belong to its later turn, after the preceding value's visitor has completed.
+type sourceLines struct {
+	reader     *bufio.Reader
+	nextLine   int
+	pending    sourceLine
+	hasPending bool
+}
+
+type sourceLine struct {
+	text    string
+	ending  string
+	number  int
+	eof     bool
+	readErr error
+}
+
+func (lines *sourceLines) next() sourceLine {
+	if lines.hasPending {
+		line := lines.pending
+		lines.pending = sourceLine{}
+		lines.hasPending = false
+		return line
+	}
+	line := readPhysicalLine(lines.reader, lines.nextLine)
+	lines.nextLine++
+	return line
+}
+
+func (lines *sourceLines) unread(line sourceLine) {
+	lines.pending, lines.hasPending = line, true
+}
+
+// readPhysicalLine has no format-specific size limit. Source validation is
+// deferred, but the original LF or CRLF is retained separately from the text.
+func readPhysicalLine(r *bufio.Reader, number int) sourceLine {
+	s, err := r.ReadString('\n')
+	line := sourceLine{number: number, eof: err == io.EOF}
+	if err != nil && err != io.EOF {
+		line.readErr = problem(number, ErrInput)
+	}
+	if strings.HasSuffix(s, "\n") {
+		s, line.ending = s[:len(s)-1], "\n"
+		if strings.HasSuffix(s, "\r") {
+			s, line.ending = s[:len(s)-1], "\r\n"
+		}
+	}
+	if number == 1 {
+		s = strings.TrimPrefix(s, bom)
+	}
+	line.text = s
+	return line
+}
+
+func (line sourceLine) validate() error {
+	if line.readErr != nil {
+		return line.readErr
+	}
+	if !utf8.ValidString(line.text) || strings.ContainsRune(line.text, '\r') {
+		return problem(line.number, ErrSyntax)
+	}
+	return nil
+}
+
+// properties consumes the required declaration region and its blank separator.
+// It does not emit entries or inspect the body. Only @dotReg 0.1 is supported.
+func (lines *sourceLines) properties() (bool, error) {
+	declared := false
+	for {
+		line := lines.next()
+		if err := line.validate(); err != nil {
+			return false, err
+		}
+		text := trimRightSpaceTab(line.text)
+		if text == "" {
+			// An empty read at EOF is not a physical blank separator line.
+			if !declared || (line.text == "" && line.ending == "") {
+				return false, problem(line.number, ErrSyntax)
+			}
+			return line.eof, nil
+		}
+		separator := strings.IndexAny(text, " \t")
+		if separator <= 0 || text[0] != '@' {
+			return false, problem(line.number, ErrSyntax)
+		}
+		name, value := text[:separator], trimSpaceTab(text[separator:])
+		if value == "" {
+			return false, problem(line.number, ErrSyntax)
+		}
+		if name != "@dotReg" {
+			return false, problem(line.number, ErrUnsupported)
+		}
+		if declared {
+			return false, problem(line.number, ErrDuplicate)
+		}
+		if value != "0.1" {
+			return false, problem(line.number, ErrUnsupported)
+		}
+		declared = true
+		if line.eof {
+			return false, problem(line.number+1, ErrSyntax)
+		}
+	}
+}
+
+// valueBody completes a value before notification and returns its EOF state.
+// A non-pipe lookahead stays pending; it is parsed only after notification.
+func (lines *sourceLines) valueBody(entry *Entry, indent int, eof bool) (bool, error) {
+	switch {
+	case entry.Raw == `"""`:
+		raw, blockEOF, err := lines.tripleBody(entry.Line)
+		if err != nil {
+			return false, err
+		}
+		entry.Raw, entry.Form, entry.Unset = raw, TripleQuoted, false
+		return blockEOF, nil
+	case entry.Unset && !eof:
+		raw, blockEOF, found, err := lines.pipeBody(indent)
+		if err != nil {
+			return false, err
+		}
+		if found {
+			entry.Raw, entry.Form, entry.Unset = raw, PipeBlock, false
+			return blockEOF, nil
+		}
+	}
+	return eof, nil
+}
+
+func (lines *sourceLines) tripleBody(opening int) (string, bool, error) {
+	// The closing marker supplies the margin, so retain the body until it is
+	// known. Small bodies keep their line metadata on the stack; longer bodies
+	// grow normally, without imposing a notation length limit.
+	var initial [8]struct{ text, ending string }
+	body := initial[:0]
+	outputBytes, nonempty, minimumMargin := 0, 0, 0
+	for {
+		line := lines.next()
+		if err := line.validate(); err != nil {
+			return "", false, err
+		}
+		margin := leadingSpaces(line.text)
+		if trimRightSpaceTab(line.text[margin:]) == `"""` {
+			// Do not reject a short margin before the closer arrives: a later
+			// physical-line validation error must keep its existing priority.
+			if nonempty > 0 && margin > minimumMargin {
+				for i, part := range body {
+					if part.text != "" && leadingSpaces(part.text) < margin {
+						return "", false, problem(opening+i+1, ErrSyntax)
+					}
+				}
+			}
+			var raw strings.Builder
+			// Every nonempty line now has at least this margin. The exact
+			// output size needs no additional content or escape-sizing pass.
+			raw.Grow(outputBytes - margin*nonempty)
+			for i, part := range body {
+				text := part.text
+				if text != "" {
+					text = text[margin:]
+				}
+				if i > 0 {
+					raw.WriteString(body[i-1].ending)
+				}
+				raw.WriteString(text)
+			}
+			return raw.String(), line.eof, nil
+		}
+		if line.eof {
+			return "", false, problem(opening, ErrSyntax)
+		}
+		if len(body) > 0 {
+			outputBytes += len(body[len(body)-1].ending)
+		}
+		outputBytes += len(line.text)
+		if line.text != "" {
+			nonempty++
+			if nonempty == 1 || margin < minimumMargin {
+				minimumMargin = margin
+			}
+		}
+		body = append(body, struct{ text, ending string }{line.text, line.ending})
+	}
+}
+
+func (lines *sourceLines) pipeBody(indent int) (string, bool, bool, error) {
+	// Buffer only small bodies so their compact result needs one allocation.
+	// Count the original source, including discarded indentation, to bound
+	// buffering. Borrowed line bytes are copied before the next read. Larger
+	// bodies continue through the streaming builder without retaining input.
+	const maxBufferedSource = 4096
+	var output [256]byte
+	var parts [8]pipeBodyPart
+	buffered, sourceBytes, outputBytes, stackBytes := 0, 0, 0, 0
+	spilled := false
+	buffering := true
+	var raw strings.Builder
+	var previousEnding string
+	found := false
+	for {
+		line := lines.nextBodyLine()
+		prefix, pipe := line.pipePrefix(indent)
+		if !pipe {
+			// Lookahead validation belongs to the next logical entry. Its bytes
+			// must survive both the current visitor and later buffer refills.
+			lines.unread(line.owned())
+			if buffering {
+				if !spilled {
+					return string(output[:stackBytes]), false, found, nil
+				}
+				raw.Grow(outputBytes)
+				writePipeBodyParts(&raw, output[:], parts[:buffered])
+			}
+			return raw.String(), false, found, nil
+		}
+		if err := line.validate(); err != nil {
+			return "", false, false, err
+		}
+		if buffering {
+			footprint := line.size() + len(line.ending)
+			payload := line.size() - prefix - 1
+			if found {
+				payload += len(previousEnding)
+			}
+			if buffered < len(parts) && footprint <= maxBufferedSource-sourceBytes {
+				if !spilled && payload <= len(output)-stackBytes {
+					if found {
+						stackBytes += copy(output[stackBytes:], previousEnding)
+					}
+					start := stackBytes
+					stackBytes += line.copyTail(output[stackBytes:], prefix+1)
+					parts[buffered] = pipeBodyPart{start: start, end: stackBytes, ending: line.ending}
+				} else {
+					// Keep the original small-body sizing advantage after the
+					// tiny stack buffer fills, without growing every call's stack.
+					spilled = true
+					parts[buffered] = pipeBodyPart{ownedText: line.ownTail(prefix + 1), ending: line.ending}
+				}
+				outputBytes += payload
+				buffered++
+				sourceBytes += footprint
+			} else {
+				// Preserve streaming growth for larger bodies. An up-front
+				// prefix reservation can inflate later growth allocations.
+				writePipeBodyParts(&raw, output[:], parts[:buffered])
+				buffering = false
+			}
+		}
+		if !buffering {
+			if found {
+				raw.WriteString(previousEnding)
+			}
+			line.writeTail(&raw, prefix+1)
+		}
+		found, previousEnding = true, line.ending
+		if line.eof {
+			if buffering {
+				if !spilled {
+					return string(output[:stackBytes]), true, true, nil
+				}
+				raw.Grow(outputBytes)
+				writePipeBodyParts(&raw, output[:], parts[:buffered])
+			}
+			return raw.String(), true, true, nil
+		}
+	}
+}
+
+type pipeBodyPart struct {
+	start, end int
+	ownedText  string
+	ending     string
+}
+
+func writePipeBodyParts(raw *strings.Builder, output []byte, parts []pipeBodyPart) {
+	for i, part := range parts {
+		if i > 0 {
+			raw.WriteString(parts[i-1].ending)
+		}
+		if part.ownedText != "" {
+			raw.WriteString(part.ownedText)
+		} else {
+			raw.Write(output[part.start:part.end])
+		}
+	}
+}
+
+func leadingSpaces(s string) int {
+	i := 0
+	for i < len(s) && s[i] == ' ' {
+		i++
+	}
+	return i
+}
+
+// The grammar trims only ASCII SP/HT, not Unicode whitespace. Keep these
+// frequent boundary checks byte-based without constructing a character set.
+func trimSpaceTab(s string) string {
+	start := 0
+	for start < len(s) && (s[start] == ' ' || s[start] == '\t') {
+		start++
+	}
+	return trimRightSpaceTab(s[start:])
+}
+
+func trimRightSpaceTab(s string) string {
+	end := len(s)
+	for end > 0 && (s[end-1] == ' ' || s[end-1] == '\t') {
+		end--
+	}
+	return s[:end]
+}
+
+// splitLine stops at the delimiter. It never scans or decodes the right side.
+func splitLine(body string, line int) (Entry, string, error) {
+	e := Entry{Line: line}
+	var key, rhs string
+	for i := 0; i < len(body); {
+		switch body[i] {
+		case '"':
+			end, err := scanQuoted(body[i:])
+			if err != nil {
+				return Entry{}, "", problem(line, ErrSyntax)
+			}
+			i += end
+			continue
+		case ':':
+			key, rhs = trimSpaceTab(body[:i]), body[i+1:]
+		case '(':
+			key = strings.TrimRight(body[:i], " ")
+			if strings.HasSuffix(key, "\t") {
+				return Entry{}, "", problem(line, ErrUnsupported)
+			}
+			close, err := typeEnd(body, i, line)
+			if err != nil {
+				return Entry{}, "", err
+			}
+			name := body[i+1 : close]
+			if name == "" {
+				return Entry{}, "", problem(line, ErrUnsupported)
+			}
+			tail := strings.TrimLeft(body[close+1:], " ")
+			if strings.HasPrefix(tail, "\t") {
+				return Entry{}, "", problem(line, ErrUnsupported)
+			}
+			if tail == "" || tail[0] != ':' {
+				return Entry{}, "", problem(line, ErrSyntax)
+			}
+			e.HasType, e.Type, rhs = true, name, tail[1:]
+		default:
+			i++
+			continue
+		}
+		e.Kind, e.Raw = Value, trimSpaceTab(rhs)
+		e.Unset = e.Raw == ""
+		return e, key, nil
+	}
+	if strings.HasSuffix(body, ".") {
+		e.Kind = Heading
+		return e, body[:len(body)-1], nil
+	}
+	return Entry{}, "", problem(line, ErrSyntax)
+}
+
+// typeEnd locates the outer closing parenthesis without interpreting the type.
+// Type syntax other than balanced parentheses and the space prohibition belongs
+// to the selected profile. Quotes and escapes in types are not specified yet.
+func typeEnd(body string, open, line int) (int, error) {
+	depth := 1
+	for offset, c := range body[open+1:] {
+		switch {
+		case unicode.IsSpace(c):
+			return 0, problem(line, ErrSyntax)
+		case c == '"' || c == '\\':
+			return 0, problem(line, ErrUnsupported)
+		case c == '(':
+			depth++
+		case c == ')':
+			depth--
+			if depth == 0 {
+				return open + 1 + offset, nil
+			}
+		}
+	}
+	return 0, problem(line, ErrSyntax)
+}
+
+func parsePath(key string, line int) ([]string, error) {
+	return appendPath(nil, key, line)
+}
+
+// appendPath decodes a key suffix into the caller's owned path. Headings keep
+// their compact suffix separately; values build their final path directly.
+func appendPath(path []string, key string, line int) ([]string, error) {
+	for {
+		if key == "" {
+			return nil, problem(line, ErrSyntax)
+		}
+		var element string
+		if key[0] == '"' {
+			text, end, err := decodeQuoted(key)
+			if err != nil {
+				return nil, problem(line, ErrSyntax)
+			}
+			element, key = text, key[end:]
+			if key != "" && key[0] != '.' {
+				return nil, problem(line, ErrSyntax)
+			}
+		} else {
+			end := strings.IndexByte(key, '.')
+			if end < 0 {
+				end = len(key)
+			}
+			element, key = key[:end], key[end:]
+			if element == "" {
+				return nil, problem(line, ErrSyntax)
+			}
+			for i := 0; i < len(element); {
+				c := element[i]
+				if c < utf8.RuneSelf {
+					if c <= ' ' || c == 0x7f || c == ':' || c == '(' || c == ')' || c == '#' || c == '"' || c == '\\' {
+						return nil, problem(line, ErrSyntax)
+					}
+					i++
+					continue
+				}
+				r, width := utf8.DecodeRuneInString(element[i:])
+				if unicode.IsSpace(r) || unicode.IsControl(r) {
+					return nil, problem(line, ErrSyntax)
+				}
+				i += width
+			}
+		}
+		path = append(path, element)
+		if key == "" {
+			return path, nil
+		}
+		key = key[1:] // An element separator outside quotes.
+	}
+}
+
+// Nodes avoid storing a full copy of every ancestor path at every scope.
+type pathNode struct {
+	parent *pathNode
+	suffix []string
+	count  int
+}
+
+func extendPath(parent *pathNode, suffix []string) *pathNode {
+	n := &pathNode{parent: parent, suffix: suffix, count: len(suffix)}
+	if parent != nil {
+		n.count += parent.count
+	}
+	return n
+}
+
+func (n *pathNode) elements() []string {
+	path := make([]string, n.count)
+	n.copyElements(path)
+	return path
+}
+
+func (n *pathNode) copyElements(path []string) {
+	end := len(path)
+	for current := n; current != nil; current = current.parent {
+		start := end - len(current.suffix)
+		copy(path[start:end], current.suffix)
+		end = start
+	}
+}
+
+func pathID(path []string) string {
+	var b strings.Builder
+	size := len(path) // One colon per element, plus exact decimal byte lengths.
+	for _, s := range path {
+		length := len(s)
+		size += length + 1
+		for length >= 10 {
+			length /= 10
+			size++
+		}
+	}
+	b.Grow(size)
+	var digits [20]byte // Enough for a decimal byte length on 32- and 64-bit Go.
+	for _, s := range path {
+		b.Write(strconv.AppendInt(digits[:0], int64(len(s)), 10))
+		b.WriteByte(':')
+		b.WriteString(s)
+	}
+	return b.String()
+}

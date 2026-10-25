@@ -1,0 +1,81 @@
+:root {
+  --sl-font: 'Segoe UI', system-ui, sans-serif;
+  --sl-font-mono: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+  --sl-color-accent-low: #113c37;
+  --sl-color-accent: #47b4a0;
+  --sl-color-accent-high: #b9e7dc;
+  --sl-content-width: 49rem;
+  --sl-text-h1: clamp(2rem, 4vw, 2.8rem);
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e1f1eb;
+  --sl-color-accent: #117b70;
+  --sl-color-accent-high: #164e47;
+  --sl-color-bg: #fffefa;
+  --sl-color-bg-nav: #fffefa;
+  --sl-color-bg-sidebar: #f7f7f2;
+}
+
+.site-title { font-weight: 750; letter-spacing: -0.04em; }
+.site-title img { height: 2rem; }
+.sl-markdown-content :is(h2, h3) { letter-spacing: -0.025em; }
+.sl-markdown-content pre { tab-size: 2; }
+.sl-markdown-content :is(td, th) { min-width: 5rem; }
+.sl-markdown-content table { font-size: 0.9em; }
+
+[data-has-hero] .hero { padding-block: 3.5rem 1.25rem; }
+[data-has-hero] .hero h1 {
+  max-width: 15ch;
+  font-size: clamp(2.6rem, 5.4vw, 4.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+[data-has-hero] .hero .tagline { max-width: 36rem; font-size: 1.15rem; line-height: 1.65; }
+[data-has-hero] .hero .actions { gap: 1rem; }
+[data-has-hero] .sl-markdown-content > h2 { margin-top: 3rem; font-size: 1.6rem; }
+
+.project-version {
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+  color: var(--sl-color-gray-2);
+  font: 0.8rem var(--sl-font-mono);
+}
+.notation-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-block: 1.75rem; }
+.notation-pair > .expressive-code { margin-top: 0; min-width: 0; }
+.notation-pair .expressive-code pre { min-height: 14rem; }
+.notation-principles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+.notation-principles > section { margin-top: 0; border-top: 2px solid var(--sl-color-accent); padding-top: 1rem; }
+.notation-principles h3 { margin-top: 0; font-size: 1.05rem; }
+.notation-principles p { color: var(--sl-color-gray-2); font-size: 0.9rem; line-height: 1.65; }
+.reading-path { margin-top: 1.5rem; }
+.reading-path a {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto;
+  gap: 1rem;
+  padding: 1.3rem 0;
+  border-top: 1px solid var(--sl-color-hairline);
+  color: var(--sl-color-white);
+  text-decoration: none;
+}
+.reading-path a:last-child { border-bottom: 1px solid var(--sl-color-hairline); }
+.reading-path a:hover strong { color: var(--sl-color-text-accent); }
+.reading-path a:focus-visible { outline: 2px solid var(--sl-color-accent); outline-offset: 4px; }
+.reading-path a > span, .reading-path strong, .reading-path strong + span { margin-top: 0; }
+.reading-path strong { display: block; font-size: 1.08rem; }
+.reading-path strong + span { display: block; color: var(--sl-color-gray-2); font-size: 0.9rem; }
+.path-number { color: var(--sl-color-text-accent); font: 0.8rem var(--sl-font-mono); padding-top: 0.2rem; }
+.project-note { margin-top: 3rem; padding: 1.25rem 1.5rem; background: var(--sl-color-bg-sidebar); border-left: 3px solid var(--sl-color-accent); font-size: 0.9rem; }
+
+@media (min-width: 50rem) {
+  [data-has-hero] .hero { grid-template-columns: 1fr; }
+  [data-has-hero] .hero > .stack { text-align: start; }
+}
+
+@media (max-width: 40rem) {
+  [data-has-hero] .hero { padding-top: 1.5rem; }
+  .notation-pair, .notation-principles { grid-template-columns: 1fr; }
+  .notation-pair .expressive-code pre { min-height: unset; }
+  .reading-path a { grid-template-columns: 1.5rem 1fr auto; gap: 0.6rem; }
+  .project-version { font-size: 0.7rem; }
+}
