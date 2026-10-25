@@ -37,3 +37,5 @@ These names and right-hand-side values are an illustrative candidate set, not a 
 | `uri` | URI | `https://example.com/items/42` |
 
 The type names and examples for IP addresses and network prefixes distinguish IPv4 from IPv6; their complete accepted textual forms and conversion behaviour remain to be specified.
+
+The VS Code editor integration may offer these names as completion and quick-fix suggestions. They remain illustrative, not a standard permitted-type list. The Go sample's `DemoProfile` also accepts `int`; that sample-specific name is not added to this candidate set. Editor suggestions do not validate or convert values.

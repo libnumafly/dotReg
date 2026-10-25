@@ -16,6 +16,11 @@ façade over the JavaScript engine, sharing its grammar and runtime behaviour.
 | Rust | Current stable Rust, edition 2021 | `parse`, `parse_each`, `decode_string` | [Rust](rust/README.md) |
 | C++ | C++17 compiler | `parse`, `parse_each`, `decode_string` | [C++](cpp/README.md) |
 
+The [JavaScript implementation](javascript/README.md) also includes editor
+support for VS Code compatible editors: formatting, syntax diagnostics,
+syntax highlighting, snippets, resolved-key hover information, and a hierarchical
+Document Outline.
+
 The compiler, interpreter or SDK in this table is a development prerequisite;
 the parsers need no package installation. TypeScript's compiler checks the typed
 interface; its runtime implementation is the neighbouring JavaScript module.

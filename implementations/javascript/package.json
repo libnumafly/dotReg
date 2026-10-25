@@ -1,0 +1,65 @@
+{
+  "name": "dotreg-language-support",
+  "displayName": "dotReg Language Support",
+  "description": "Formatting, syntax diagnostics, and editor assistance for dotReg configuration files.",
+  "version": "0.1.0",
+  "publisher": "dotreg",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters"
+  ],
+  "main": "./extension.cjs",
+  "activationEvents": [
+    "onLanguage:dotreg"
+  ],
+  "contributes": {
+    "configurationDefaults": {
+      "[dotreg]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2
+      }
+    },
+    "languages": [
+      {
+        "id": "dotreg",
+        "aliases": ["dotReg", "dotreg"],
+        "extensions": [".dotreg"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dotreg",
+        "scopeName": "source.dotreg",
+        "path": "./syntaxes/dotreg.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "dotreg",
+        "path": "./snippets/dotreg.code-snippets"
+      }
+    ],
+    "commands": [
+      {
+        "command": "dotreg.formatDocument",
+        "title": "dotReg: Format Document"
+      }
+    ]
+  },
+  "files": [
+    "dotreg.mjs",
+    "formatter.mjs",
+    "extension.cjs",
+    "README.md",
+    "language-configuration.json",
+    "syntaxes/**",
+    "snippets/**",
+    "editor-support.md",
+    "LICENSE"
+  ]
+}

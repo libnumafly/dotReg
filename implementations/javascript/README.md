@@ -1,4 +1,4 @@
-# JavaScript sample
+# JavaScript parser and editor support
 
 Requires Node.js 20 or later. Uses only built-in modules; no installation step.
 Run from the repository root:
@@ -38,6 +38,13 @@ an unfinished multiline value requires its body. Persistent path nodes avoid
 copying all ancestors into every stored scope. Each emitted path is independent.
 Literal block decoding returns the existing string where possible; escaped
 text is assembled from spans. It does not split the whole source into lines.
+
+This folder also contains [VS Code editor support](editor-support.md), including
+formatting, parser diagnostics, syntax highlighting, snippets and resolved-key
+hover information, plus a hierarchical Document Outline. It offers type-name
+completion and a quick fix for adding provisional type annotations. These
+names are hints, not a standard type list or conversion implementation. It
+uses this same parser and requires no npm dependencies.
 
 See the [parser set](../README.md) for the common contract, conformance checks
 and provisional grammar choices. [TypeScript](../typescript/README.md)

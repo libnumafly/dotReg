@@ -1,0 +1,41 @@
+{
+  "dotReg file header": {
+    "prefix": "dotreg-header",
+    "body": [
+      "@dotReg 0.1",
+      "",
+      "$0"
+    ],
+    "description": "Required dotReg file declaration"
+  },
+  "Heading with a value": {
+    "prefix": "dotreg-heading",
+    "body": [
+      "${1:Section}.",
+      "  .${2:Key}: ${3:value}$0"
+    ],
+    "description": "Add a heading and a relative key"
+  },
+  "Typed value": {
+    "prefix": "dotreg-typed",
+    "body": "${1:Key} (${2:string}): ${3:value}$0",
+    "description": "Add a value with a provisional type annotation"
+  },
+  "Triple-quoted value": {
+    "prefix": "dotreg-triple",
+    "body": [
+      "${1:Key}: \"\"\"",
+      "  ${2:text}",
+      "  \"\"\"$0"
+    ],
+    "description": "Add a triple-quoted multiline value"
+  },
+  "Literal pipe value": {
+    "prefix": "dotreg-pipe",
+    "body": [
+      "${1:Key}:",
+      " |${2:text}$0"
+    ],
+    "description": "Add a literal pipe-block value"
+  }
+}

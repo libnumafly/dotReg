@@ -1,0 +1,70 @@
+{
+  "scopeName": "source.dotreg",
+  "patterns": [
+    { "include": "#declaration" },
+    { "include": "#comment" },
+    { "include": "#pipe" },
+    { "include": "#tripleQuotedBlock" },
+    { "include": "#type" },
+    { "include": "#quoted" },
+    { "include": "#separator" },
+    { "include": "#headingEnd" }
+  ],
+  "repository": {
+    "declaration": {
+      "name": "keyword.control.dotreg",
+      "match": "^@dotReg[ \\t]+0\\.1[ \\t]*$"
+    },
+    "comment": {
+      "name": "comment.line.number-sign.dotreg",
+      "match": "^[ \\t]*#.*$"
+    },
+    "pipe": {
+      "name": "string.unquoted.block.dotreg",
+      "match": "^[ ]+\\|.*$"
+    },
+    "tripleQuotedBlock": {
+      "name": "string.quoted.multiline.dotreg",
+      "begin": "^([ ]*[^\\r\\n]*?:[ \\t]*)(\"\"\"[ \\t]*)$",
+      "beginCaptures": {
+        "1": { "name": "meta.value.header.dotreg" },
+        "2": { "name": "punctuation.definition.string.begin.dotreg" }
+      },
+      "end": "^[ ]*\"\"\"[ \\t]*$",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.dotreg" }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.dotreg",
+          "match": "\\\\(?:[.\\\"\\\\/bfnrt]|u(?:\\{[0-9A-Fa-f]{1,6}\\}|[0-9A-Fa-f]{4}))"
+        }
+      ]
+    },
+    "type": {
+      "match": "^[ ]*[^:\\r\\n]*?(\\([^ \\t()]+\\))[ ]*:",
+      "captures": {
+        "1": { "name": "storage.type.dotreg" }
+      }
+    },
+    "quoted": {
+      "name": "string.quoted.double.dotreg",
+      "begin": "\"",
+      "end": "\"|$",
+      "patterns": [
+        {
+          "name": "constant.character.escape.dotreg",
+          "match": "\\\\(?:[.\\\"\\\\/bfnrt]|u(?:\\{[0-9A-Fa-f]{1,6}\\}|[0-9A-Fa-f]{4}))"
+        }
+      ]
+    },
+    "separator": {
+      "name": "punctuation.separator.key-value.dotreg",
+      "match": ":"
+    },
+    "headingEnd": {
+      "name": "punctuation.terminator.heading.dotreg",
+      "match": "\\.$"
+    }
+  }
+}

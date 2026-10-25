@@ -1,0 +1,6 @@
+test.mjs
+configsample.mjs
+typescript/**
+**/*.test.*
+**/__pycache__/**
+**/.vscode/**
