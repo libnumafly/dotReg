@@ -37,6 +37,7 @@ The site imports these repository files rather than maintaining separate copies:
 | `../README.md` | `overview/` |
 | `../docs/README.md` | `documentation/` |
 | `../docs/getting-started.md` | `getting-started/` |
+| `../docs/agent-skill.md` | `agent-skill/` |
 | `../docs/config-format.md` | `specification/` |
 | `../docs/type-profile.md` | `type-profile/` |
 | `../docs/open-issues.md` | `open-issues/` |

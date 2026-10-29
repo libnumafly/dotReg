@@ -9,6 +9,7 @@ dotReg is a line-oriented configuration notation built around dotted key paths, 
 | Document | Read it to… |
 |---|---|
 | [Getting started](getting-started.md) | Learn the required file declaration, value lines, repeated values, headings, grouped retrieval, strings and unset values through small examples |
+| [Coding agent skill](agent-skill.md) | Install the portable skill, invoke it for application development and run its offline configuration checker |
 | [Configuration file format](config-format.md) | Consult the reference specification for syntax, processing stages and application responsibilities |
 | [Type profiles and candidate types](type-profile.md) | Look up defined type-specific representations and distinguish them from candidate type names and examples |
 | [Conformance checklist](conformance.md) | Check syntax, decoding and any provided consumer layer against the specified rules |
@@ -48,6 +49,7 @@ For a first read, follow [Getting started](getting-started.md). For a particular
 .
 ├── README.md              # Project introduction
 ├── docs/                  # Guides and reference specification
+├── .agents/skills/dotreg/  # Portable coding agent skill and offline checker
 ├── examples/              # Configuration inputs
 ├── implementations/
 │   ├── README.md          # Parser set and common contract

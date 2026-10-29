@@ -25,6 +25,7 @@ export default defineConfig({
         { label: 'Start here', items: [
           { label: 'Introduction', slug: 'overview' },
           { label: 'Getting started', slug: 'getting-started' },
+          { label: 'Coding agent skill', slug: 'agent-skill' },
           { label: 'Documentation guide', slug: 'documentation' },
         ] },
         { label: 'The notation', items: [

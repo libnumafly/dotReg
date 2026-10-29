@@ -1,0 +1,4 @@
+interface:
+  display_name: "dotReg"
+  short_description: "Author and integrate dotReg configuration files"
+  default_prompt: "Use $dotreg to add dotReg configuration to this application while preserving key boundaries, source order and unset values."

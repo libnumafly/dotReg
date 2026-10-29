@@ -27,6 +27,12 @@ export const pages = [
     description: 'Learn dotReg through small examples, from full keys to multiline values.',
   },
   {
+    source: 'docs/agent-skill.md',
+    slug: 'agent-skill',
+    title: 'Coding agent skill',
+    description: 'Install the portable dotReg skill, use it in application development and check configuration files offline.',
+  },
+  {
     source: 'docs/config-format.md',
     slug: 'specification',
     title: 'Configuration file format',

@@ -45,13 +45,17 @@ A.Path:
 
 The closing triple quotes set the indentation margin to remove. In a pipe block, everything after the first `|` belongs to the value, including spaces and backslashes. Both forms preserve line endings between body lines. To include a final newline, add an empty body line before the closing triple quotes, or an empty final pipe line (` |`). See the [value rules](docs/config-format.md#8-preserving-right-hand-sides-and-interpreting-values).
 
-[Get started](docs/getting-started.md) · [Documentation](docs/README.md) · [Specification](docs/config-format.md) · [Sample parsers](implementations/README.md)
+[Get started](docs/getting-started.md) · [Documentation](docs/README.md) · [Specification](docs/config-format.md) · [Sample parsers](implementations/README.md) · [Coding agent skill](docs/agent-skill.md)
 
 Try the notation in Go, Python, JavaScript, TypeScript, Java, C#, Rust or C++.
 The [parser set](implementations/README.md) provides dependency-free syntax and
 common string decoding, incremental APIs for bounded retention and shared
 conformance cases.
 TypeScript shares the JavaScript engine through a typed interface.
+
+For application development with a coding agent, install the
+[dotReg skill](docs/agent-skill.md). It includes syntax and integration guidance,
+a complete example and an offline checker.
 
 Website development and GitHub Pages setup: [Starlight website guide](pages/README.md).
 

@@ -1,0 +1,47 @@
+{
+  "repository": "https://github.com/libnumafly/dotReg",
+  "revision": "4aca4adba1cdc4c523d3e07b91a64403de4f8f68",
+  "format_version": "0.1",
+  "note": "Bundled files are verbatim snapshots. References summarise this revision; the upstream specification remains authoritative. Hashes describe the listed source bytes.",
+  "sources": [
+    {
+      "sha256": "1803b8ce3725e4a53ca38074a1f622082e4430fe46a5bcc98847ceafc9b2a86b",
+      "path": "docs/config-format.md"
+    },
+    {
+      "sha256": "d2ea9a385b01f8387d50f94693371f095c5af66bce86054a77105cd72e70dcbc",
+      "path": "docs/type-profile.md"
+    },
+    {
+      "sha256": "1580db2e2be674c1eac144b863c30f59fd69e82eaabedfc1cd6af304de3fe661",
+      "path": "docs/open-issues.md"
+    },
+    {
+      "sha256": "13c37d94fc2bc7e19e37d23f44ce394999ddb55a9bc759de839dc5acae6901a5",
+      "path": "implementations/README.md"
+    },
+    {
+      "sha256": "3336abb6ac51f6fecf7a6473f79310a01d3b1fb60d31512135fe9b9b4ac40d06",
+      "path": "implementations/go/README.md"
+    },
+    {
+      "sha256": "ccebcdc5e273b971d7627a6e71fb21e8542cc8b8785036cf6bf58d416d4d237a",
+      "path": "implementations/javascript/README.md"
+    },
+    {
+      "bundled_path": "scripts/lib/dotreg.mjs",
+      "sha256": "c6e43827e451565c7e243dfc459c2cbb1bbdbfe8a0d84feeafb26f2d1816fedb",
+      "path": "implementations/javascript/dotreg.mjs"
+    },
+    {
+      "bundled_path": "assets/example.dotreg",
+      "sha256": "06469399ac9dd325e326d1581ae3a1f19da67d514a04a15420c84edc99b346f0",
+      "path": "examples/sample.dotreg"
+    },
+    {
+      "bundled_path": "LICENSE",
+      "sha256": "2ad140b6edec8524f793a901e9dfebc5b2d12adac41e15f42be747ee9896eb54",
+      "path": "LICENSE"
+    }
+  ]
+}
