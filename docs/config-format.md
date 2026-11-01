@@ -238,7 +238,7 @@ Unicode normalisation is not performed. Each decoded element is compared by exac
 
 Syntax results retain the element sequence itself or a representation from which element boundaries can be recovered. Keys are not identified solely by a string made by removing quotes and joining elements with dots. A single element with an empty name `[""]` is also distinct from having no elements `[]`. This requirement also applies to a flat key space and does not require keys to be converted to nested objects.
 
-The concrete output representation, canonical notation and retrieval API are undecided. The retrieval API must also distinguish elements containing dots, empty names and an omitted key specification.
+The concrete output representation, canonical notation and retrieval API are undecided. The retrieval API must also distinguish elements containing dots, empty names and an omitted key specification. No general write-back or formatting policy is prescribed. Applications that edit existing files may preserve the existing style or apply a policy of their own; this does not establish a canonical notation.
 
 ### 3.4 Common escapes within quotes
 

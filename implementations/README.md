@@ -45,6 +45,12 @@ The shared [prefix-selection rules](../docs/config-format.md#91-prefix-selection
 belong to that consumer layer; the syntax-only ports and shared syntax/decoding
 corpus do not provide or test retrieval APIs.
 
+Each language sample also provides source-preserving helpers to append a value,
+replace one unique occurrence, or replace a selected repeated occurrence.
+These helpers follow a matching heading section when one exists and otherwise
+write a fully qualified key. Their write style is sample policy, not a canonical
+serialization rule for the format.
+
 Each engine offers a collecting syntax API, an incremental visitor API and a
 separate common string decoder. A collection succeeds as a whole or reports a
 failure without returning partial entries. An incremental visitor receives each

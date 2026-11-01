@@ -39,6 +39,15 @@ copying all ancestors into every stored scope. Each emitted path is independent.
 Literal block decoding returns the existing string where possible; escaped
 text is assembled from spans. It does not split the whole source into lines.
 
+The library also exports appendValue, setText and setTextAt. They accept a
+complete source string and decoded key elements and return an updated string.
+Appending follows the deepest existing matching heading with two more spaces
+and a relative key; with no matching heading it writes a fully qualified key at
+the end. setText replaces a unique occurrence or appends when absent;
+setTextAt selects a zero-based repeated occurrence. Values are written as
+escaped, double-quoted single-line strings. These helpers preserve unrelated
+source text and do not perform type conversion.
+
 This folder also contains [VS Code editor support](editor-support.md), including
 formatting, parser diagnostics, syntax highlighting, snippets and resolved-key
 hover information, plus a hierarchical Document Outline. It offers type-name

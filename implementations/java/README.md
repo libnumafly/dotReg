@@ -54,6 +54,14 @@ change later resolution. `decodeString(entry)` returns the common decoded
 string, with `entry.unset()` distinguishing unset from explicit empty values.
 Annotations do not bypass common decoding.
 
+DotReg.appendValue, DotReg.setText and DotReg.setTextAt edit a valid source
+string while preserving unrelated text. Appending follows the deepest existing
+matching heading with two more spaces and a relative key; with no matching
+heading it uses a fully qualified key at end of file. setText replaces a unique
+occurrence or appends when absent; setTextAt selects a zero-based repeated
+occurrence. Set values use escaped, double-quoted single-line syntax. The
+helpers do not perform type conversion or define canonical notation.
+
 The visitor retains an 8 KiB byte buffer, active heading suffixes, the current
 physical line and, when necessary, a block body plus one boundary line. Lines
 within the buffer borrow a byte slice until their next read; spanning lines use

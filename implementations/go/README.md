@@ -12,6 +12,7 @@ Simple type names use lowercase English spelling, as specified in the format spe
 - [Running the sample](#running-the-sample)
 - [Using the library](#using-the-library)
   - [Selecting values by key prefix](#selecting-values-by-key-prefix)
+  - [Writing values to an existing file](#writing-values-to-an-existing-file)
 - [Single-line strings](#single-line-strings)
 - [Multiline values](#multiline-values)
 - [Type conversion and the caller's configuration schema](#type-conversion-and-the-callers-configuration-schema)
@@ -95,6 +96,9 @@ The `raw` mode can retain an unterminated ordinary quote in a single-line value 
 | `Config.SelectPrefix([]string) ([]SelectedValue, error)` | Select values at the prefix and below it in global source order, retaining full and relative paths and per-occurrence metadata without further conversion |
 | `Config.IsUnset([]string) (bool, error)` | Query the unset state of exactly one occurrence; report `ErrMultipleValues` if there is more than one |
 | `Config.IsUnsetAll([]string) ([]bool, error)` | Query every occurrence's unset state in source order without retrieving or converting values |
+| `AppendValue([]byte, []string, WriteValue) ([]byte, error)` | Append a new text occurrence, following an active matching heading or falling back to a full key |
+| `SetText([]byte, []string, Text) ([]byte, error)` | Replace one occurrence or append when absent; reject ambiguous repeated keys |
+| `SetTextAt([]byte, []string, int, Text) ([]byte, error)` | Replace one zero-based occurrence while preserving its key spelling and type annotation |
 
 `Entry` has `Line`, `Kind`, `Path`, `Raw`, `Unset`, `Type`, `HasType` and `Form` fields. `Line` identifies the heading or value header, including for a multiline body, counted from the beginning of the file including declarations and the separator. Those declarations do not create entries. `Kind` is either `Heading` or `Value`. A heading alone does not create a value. `Form` is a `ValueForm`: its zero value denotes ordinary single-line handling, `TripleQuoted` is `"triple_quoted"` and `PipeBlock` is `"pipe"`. Preserve `Form` along with `Raw` when retaining or constructing entries; block contents alone must not be inspected to guess the value syntax. For blocks, `Raw` is already stripped of structural markers and margin, and `Unset` is always false, even for an empty body. `Text` holds the decoded `Value string` and `Unset bool`.
 
@@ -192,6 +196,47 @@ The returned `SelectedValue` has these fields:
 Selection performs no new conversion and can return mixed declared types. It preserves unset separately from an explicit empty string. In the example, the prefix's untyped unset occurrence has `Value == ""` and `Unset == true`. `GetAll` instead addresses one exact key and requests a common type; use ordinary retrieval when a selected value needs conversion to a particular requested type.
 
 Matching uses exact decoded elements, including case and Unicode identity. `[]string{"ip", "filter"}` excludes `ip.filters.100099` and `ip."filter.100099"`. An empty prefix (`nil` or `[]string{}`) selects all values, whereas `[]string{""}` selects the explicit empty-name key's own values and descendants. `*` is a literal element rather than a wildcard; its prefix selects that literal key's own values and descendants.
+
+### Writing values to an existing file
+
+`AppendValue` adds one new occurrence to an existing, valid file and preserves
+all its existing bytes. It finds the deepest existing heading whose resolved
+path is a prefix of the target, choosing the last occurrence if that heading
+was redeclared. It inserts the new value at the end of that section, with two
+additional ASCII spaces and a relative key. If no heading matches, it appends
+the fully qualified key at end of file. It does not reorder or deduplicate
+repeated keys. This is a small insertion heuristic for the Go sample, not a
+canonical serialization rule for dotReg.
+
+```go
+source := []byte("@dotReg 0.1\n\nServer.\n  .Port: \"8080\"\n")
+updated, err := dotreg.AppendValue(source, []string{"Server", "Host"}, dotreg.WriteValue{
+    Text: dotreg.Text{Value: "localhost"},
+})
+if err != nil {
+    return err
+}
+```
+
+The appended setting is `  .Host: "localhost"`. If no heading in the file has
+a resolved path that is a prefix of the target, the appended line is a fully
+qualified setting such as `Server.Host: "localhost"`. Key elements containing
+syntax characters are quoted and escaped. Set values are always written as one
+double-quoted single-line value; backslashes, quotes and line breaks are
+escaped. An unset value has an empty right-hand side, while a set empty string
+is written as `""`. An optional `WriteValue.Type` is retained as an opaque type
+expression; writing never performs type conversion. Appending uses the last
+line ending already present (or LF if none is present) and preserves whether
+the original file ended with a line ending.
+
+`SetText` replaces the right-hand side of a key with exactly one occurrence,
+preserving its existing key spelling, type annotation and indentation. It
+appends an untyped occurrence when the key is absent and reports
+`ErrMultipleValues` when the key already occurs more than once. Use `SetTextAt`
+to replace a chosen repeated occurrence. Replacing a block value removes its
+old body and writes the new text as a quoted single-line value. These methods
+write decoded strings; use the consuming application's profile to convert
+typed values to and from their textual representation.
 
 A valid `Config` with no matches returns an empty slice and no error. A nil `*Config` returns `ErrMissing` with line zero. The returned result slice and all full and relative path slices are independent of the supplied prefix, the configuration and other results; editing them cannot change later selections. A custom profile's `Value` follows the same ownership rules as values returned by existing `Config` retrieval methods: mutable objects are not deep-copied. The method name, `SelectedValue` representation and diagnostic details are provisional Go API choices; the format specification defines the shared selection behaviour.
 

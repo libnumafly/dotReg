@@ -19,5 +19,11 @@ Keep the neighbouring `javascript` directory when distributing it; the facade
 does not bundle its engine. The JavaScript CLI and conformance checks also test
 the runtime used by TypeScript.
 
+The typed facade also exports appendValue, setText and setTextAt, together
+with the WriteValue type. These functions share the JavaScript engine's
+source-preserving write policy: follow a matching heading section when
+appending, preserve unrelated text, and use a full key when no heading matches.
+This is sample formatting behavior, not canonical notation.
+
 See [example.mts](example.mts) for checked callback types and repeated values,
 and the [parser set](../README.md) for common contracts.

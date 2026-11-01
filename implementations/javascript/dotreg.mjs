@@ -346,3 +346,228 @@ export function decodeString(entry) {
   if (end !== text.length) fail(line, 'string');
   return { value, unset: false };
 }
+
+/** Append one value occurrence, following the deepest matching heading when present. */
+export async function appendValue(source, path, value) {
+  if (typeof source !== 'string') fail(0, 'input');
+  const entries = await parse(source);
+  return appendParsed(source, entries, path, value);
+}
+
+/** Replace a unique key occurrence, or append an untyped value when it is absent. */
+export async function setText(source, path, text) {
+  if (typeof source !== 'string') fail(0, 'input');
+  const entries = await parse(source);
+  const matches = matchingValues(entries, path);
+  if (matches.length === 0) return appendParsed(source, entries, path, text);
+  if (matches.length > 1) fail(matches[1].line, 'multiple_values');
+  return replaceParsed(source, matches[0], text);
+}
+
+/** Replace one zero-based occurrence of a repeated key. */
+export async function setTextAt(source, path, occurrence, text) {
+  if (typeof source !== 'string') fail(0, 'input');
+  const entries = await parse(source);
+  if (!Array.isArray(path) || path.length === 0 || !Number.isInteger(occurrence) || occurrence < 0)
+    fail(0, 'input');
+  const matches = matchingValues(entries, path);
+  if (occurrence >= matches.length) fail(0, 'missing');
+  return replaceParsed(source, matches[occurrence], text);
+}
+
+async function appendParsed(source, entries, path, value) {
+  if (typeof source !== 'string' || !Array.isArray(path) || path.length === 0 ||
+      !value || typeof value.value !== 'string' || typeof value.unset !== 'boolean' ||
+      (value.unset && value.value !== '') ||
+      (value.type !== undefined && (typeof value.type !== 'string' || value.type === ''))) fail(0, 'input');
+  const key = encodeKeyPath(path);
+  let line = encodeWriteLine(key, value);
+  let insertAt = source.length;
+  const heading = deepestHeadingAncestor(entries, path);
+  let indent = 0;
+  if (heading) {
+    const lines = writerLines(source);
+    const headingLine = lines[heading.line - 1];
+    if (!headingLine) fail(heading.line, 'syntax');
+    indent = leadingSpaces(headingLine.text) + 2;
+    const remainder = line.slice(key.length);
+    const suffix = path.length === heading.path.length ? '' : encodeKeyPath(path.slice(heading.path.length));
+    line = `.${suffix}${remainder}`;
+    insertAt = headingSectionEnd(entries, lines, heading);
+  }
+  if (indent) line = ' '.repeat(indent) + line;
+  const updated = insertSourceLine(source, insertAt, line, lineEndingAt(source, insertAt));
+  await parse(updated);
+  return updated;
+}
+
+async function replaceParsed(source, entry, text) {
+  if (typeof source !== 'string' || !text || typeof text.value !== 'string' ||
+      typeof text.unset !== 'boolean' || (text.unset && text.value !== '')) fail(0, 'input');
+  const lines = writerLines(source);
+  const firstIndex = entry.line - 1;
+  const first = lines[firstIndex];
+  if (!first) fail(entry.line, 'syntax');
+  const lastIndex = entryEndLine(lines, entry);
+  const firstLine = first.text;
+  const separator = valueSeparator(firstLine);
+  if (separator < 0) fail(entry.line, 'syntax');
+  const rhs = text.unset ? '' : ` ${encodeQuotedValue(text.value)}`;
+  const last = lines[lastIndex];
+  const replacement = source.slice(first.start, first.start + separator + 1) + rhs +
+    source.slice(last.contentEnd, last.end);
+  const updated = source.slice(0, first.start) + replacement + source.slice(last.end);
+  await parse(updated);
+  return updated;
+}
+
+function matchingValues(entries, path) {
+  if (!Array.isArray(path) || path.length === 0 || path.some(element => typeof element !== 'string')) fail(0, 'input');
+  return entries.filter(entry => entry.kind === 'value' && samePath(entry.path, path));
+}
+
+function samePath(left, right) {
+  return left.length === right.length && left.every((element, index) => element === right[index]);
+}
+
+function deepestHeadingAncestor(entries, path) {
+  let best = null;
+  for (const entry of entries) {
+    if (entry.kind !== 'heading' || entry.path.length > path.length ||
+        !entry.path.every((element, index) => element === path[index])) continue;
+    if (!best || entry.path.length >= best.path.length) best = entry;
+  }
+  return best;
+}
+
+function encodeWriteLine(key, value) {
+  const annotation = value.type === undefined ? '' : ` (${value.type})`;
+  if (value.unset) return `${key}${annotation}:`;
+  return `${key}${annotation}: ${encodeQuotedValue(value.value)}`;
+}
+
+function encodeKeyPath(path) {
+  if (!Array.isArray(path) || path.length === 0 || path.some(element => typeof element !== 'string')) fail(0, 'input');
+  return path.map(encodeKeyElement).join('.');
+}
+
+function encodeKeyElement(element) {
+  if (!validText(element)) fail(0, 'input');
+  if (element !== '' && !/[.\p{White_Space}\p{Cc}:()#"\\]/u.test(element)) return element;
+  return encodeQuotedValue(element);
+}
+
+function encodeQuotedValue(value) {
+  if (!validText(value)) fail(0, 'input');
+  let result = '"';
+  for (const character of value) {
+    const scalar = character.codePointAt(0);
+    switch (character) {
+      case '"': result += '\\"'; break;
+      case '\\': result += '\\\\'; break;
+      case '\b': result += '\\b'; break;
+      case '\f': result += '\\f'; break;
+      case '\n': result += '\\n'; break;
+      case '\r': result += '\\r'; break;
+      case '\t': result += '\\t'; break;
+      default:
+        result += /\p{Cc}/u.test(character) ? `\\u{${scalar.toString(16)}}` : character;
+    }
+  }
+  return result + '"';
+}
+
+function writerLines(source) {
+  const result = [];
+  for (let start = 0; start < source.length;) {
+    const newline = source.indexOf('\n', start);
+    const end = newline < 0 ? source.length : newline + 1;
+    let contentEnd = newline < 0 ? end : newline;
+    if (contentEnd > start && source[contentEnd - 1] === '\r') contentEnd--;
+    result.push({ text: source.slice(start, contentEnd), start, contentEnd, end });
+    start = end;
+  }
+  return result;
+}
+
+function entryEndLine(lines, entry) {
+  const start = entry.line - 1;
+  if (!lines[start]) fail(entry.line, 'syntax');
+  if (!entry.form) return start;
+  if (entry.form === 'triple_quoted') {
+    for (let i = start + 1; i < lines.length; i++) {
+      const indent = leadingSpaces(lines[i].text);
+      if (lines[i].text.slice(indent).replace(/[ \t]+$/g, '') === '\"\"\"') return i;
+    }
+    fail(entry.line, 'syntax');
+  }
+  if (entry.form === 'pipe') {
+    const parentIndent = leadingSpaces(lines[start].text);
+    let end = start;
+    for (let i = start + 1; i < lines.length; i++) {
+      const indent = leadingSpaces(lines[i].text);
+      if (indent <= parentIndent || indent === lines[i].text.length || lines[i].text[indent] !== '|') break;
+      end = i;
+    }
+    if (end === start) fail(entry.line, 'syntax');
+    return end;
+  }
+  fail(entry.line, 'syntax');
+}
+
+function headingSectionEnd(entries, lines, heading) {
+  const headingIndex = heading.line - 1;
+  const indent = leadingSpaces(lines[headingIndex].text);
+  let insertAt = lines[headingIndex].end;
+  let found = false;
+  for (const entry of entries) {
+    if (!found) {
+      if (entry.kind === 'heading' && entry.line === heading.line) found = true;
+      continue;
+    }
+    const index = entry.line - 1;
+    if (!lines[index] || leadingSpaces(lines[index].text) <= indent) break;
+    const lastIndex = entryEndLine(lines, entry);
+    insertAt = lines[lastIndex].end;
+  }
+  return insertAt;
+}
+
+function valueSeparator(line) {
+  let quotedKey = false, depth = 0;
+  for (let i = 0; i < line.length; i++) {
+    const character = line[i];
+    if (character === '\\' && quotedKey) { i++; continue; }
+    if (character === '"') { quotedKey = !quotedKey; continue; }
+    if (quotedKey) continue;
+    if (character === '(') depth++;
+    else if (character === ')' && depth > 0) depth--;
+    else if (character === ':' && depth === 0) return i;
+  }
+  return -1;
+}
+
+function leadingSpaces(line) {
+  let i = 0;
+  while (line[i] === ' ') i++;
+  return i;
+}
+
+function lineEndingAt(source, offset) {
+  for (let i = Math.max(0, offset); i < source.length; i++) {
+    if (source[i] === '\n') return i > 0 && source[i - 1] === '\r' ? '\r\n' : '\n';
+  }
+  for (let i = Math.min(source.length, offset) - 1; i >= 0; i--) {
+    if (source[i] === '\n') return i > 0 && source[i - 1] === '\r' ? '\r\n' : '\n';
+  }
+  return '\n';
+}
+
+function insertSourceLine(source, offset, line, ending) {
+  const hasPreviousBreak = offset === 0 || source[offset - 1] === '\n';
+  const following = offset < source.length;
+  const endsWithBreak = source.endsWith('\n');
+  const needsFollowingBreak = following || (offset === source.length && endsWithBreak);
+  return source.slice(0, offset) + (hasPreviousBreak ? '' : ending) + line +
+    (needsFollowingBreak ? ending : '') + source.slice(offset);
+}

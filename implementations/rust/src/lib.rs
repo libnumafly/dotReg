@@ -17,6 +17,15 @@ pub struct Entry {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Text { pub value: String, pub unset: bool }
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WriteValue { pub text: Text, pub type_expression: Option<String> }
+
+mod writer;
+pub use writer::{append_value, set_text, set_text_at};
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ParseError { pub line: usize, pub cause: &'static str }
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

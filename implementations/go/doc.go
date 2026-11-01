@@ -16,6 +16,10 @@
 // SelectPrefix selects values at or below a prefix of decoded key elements in
 // global source order, retaining full and relative paths without additional
 // conversion. Each occurrence retains its unset state and type declaration.
+// AppendValue, SetText and SetTextAt provide provisional helpers for writing
+// decoded text values into an existing source document while preserving its
+// other bytes; they do not perform type conversion or define canonical
+// notation.
 //
 // Standard type names and the stable public API are not yet defined.
 // See this sample module's README.md for supported syntax and

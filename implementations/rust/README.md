@@ -2,6 +2,17 @@
 
 An independent Rust 2021 implementation of the [dotReg format](../../docs/config-format.md), using only the standard library. It parses required file declarations, headings, quoted path elements, annotations, repeated occurrences and all three value forms. `decode_string` implements common string decoding; type expressions remain opaque and no type conversion profile is supplied.
 
+## Updating source text
+
+The library exports append_value, set_text and set_text_at. They take a source
+string and decoded key elements and return a modified string. Appending follows
+the deepest existing matching heading with two additional spaces and a
+relative key; when no heading matches, it appends a fully qualified key.
+set_text replaces a unique occurrence or appends when absent. set_text_at
+selects a zero-based repeated occurrence. Set values use escaped,
+double-quoted single-line syntax. The helpers preserve other source text and
+do not perform type conversion.
+
 ## Build and check
 
 Use a current stable Rust toolchain:

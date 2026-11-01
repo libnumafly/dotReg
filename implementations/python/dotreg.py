@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+import io
 import json
 import sys
 import unicodedata
@@ -37,6 +38,18 @@ class Entry:
         if self.form:
             result["form"] = self.form
         return result
+
+
+@dataclass(frozen=True, slots=True)
+class Text:
+    value: str
+    unset: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class WriteValue:
+    text: Text
+    type: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -437,6 +450,248 @@ def decode_string(entry: Entry) -> str:
     if end != len(raw):
         fail()
     return value
+
+
+def append_value(source: str, path: list[str], value: WriteValue) -> str:
+    """Append one occurrence, following the deepest matching heading if present."""
+    entries = _parse_text(source)
+    return _append_parsed(source, entries, path, value)
+
+
+def set_text(source: str, path: list[str], text: Text) -> str:
+    """Replace a unique occurrence or append an untyped value when absent."""
+    entries = _parse_text(source)
+    matches = _matching_values(entries, path)
+    if not matches:
+        return _append_parsed(source, entries, path, WriteValue(text))
+    if len(matches) > 1:
+        raise ParseError(matches[1].line, "multiple values")
+    return _replace_text(source, matches[0], text)
+
+
+def set_text_at(source: str, path: list[str], occurrence: int, text: Text) -> str:
+    """Replace one zero-based occurrence of a repeated key."""
+    entries = _parse_text(source)
+    if not isinstance(occurrence, int) or isinstance(occurrence, bool) or occurrence < 0:
+        raise ParseError(0, "input")
+    matches = _matching_values(entries, path)
+    if occurrence >= len(matches):
+        raise ParseError(0, "missing")
+    return _replace_text(source, matches[occurrence], text)
+
+
+def _parse_text(source: str) -> list[Entry]:
+    if not isinstance(source, str):
+        raise ParseError(0, "input")
+    try:
+        data = source.encode("utf-8", "strict")
+    except UnicodeEncodeError:
+        raise ParseError(0, "input") from None
+    return parse(io.BytesIO(data))
+
+
+def _validate_path(path: list[str]) -> None:
+    if not isinstance(path, list) or not path or any(not isinstance(part, str) for part in path):
+        raise ParseError(0, "input")
+    try:
+        for part in path:
+            part.encode("utf-8", "strict")
+    except UnicodeEncodeError:
+        raise ParseError(0, "input") from None
+
+
+def _matching_values(entries: list[Entry], path: list[str]) -> list[Entry]:
+    _validate_path(path)
+    return [entry for entry in entries if entry.kind == "value" and entry.path == path]
+
+
+def _append_parsed(source: str, entries: list[Entry], path: list[str], value: WriteValue) -> str:
+    _validate_path(path)
+    if (not isinstance(value, WriteValue) or not isinstance(value.text, Text) or
+            not isinstance(value.text.value, str) or not isinstance(value.text.unset, bool) or
+            (value.text.unset and value.text.value != "") or
+            (value.type is not None and (not isinstance(value.type, str) or not value.type))):
+        raise ParseError(0, "input")
+    key = _encode_key_path(path)
+    line = _encode_write_line(key, value)
+    insert_at, indent = len(source), 0
+    heading = _deepest_heading_ancestor(entries, path)
+    if heading is not None:
+        lines = _writer_lines(source)
+        heading_line = lines[heading.line - 1]
+        indent = _leading_spaces(heading_line[0]) + 2
+        suffix = "" if len(path) == len(heading.path) else _encode_key_path(path[len(heading.path):])
+        line = "." + suffix + line[len(key):]
+        insert_at = _heading_section_end(entries, lines, heading)
+    line = " " * indent + line
+    updated = _insert_source_line(source, insert_at, line, _line_ending_at(source, insert_at))
+    _parse_text(updated)
+    return updated
+
+
+def _replace_text(source: str, entry: Entry, text: Text) -> str:
+    if (not isinstance(text, Text) or not isinstance(text.value, str) or
+            not isinstance(text.unset, bool) or (text.unset and text.value != "")):
+        raise ParseError(0, "input")
+    try:
+        text.value.encode("utf-8", "strict")
+    except UnicodeEncodeError:
+        raise ParseError(0, "input") from None
+    lines = _writer_lines(source)
+    start_index = entry.line - 1
+    if start_index >= len(lines):
+        raise ParseError(entry.line)
+    end_index = _entry_end_line(lines, entry)
+    first = lines[start_index]
+    separator = _value_separator(first[0])
+    if separator < 0:
+        raise ParseError(entry.line)
+    rhs = "" if text.unset else " " + _encode_quoted_value(text.value)
+    last = lines[end_index]
+    replacement = source[first[1]:first[1] + separator + 1] + rhs + source[last[2]:last[3]]
+    updated = source[:first[1]] + replacement + source[last[3]:]
+    _parse_text(updated)
+    return updated
+
+
+def _deepest_heading_ancestor(entries: list[Entry], path: list[str]) -> Entry | None:
+    best = None
+    for entry in entries:
+        if entry.kind != "heading" or len(entry.path) > len(path):
+            continue
+        if entry.path == path[:len(entry.path)] and (best is None or len(entry.path) >= len(best.path)):
+            best = entry
+    return best
+
+
+def _encode_write_line(key: str, value: WriteValue) -> str:
+    type_part = "" if value.type is None else f" ({value.type})"
+    if value.text.unset:
+        return key + type_part + ":"
+    return key + type_part + ": " + _encode_quoted_value(value.text.value)
+
+
+def _encode_key_path(path: list[str]) -> str:
+    return ".".join(_encode_key_element(part) for part in path)
+
+
+def _encode_key_element(part: str) -> str:
+    if (part and "." not in part and not any(
+            _white(char) or unicodedata.category(char) == "Cc" or char in ':()#"\\'
+            for char in part)):
+        return part
+    return _encode_quoted_value(part)
+
+
+def _encode_quoted_value(value: str) -> str:
+    result = ['"']
+    for char in value:
+        scalar = ord(char)
+        if char == '"': result.append('\\"')
+        elif char == "\\": result.append("\\\\")
+        elif char == "\b": result.append("\\b")
+        elif char == "\f": result.append("\\f")
+        elif char == "\n": result.append("\\n")
+        elif char == "\r": result.append("\\r")
+        elif char == "\t": result.append("\\t")
+        elif unicodedata.category(char) == "Cc": result.append(f"\\u{{{scalar:x}}}")
+        else: result.append(char)
+    result.append('"')
+    return "".join(result)
+
+
+def _writer_lines(source: str) -> list[tuple[str, int, int, int]]:
+    lines, start = [], 0
+    while start < len(source):
+        newline = source.find("\n", start)
+        end = len(source) if newline < 0 else newline + 1
+        content_end = end if newline < 0 else newline
+        if content_end > start and source[content_end - 1] == "\r":
+            content_end -= 1
+        lines.append((source[start:content_end], start, content_end, end))
+        start = end
+    return lines
+
+
+def _entry_end_line(lines: list[tuple[str, int, int, int]], entry: Entry) -> int:
+    start = entry.line - 1
+    if start < 0 or start >= len(lines):
+        raise ParseError(entry.line)
+    if not entry.form:
+        return start
+    if entry.form == "triple_quoted":
+        for index in range(start + 1, len(lines)):
+            text = lines[index][0]
+            indent = _leading_spaces(text)
+            if text[indent:].rstrip(" \t") == '"""':
+                return index
+        raise ParseError(entry.line)
+    if entry.form == "pipe":
+        parent_indent = _leading_spaces(lines[start][0])
+        end = start
+        for index in range(start + 1, len(lines)):
+            text = lines[index][0]
+            indent = _leading_spaces(text)
+            if indent <= parent_indent or indent == len(text) or text[indent] != "|":
+                break
+            end = index
+        if end == start:
+            raise ParseError(entry.line)
+        return end
+    raise ParseError(entry.line)
+
+
+def _heading_section_end(entries: list[Entry], lines: list[tuple[str, int, int, int]], heading: Entry) -> int:
+    heading_index = heading.line - 1
+    indent = _leading_spaces(lines[heading_index][0])
+    insert_at, found = lines[heading_index][3], False
+    for entry in entries:
+        if not found:
+            if entry.kind == "heading" and entry.line == heading.line:
+                found = True
+            continue
+        index = entry.line - 1
+        if _leading_spaces(lines[index][0]) <= indent:
+            break
+        insert_at = lines[_entry_end_line(lines, entry)][3]
+    return insert_at
+
+
+def _value_separator(line: str) -> int:
+    quoted, depth, index = False, 0, 0
+    while index < len(line):
+        char = line[index]
+        if char == "\\" and quoted:
+            index += 2
+            continue
+        if char == '"':
+            quoted = not quoted
+        elif not quoted:
+            if char == "(": depth += 1
+            elif char == ")" and depth: depth -= 1
+            elif char == ":" and depth == 0: return index
+        index += 1
+    return -1
+
+
+def _leading_spaces(line: str) -> int:
+    return len(line) - len(line.lstrip(" "))
+
+
+def _line_ending_at(source: str, offset: int) -> str:
+    index = source.find("\n", max(0, offset))
+    if index < 0:
+        index = source.rfind("\n", 0, min(len(source), offset))
+    return "\r\n" if index > 0 and source[index - 1] == "\r" else "\n"
+
+
+def _insert_source_line(source: str, offset: int, line: str, ending: str) -> str:
+    previous_break = offset == 0 or source[offset - 1] == "\n"
+    following = offset < len(source)
+    final_break = source.endswith("\n")
+    needs_following_break = following or (offset == len(source) and final_break)
+    return (source[:offset] + ("" if previous_break else ending) + line +
+            (ending if needs_following_break else "") + source[offset:])
 
 
 def main() -> int:

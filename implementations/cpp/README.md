@@ -2,6 +2,18 @@
 
 An independent C++17 implementation of the [dotReg format](../../docs/config-format.md), using only the standard library. The header-only `dotreg.hpp` provides syntax processing and common string decoding. It covers required file properties, heading resolution, decoded key element boundaries, opaque type annotations, repeated values, UTF-8 validation and all three value forms. It does not supply a type conversion profile.
 
+## Updating source text
+
+The header provides append_value, set_text and set_text_at. They accept a source
+string and decoded key elements. Appending inserts beneath the deepest existing
+heading whose path is a prefix of the target, using two additional spaces and a
+relative key. Without such a heading it appends a fully qualified key.
+set_text replaces a unique occurrence or appends when absent; set_text_at
+selects a zero-based repeated occurrence. Existing unrelated bytes, line
+endings and final-newline state are preserved. Set values are written as
+escaped, double-quoted single-line values. Type conversion is left to the
+application.
+
 ## Build and check
 
 From the repository root, use a C++17 compiler:

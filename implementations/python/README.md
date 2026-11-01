@@ -48,6 +48,15 @@ cannot change later resolution. `decode_string(entry)` returns a string while
 `entry.unset` distinguishes an unset value from an explicit empty string. The
 function never interprets an annotation as permission to skip common decoding.
 
+The module also exports Text, WriteValue, append_value, set_text and
+set_text_at. These helpers accept and return a complete source string. An
+append follows the deepest existing matching heading with two more spaces and
+a relative key. If no heading path is a prefix of the target, it writes a fully
+qualified key at the end. set_text replaces a unique occurrence or appends
+when absent; set_text_at selects a zero-based repeated occurrence. New set
+values are escaped, double-quoted single-line strings. Unrelated source text is
+preserved, and type conversion is left to the application.
+
 The visitor keeps an 8 KiB byte buffer, active heading suffixes, the current
 physical line and, when needed, a block body plus one boundary line. UTF-8 and
 line endings are validated per physical line, with boundary lookahead validation

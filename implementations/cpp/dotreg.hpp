@@ -1,9 +1,11 @@
 #ifndef DOTREG_SAMPLE_HPP
 #define DOTREG_SAMPLE_HPP
 
+#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <istream>
+#include <sstream>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -20,6 +22,8 @@ struct Entry {
     bool unset = false, has_type = false;
     std::string type_expression, form;
 };
+struct Text { std::string value; bool unset = false; };
+struct WriteValue { Text text; std::optional<std::string> type_expression; };
 struct ParseError : std::runtime_error {
     std::size_t line;
     explicit ParseError(std::size_t position, const char* cause = "invalid syntax")
@@ -335,6 +339,226 @@ inline std::string decode_string(const Entry& e) {
     std::string result;
     if (detail::quoted(raw, 0, e.line, &result) != raw.size()) throw ParseError(e.line, "invalid string");
     return result;
+}
+namespace detail {
+struct WriterLine { std::string_view text; std::size_t start, content_end, end; };
+inline std::vector<WriterLine> writer_lines(const std::string& source) {
+    std::vector<WriterLine> lines;
+    for (std::size_t start = 0; start < source.size();) {
+        auto newline = source.find('\n', start);
+        auto end = newline == source.npos ? source.size() : newline + 1;
+        auto content_end = newline == source.npos ? end : newline;
+        if (content_end > start && source[content_end - 1] == '\r') --content_end;
+        lines.push_back({std::string_view(source).substr(start, content_end - start), start, content_end, end});
+        start = end;
+    }
+    return lines;
+}
+inline std::size_t line_ending_at(const std::string& source, std::size_t offset) {
+    auto newline = source.find('\n', std::min(offset, source.size()));
+    if (newline == source.npos) {
+        auto before = std::min(offset, source.size());
+        if (before) newline = source.rfind('\n', before - 1);
+    }
+    return newline != source.npos && newline > 0 && source[newline - 1] == '\r' ? 2 : 1;
+}
+inline std::string ending_text(const std::string& source, std::size_t offset) {
+    return line_ending_at(source, offset) == 2 ? "\r\n" : "\n";
+}
+inline std::size_t leading_spaces(std::string_view text) {
+    std::size_t i = 0;
+    while (i < text.size() && text[i] == ' ') ++i;
+    return i;
+}
+inline std::size_t value_separator(std::string_view line) {
+    bool quoted_key = false;
+    int depth = 0;
+    for (std::size_t i = 0; i < line.size(); ++i) {
+        if (line[i] == '\\' && quoted_key) { ++i; continue; }
+        if (line[i] == '"') { quoted_key = !quoted_key; continue; }
+        if (quoted_key) continue;
+        if (line[i] == '(') ++depth;
+        else if (line[i] == ')' && depth > 0) --depth;
+        else if (line[i] == ':' && depth == 0) return i;
+    }
+    return line.npos;
+}
+inline std::size_t entry_end_line(const std::vector<WriterLine>& lines, const Entry& entry) {
+    auto start = entry.line - 1;
+    if (start >= lines.size()) throw ParseError(entry.line);
+    if (entry.form.empty()) return start;
+    if (entry.form == "triple_quoted") {
+        for (std::size_t i = start + 1; i < lines.size(); ++i) {
+            auto text = lines[i].text;
+            auto margin = leading_spaces(text);
+            if (right_trim(text.substr(margin)) == "\"\"\"") return i;
+        }
+        throw ParseError(entry.line);
+    }
+    if (entry.form == "pipe") {
+        auto parent = leading_spaces(lines[start].text), end = start;
+        for (std::size_t i = start + 1; i < lines.size(); ++i) {
+            auto text = lines[i].text;
+            auto indent = leading_spaces(text);
+            if (indent <= parent || indent == text.size() || text[indent] != '|') break;
+            end = i;
+        }
+        if (end == start) throw ParseError(entry.line);
+        return end;
+    }
+    throw ParseError(entry.line);
+}
+inline std::size_t heading_section_end(const std::vector<Entry>& entries,
+                                       const std::vector<WriterLine>& lines, const Entry& heading) {
+    auto heading_index = heading.line - 1;
+    auto indent = leading_spaces(lines[heading_index].text), insert_at = lines[heading_index].end;
+    bool found = false;
+    for (const auto& entry : entries) {
+        if (!found) {
+            if (entry.kind == "heading" && entry.line == heading.line) found = true;
+            continue;
+        }
+        auto index = entry.line - 1;
+        if (leading_spaces(lines[index].text) <= indent) break;
+        insert_at = lines[entry_end_line(lines, entry)].end;
+    }
+    return insert_at;
+}
+inline bool same_path(const std::vector<std::string>& left, const std::vector<std::string>& right) {
+    return left == right;
+}
+inline bool prefix_path(const std::vector<std::string>& path, const std::vector<std::string>& prefix) {
+    return prefix.size() <= path.size() && std::equal(prefix.begin(), prefix.end(), path.begin());
+}
+inline std::string hex_scalar(std::uint32_t value) {
+    static constexpr char digits[] = "0123456789abcdef";
+    char buffer[8]; std::size_t count = 0;
+    do { buffer[count++] = digits[value & 15]; value >>= 4; } while (value);
+    std::string result;
+    while (count) result.push_back(buffer[--count]);
+    return result;
+}
+inline std::string encode_quoted(std::string_view value) {
+    std::string result = "\"";
+    for (std::size_t i = 0; i < value.size();) {
+        auto start = i;
+        auto c = scalar(value, i, 0);
+        switch (c) {
+        case '"': result += "\\\""; break;
+        case '\\': result += "\\\\"; break;
+        case '\b': result += "\\b"; break;
+        case '\f': result += "\\f"; break;
+        case '\n': result += "\\n"; break;
+        case '\r': result += "\\r"; break;
+        case '\t': result += "\\t"; break;
+        default:
+            if (c <= 31 || (c >= 127 && c <= 159)) result += "\\u{" + hex_scalar(c) + "}";
+            else result.append(value.substr(start, i - start));
+        }
+    }
+    result.push_back('"');
+    return result;
+}
+inline std::string encode_key_element(std::string_view element) {
+    bool plain = !element.empty();
+    for (std::size_t i = 0; plain && i < element.size();) {
+        auto c = scalar(element, i, 0);
+        if (c == '.' || whitespace(c) || c <= 31 || (c >= 127 && c <= 159) ||
+            (c < 128 && std::string_view(":()#\"\\").find(static_cast<char>(c)) != std::string_view::npos))
+            plain = false;
+    }
+    return plain ? std::string(element) : encode_quoted(element);
+}
+inline std::string encode_path(const std::vector<std::string>& path) {
+    if (path.empty()) throw ParseError(0, "input");
+    std::string result;
+    for (std::size_t i = 0; i < path.size(); ++i) {
+        if (i) result.push_back('.');
+        result += encode_key_element(path[i]);
+    }
+    return result;
+}
+inline std::string insert_source_line(const std::string& source, std::size_t offset,
+                                      const std::string& line, const std::string& ending) {
+    bool previous_break = offset == 0 || source[offset - 1] == '\n';
+    bool following = offset < source.size(), final_break = !source.empty() && source.back() == '\n';
+    bool add_after = following || (offset == source.size() && final_break);
+    return source.substr(0, offset) + (previous_break ? "" : ending) + line +
+        (add_after ? ending : "") + source.substr(offset);
+}
+inline std::vector<Entry> parse_source(const std::string& source) {
+    std::istringstream input(source);
+    return parse(input);
+}
+inline std::vector<Entry> matching_values(const std::vector<Entry>& entries,
+                                          const std::vector<std::string>& path) {
+    if (path.empty()) throw ParseError(0, "input");
+    std::vector<Entry> matches;
+    for (const auto& entry : entries)
+        if (entry.kind == "value" && same_path(entry.path, path)) matches.push_back(entry);
+    return matches;
+}
+inline std::string append_parsed(const std::string& source, const std::vector<Entry>& entries,
+                                 const std::vector<std::string>& path, const WriteValue& value) {
+    if (path.empty() || (value.text.unset && !value.text.value.empty()) ||
+        (value.type_expression && value.type_expression->empty())) throw ParseError(0, "input");
+    auto key = encode_path(path);
+    std::string line = key;
+    if (value.type_expression) line += " (" + *value.type_expression + ")";
+    line += ":";
+    if (!value.text.unset) line += " " + encode_quoted(value.text.value);
+    std::size_t insert_at = source.size(), indent = 0;
+    const Entry* heading = nullptr;
+    for (const auto& entry : entries)
+        if (entry.kind == "heading" && prefix_path(path, entry.path) &&
+            (!heading || entry.path.size() >= heading->path.size())) heading = &entry;
+    if (heading) {
+        auto lines = writer_lines(source);
+        indent = leading_spaces(lines[heading->line - 1].text) + 2;
+        auto suffix = path.size() == heading->path.size() ? std::string{} :
+            encode_path(std::vector<std::string>(path.begin() + heading->path.size(), path.end()));
+        line = "." + suffix + line.substr(key.size());
+        insert_at = heading_section_end(entries, lines, *heading);
+    }
+    line.insert(0, indent, ' ');
+    auto updated = insert_source_line(source, insert_at, line, ending_text(source, insert_at));
+    (void)parse_source(updated);
+    return updated;
+}
+inline std::string replace_text(const std::string& source, const Entry& entry, const Text& text) {
+    if (text.unset && !text.value.empty()) throw ParseError(0, "input");
+    auto lines = writer_lines(source);
+    auto start = entry.line - 1;
+    auto end = entry_end_line(lines, entry);
+    auto separator = value_separator(lines[start].text);
+    if (separator == std::string_view::npos) throw ParseError(entry.line);
+    std::string rhs = text.unset ? "" : " " + encode_quoted(text.value);
+    const auto& first = lines[start]; const auto& last = lines[end];
+    auto replacement = source.substr(first.start, separator + 1) + rhs +
+        source.substr(last.content_end, last.end - last.content_end);
+    auto updated = source.substr(0, first.start) + replacement + source.substr(last.end);
+    (void)parse_source(updated);
+    return updated;
+}
+} // namespace detail
+inline std::string append_value(const std::string& source, const std::vector<std::string>& path,
+                                const WriteValue& value) {
+    auto entries = detail::parse_source(source);
+    return detail::append_parsed(source, entries, path, value);
+}
+inline std::string set_text(const std::string& source, const std::vector<std::string>& path, const Text& text) {
+    auto entries = detail::parse_source(source);
+    auto matches = detail::matching_values(entries, path);
+    if (matches.empty()) return detail::append_parsed(source, entries, path, WriteValue{text, std::nullopt});
+    if (matches.size() > 1) throw ParseError(matches[1].line, "multiple values");
+    return detail::replace_text(source, matches[0], text);
+}
+inline std::string set_text_at(const std::string& source, const std::vector<std::string>& path,
+                               std::size_t occurrence, const Text& text) {
+    auto entries = detail::parse_source(source);
+    auto matches = detail::matching_values(entries, path);
+    if (occurrence >= matches.size()) throw ParseError(0, "missing");
+    return detail::replace_text(source, matches[occurrence], text);
 }
 inline void json_string(std::string_view s, std::string& out) {
     static constexpr char hex[] = "0123456789abcdef"; out += '"';

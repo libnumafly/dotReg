@@ -59,6 +59,16 @@ decoding step. `Entry.Path` is a separate array on each notification, so mutatin
 it cannot alter subsequent heading resolution. Compare complete element sequences
 to identify keys; joining elements with dots loses their boundaries.
 
+## Updating source text
+
+Writer.AppendValue, Writer.SetText and Writer.SetTextAt edit a valid source
+string while preserving unrelated text. Appending follows the deepest existing
+matching heading with two more spaces and a relative key. If no heading path is
+a prefix of the target, it uses a fully qualified key at end of file.
+SetText replaces a unique occurrence or appends when absent; SetTextAt selects
+a zero-based repeated occurrence. Values are written as escaped, quoted
+single-line strings. Type conversion remains the application's responsibility.
+
 ## Memory and work
 
 The parser scans the input once using a 32 KiB byte buffer. It validates UTF-8

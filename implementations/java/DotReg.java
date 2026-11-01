@@ -34,6 +34,10 @@ public final class DotReg {
         }
     }
 
+    public record Text(String value, boolean unset) {}
+    /** A new setting's text and optional opaque type expression. */
+    public record WriteValue(Text text, String type) {}
+
     @FunctionalInterface
     public interface Visitor {
         /** Return false to stop successfully; thrown exceptions pass unchanged. */
@@ -452,6 +456,240 @@ public final class DotReg {
             if (quoted(raw, 0, decoded) != raw.length()) throw new IllegalArgumentException();
         } catch (IllegalArgumentException error) { throw problem(entry.line, "string decoding"); }
         return decoded.toString();
+    }
+
+    /** Append an occurrence under the deepest matching heading, or as a full key. */
+    public static String appendValue(String source, List<String> path, WriteValue value) throws Exception {
+        List<Entry> entries = parseText(source);
+        return appendParsed(source, entries, path, value);
+    }
+
+    /** Replace a unique occurrence, or append an untyped setting when absent. */
+    public static String setText(String source, List<String> path, Text text) throws Exception {
+        List<Entry> entries = parseText(source);
+        List<Entry> matches = matchingValues(entries, path);
+        if (matches.isEmpty()) return appendParsed(source, entries, path, new WriteValue(text, null));
+        if (matches.size() > 1) throw problem(matches.get(1).line, "multiple values");
+        return replaceText(source, matches.get(0), text);
+    }
+
+    /** Replace one zero-based occurrence of a repeated key. */
+    public static String setTextAt(String source, List<String> path, int occurrence, Text text) throws Exception {
+        List<Entry> entries = parseText(source);
+        if (occurrence < 0) throw problem(0, "input");
+        List<Entry> matches = matchingValues(entries, path);
+        if (occurrence >= matches.size()) throw problem(0, "missing");
+        return replaceText(source, matches.get(occurrence), text);
+    }
+
+    private static List<Entry> parseText(String source) throws Exception {
+        if (source == null || !validScalars(source)) throw problem(0, "input");
+        return parse(new java.io.ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static List<Entry> matchingValues(List<Entry> entries, List<String> path) throws ParseException {
+        validatePath(path);
+        List<Entry> matches = new ArrayList<>();
+        for (Entry entry : entries)
+            if (entry.kind.equals("value") && entry.path.equals(path)) matches.add(entry);
+        return matches;
+    }
+
+    private static void validatePath(List<String> path) throws ParseException {
+        if (path == null || path.isEmpty()) throw problem(0, "input");
+        for (String part : path)
+            if (part == null || !validScalars(part)) throw problem(0, "input");
+    }
+
+    private static String appendParsed(String source, List<Entry> entries, List<String> path,
+                                       WriteValue value) throws Exception {
+        validatePath(path);
+        if (value == null || value.text == null || value.text.value == null ||
+                !validScalars(value.text.value) || value.text.unset && !value.text.value.isEmpty() ||
+                value.type != null && (value.type.isEmpty() || !validScalars(value.type)))
+            throw problem(0, "input");
+        String key = encodeKeyPath(path);
+        String line = encodeWriteLine(key, value);
+        int insertAt = source.length(), indent = 0;
+        Entry heading = deepestHeadingAncestor(entries, path);
+        if (heading != null) {
+            List<SourceLine> lines = writerLines(source);
+            indent = spaces(lines.get(heading.line - 1).text) + 2;
+            String suffix = path.size() == heading.path.size() ? "" :
+                    encodeKeyPath(path.subList(heading.path.size(), path.size()));
+            line = "." + suffix + line.substring(key.length());
+            insertAt = headingSectionEnd(entries, lines, heading);
+        }
+        line = " ".repeat(indent) + line;
+        String updated = insertSourceLine(source, insertAt, line, lineEndingAt(source, insertAt));
+        parseText(updated);
+        return updated;
+    }
+
+    private static String replaceText(String source, Entry entry, Text text) throws Exception {
+        if (text == null || text.value == null || !validScalars(text.value) ||
+                text.unset && !text.value.isEmpty()) throw problem(0, "input");
+        List<SourceLine> lines = writerLines(source);
+        int start = entry.line - 1;
+        if (start < 0 || start >= lines.size()) throw problem(entry.line, "syntax");
+        int end = entryEndLine(lines, entry);
+        SourceLine first = lines.get(start), last = lines.get(end);
+        int separator = valueSeparator(first.text);
+        if (separator < 0) throw problem(entry.line, "syntax");
+        String rhs = text.unset ? "" : " " + encodeQuotedValue(text.value);
+        String replacement = source.substring(first.start, first.start + separator + 1) + rhs +
+                source.substring(last.contentEnd, last.end);
+        String updated = source.substring(0, first.start) + replacement + source.substring(last.end);
+        parseText(updated);
+        return updated;
+    }
+
+    private static Entry deepestHeadingAncestor(List<Entry> entries, List<String> path) {
+        Entry best = null;
+        for (Entry entry : entries) {
+            if (!entry.kind.equals("heading") || entry.path.size() > path.size() ||
+                    !path.subList(0, entry.path.size()).equals(entry.path)) continue;
+            if (best == null || entry.path.size() >= best.path.size()) best = entry;
+        }
+        return best;
+    }
+
+    private static String encodeWriteLine(String key, WriteValue value) {
+        String type = value.type == null ? "" : " (" + value.type + ")";
+        if (value.text.unset) return key + type + ":";
+        return key + type + ": " + encodeQuotedValue(value.text.value);
+    }
+
+    private static String encodeKeyPath(List<String> path) throws ParseException {
+        validatePath(path);
+        StringBuilder result = new StringBuilder();
+        for (String element : path) {
+            if (result.length() > 0) result.append('.');
+            result.append(encodeKeyElement(element));
+        }
+        return result.toString();
+    }
+
+    private static String encodeKeyElement(String element) {
+        boolean plain = !element.isEmpty();
+        for (int offset = 0; plain && offset < element.length();) {
+            int c = element.codePointAt(offset);
+            if (c == '.' || white(c) || Character.getType(c) == Character.CONTROL ||
+                    c == ':' || c == '(' || c == ')' || c == '#' || c == '"' || c == '\\') plain = false;
+            offset += Character.charCount(c);
+        }
+        return plain ? element : encodeQuotedValue(element);
+    }
+
+    private static String encodeQuotedValue(String value) {
+        StringBuilder result = new StringBuilder("\"");
+        value.codePoints().forEach(c -> {
+            switch (c) {
+                case '"' -> result.append("\\\"");
+                case '\\' -> result.append("\\\\");
+                case '\b' -> result.append("\\b");
+                case '\f' -> result.append("\\f");
+                case '\n' -> result.append("\\n");
+                case '\r' -> result.append("\\r");
+                case '\t' -> result.append("\\t");
+                default -> {
+                    if (Character.getType(c) == Character.CONTROL)
+                        result.append("\\u{").append(Integer.toHexString(c)).append('}');
+                    else result.appendCodePoint(c);
+                }
+            }
+        });
+        return result.append('"').toString();
+    }
+
+    private record SourceLine(String text, int start, int contentEnd, int end) {}
+
+    private static List<SourceLine> writerLines(String source) {
+        List<SourceLine> result = new ArrayList<>();
+        for (int start = 0; start < source.length();) {
+            int newline = source.indexOf('\n', start);
+            int end = newline < 0 ? source.length() : newline + 1;
+            int contentEnd = newline < 0 ? end : newline;
+            if (contentEnd > start && source.charAt(contentEnd - 1) == '\r') contentEnd--;
+            result.add(new SourceLine(source.substring(start, contentEnd), start, contentEnd, end));
+            start = end;
+        }
+        return result;
+    }
+
+    private static int entryEndLine(List<SourceLine> lines, Entry entry) throws ParseException {
+        int start = entry.line - 1;
+        if (start < 0 || start >= lines.size()) throw problem(entry.line, "syntax");
+        if (entry.form.isEmpty()) return start;
+        if (entry.form.equals("triple_quoted")) {
+            for (int i = start + 1; i < lines.size(); i++) {
+                String text = lines.get(i).text;
+                int indent = spaces(text);
+                if (trimRight(text.substring(indent)).equals("\"\"\"")) return i;
+            }
+            throw problem(entry.line, "syntax");
+        }
+        if (entry.form.equals("pipe")) {
+            int parentIndent = spaces(lines.get(start).text), end = start;
+            for (int i = start + 1; i < lines.size(); i++) {
+                String text = lines.get(i).text;
+                int indent = spaces(text);
+                if (indent <= parentIndent || indent == text.length() || text.charAt(indent) != '|') break;
+                end = i;
+            }
+            if (end == start) throw problem(entry.line, "syntax");
+            return end;
+        }
+        throw problem(entry.line, "syntax");
+    }
+
+    private static int headingSectionEnd(List<Entry> entries, List<SourceLine> lines,
+                                         Entry heading) throws ParseException {
+        int headingIndex = heading.line - 1;
+        int indent = spaces(lines.get(headingIndex).text), insertAt = lines.get(headingIndex).end;
+        boolean found = false;
+        for (Entry entry : entries) {
+            if (!found) {
+                if (entry.kind.equals("heading") && entry.line == heading.line) found = true;
+                continue;
+            }
+            int index = entry.line - 1;
+            if (spaces(lines.get(index).text) <= indent) break;
+            insertAt = lines.get(entryEndLine(lines, entry)).end;
+        }
+        return insertAt;
+    }
+
+    private static int valueSeparator(String line) {
+        boolean quoted = false;
+        int depth = 0;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '\\' && quoted) { i++; continue; }
+            if (c == '"') { quoted = !quoted; continue; }
+            if (quoted) continue;
+            if (c == '(') depth++;
+            else if (c == ')' && depth > 0) depth--;
+            else if (c == ':' && depth == 0) return i;
+        }
+        return -1;
+    }
+
+    private static int leadingSpaces(String line) { return spaces(line); }
+
+    private static String lineEndingAt(String source, int offset) {
+        int newline = source.indexOf('\n', Math.max(0, offset));
+        if (newline < 0) newline = source.lastIndexOf('\n', Math.min(source.length(), offset) - 1);
+        return newline > 0 && source.charAt(newline - 1) == '\r' ? "\r\n" : "\n";
+    }
+
+    private static String insertSourceLine(String source, int offset, String line, String ending) {
+        boolean previousBreak = offset == 0 || source.charAt(offset - 1) == '\n';
+        boolean following = offset < source.length();
+        boolean finalBreak = source.endsWith("\n");
+        boolean needsFollowingBreak = following || offset == source.length() && finalBreak;
+        return source.substring(0, offset) + (previousBreak ? "" : ending) + line +
+                (needsFollowingBreak ? ending : "") + source.substring(offset);
     }
 
     private static boolean validScalars(String text) {
