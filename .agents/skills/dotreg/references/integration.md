@@ -1,7 +1,7 @@
 # Integrating dotReg into an application
 
 Use the target application's existing dotReg library where available. The
-upstream [sample set](https://github.com/libnumafly/dotReg/tree/4aca4adba1cdc4c523d3e07b91a64403de4f8f68/implementations)
+upstream [sample set](https://github.com/libnumafly/dotReg/tree/2c76ec3d88224c30fad42608dd02a615bd8bfe5c/implementations)
 contains Go, Python, JavaScript, TypeScript, Java, C#, Rust and C++ implementations
 with library APIs and CLIs. TypeScript shares the JavaScript engine. Read the
 selected language's guide and source before depending on its API or build steps.
@@ -45,6 +45,48 @@ path expansion, cross-file merging, JSON array/object parsing or implicit
 concatenation. Implement such application features only when requested, with
 their own explicit rules.
 
+## Editing existing source
+
+Use the application's existing writer when it meets the task. The sample
+implementations also provide helpers that return updated source:
+
+| Language | Append an occurrence | Set a unique occurrence | Set one occurrence |
+|---|---|---|---|
+| Go | `AppendValue` | `SetText` | `SetTextAt` |
+| JavaScript / TypeScript | `appendValue` | `setText` | `setTextAt` |
+| Python, Rust, C++ | `append_value` | `set_text` | `set_text_at` |
+| Java | `DotReg.appendValue` | `DotReg.setText` | `DotReg.setTextAt` |
+| C# | `Writer.AppendValue` | `Writer.SetText` | `Writer.SetTextAt` |
+
+These are sample APIs, not a standard serializer. Signatures and error types
+vary by language; read the selected language's guide. Pass a decoded sequence
+of key elements, retaining dots and empty names within their elements.
+
+Appending chooses the deepest existing heading whose resolved path is a prefix
+of the target, preferring the last occurrence of that heading. It inserts a
+relative value line at the end of that section, indented by two more ASCII
+spaces than the heading. If no heading matches, it appends a fully qualified
+key at the end of the file. It preserves existing source text and occurrences,
+including identical repetitions. If the same key occurs later elsewhere in
+the file, the new occurrence can precede it; check the resulting order when an
+application requires the new occurrence to be last globally.
+
+The unique setter replaces an existing value or appends an untyped value if
+absent. It reports multiple occurrences as an error. The indexed setter
+replaces the chosen zero-based occurrence and reports a missing index. An
+existing key's spelling, indentation and type annotation are preserved. Set
+values are written as quoted single-line text with escapes; replacing a block
+changes its form. An unset value uses an empty right-hand side, while an
+explicit empty string is quoted. Appending can also specify an opaque type
+annotation.
+
+The helpers check input and output syntax, but do not perform common string
+decoding, type conversion or application-schema validation for the whole file.
+Validate those stages before using or persisting the returned source. The Go
+helper takes bytes; C++ uses a UTF-8 `std::string`. The other samples accept
+source strings. When reading a file for a string API, use strict UTF-8 decoding
+without replacement and retain any initial BOM and physical line endings.
+
 ## JavaScript and TypeScript
 
 The bundled [JavaScript engine](../scripts/lib/dotreg.mjs) is a verbatim upstream
@@ -80,12 +122,20 @@ The sample API is provisional:
 | `await parse(source)` | Ordered syntax entries, no partial result on failure |
 | `await parseEach(source, visit)` | Awaits each recipient; `false` stops successfully |
 | `decodeString(entry)` | Returns `{ value, unset }`; can fail on invalid quoted text |
+| `await appendValue(source, path, value)` | Adds an occurrence using the source-editing policy above |
+| `await setText(source, path, text)` | Replaces a unique occurrence or adds an untyped one |
+| `await setTextAt(source, path, index, text)` | Replaces one zero-based occurrence |
 
-Sources may be strings, byte arrays, or sync/async iterables of byte arrays.
-Visitors receive headings and complete values. Their original exceptions
+The parsing functions accept strings, byte arrays, or sync/async iterables of
+byte arrays. Visitors receive headings and complete values. Their exceptions
 propagate, and already performed side effects are not rolled back. A block can
 require one physical line of lookahead; byte buffering may read further ahead.
 The caller owns and closes borrowed streams, including after an early stop.
+
+The three writer functions accept a complete source string. For example,
+`await appendValue(source, ['Server', 'Host'], { value: 'localhost', unset: false })`
+returns updated text; it does not save the file. The append value may also
+include a `type` string. The setter text uses `{ value, unset }`.
 
 For TypeScript, use the upstream typed facade with its neighbouring JavaScript
 directory and declarations, or bring the matching `dotreg.d.mts` beside a copied
@@ -117,7 +167,7 @@ prefix selects all values, while `[""]` selects that named key and descendants.
 `*` is literal. No matches succeed with an empty result. Other sample languages
 do not provide the Go consumer just because they share its parser contract.
 
-See the pinned [Go guide](https://github.com/libnumafly/dotReg/blob/4aca4adba1cdc4c523d3e07b91a64403de4f8f68/implementations/go/README.md)
+See the pinned [Go guide](https://github.com/libnumafly/dotReg/blob/2c76ec3d88224c30fad42608dd02a615bd8bfe5c/implementations/go/README.md)
 for ownership, errors and the illustrative `DemoProfile`. Its public API names
 and profile are sample choices.
 

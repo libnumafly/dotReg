@@ -14,9 +14,9 @@ work without a dotReg checkout or network access. The checker needs Node.js 20+.
 - Before writing, editing or converting configuration, read
   [references/syntax.md](references/syntax.md). It covers heading resolution,
   literal versus quoted text, multiline bodies and unset values.
-- Before implementing a loader or application schema, read
+- Before implementing a loader, source writer or application schema, read
   [references/integration.md](references/integration.md). It covers existing
-  language implementations, stage boundaries, retrieval and validation.
+  language implementations, source editing, retrieval and validation.
 - Use [assets/example.dotreg](assets/example.dotreg) for complete-file examples.
   Its annotated types illustrate a demo profile; adopt only the application's
   supported types and keys.
@@ -32,17 +32,20 @@ work without a dotReg checkout or network access. The checker needs Node.js 20+.
 3. Keep decoded key elements as a sequence. A quoted dot is part of one name,
    numeric names remain strings, and an empty name is an explicit element.
    A key can have both its own values and descendants.
-4. Retain every occurrence in source order, including identical repeated values.
-   Keep each occurrence's type annotation, unset flag, value form and source
-   line. Enforce single-value requirements in the application's schema.
+4. Unless the task requests otherwise, retain existing occurrences in source
+   order, including identical repeated values. When retaining syntax results,
+   keep their type annotations, unset flags, value forms and source lines. A
+   deliberate edit may change the edited occurrence's state and form and later
+   line numbers. Enforce single-value requirements in the application's schema.
 5. Keep syntax parsing, common string decoding, type conversion and schema
    validation distinct. Preserve leading zeroes and literal backslashes; do not
    infer numbers, booleans, arrays or null from the text's appearance.
 6. Use the application's declared type profile. A quoted value does not declare
    a string type. Never fall back to another type after a declared conversion
    fails. Candidate type names and sample APIs are provisional, not standards.
-7. Preserve block contents and their internal LF/CRLF when editing. There are no
-   inline comments, implicit environment expansion or automatic includes.
+7. Preserve unmodified block contents and their internal LF/CRLF when editing.
+   There are no inline comments, implicit environment expansion or automatic
+   includes.
 
 ## Check the result
 

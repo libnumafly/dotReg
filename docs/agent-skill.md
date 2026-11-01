@@ -13,6 +13,8 @@ Use it when asking an agent to:
 
 - Create or edit `.dotreg` configuration while preserving resolved keys and text.
 - Add a configuration loader using an existing dotReg implementation.
+- Implement application updates to an existing configuration using suitable
+  sample writer helpers.
 - Define application-specific keys, cardinality, types and validation.
 - Convert existing settings to dotReg without losing repeated values, empty
   names, leading zeroes or the distinction between unset and empty strings.
@@ -22,6 +24,9 @@ and application-schema validation. It preserves repeated identical values in
 source order and distinguishes the current rules from provisional type names
 and sample APIs. Changes to the notation or parser internals should follow the
 [specification](config-format.md) and implementation workflow in this repository.
+For programmatic edits, the integration reference explains the sample writers'
+insertion and replacement behaviour, including repeated occurrences. Their
+formatting policy is not a canonical notation rule.
 
 ## Files to install
 

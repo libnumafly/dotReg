@@ -2,7 +2,7 @@
 
 This is a task-focused guide to the revision recorded in
 [upstream.json](upstream.json). The upstream
-[format specification](https://github.com/libnumafly/dotReg/blob/4aca4adba1cdc4c523d3e07b91a64403de4f8f68/docs/config-format.md)
+[format specification](https://github.com/libnumafly/dotReg/blob/2c76ec3d88224c30fad42608dd02a615bd8bfe5c/docs/config-format.md)
 defines the rules. Fragments below omit file properties unless marked complete.
 
 ## Complete files and physical lines
@@ -193,6 +193,6 @@ not settle the open specification questions.
 The `base64` text representation is defined as padded standard Base64 with no
 wrapping or non-alphabet characters, including whitespace. This does not make
 `base64` a standard type name or a supported Go demo type. Read the upstream
-[type profile](https://github.com/libnumafly/dotReg/blob/4aca4adba1cdc4c523d3e07b91a64403de4f8f68/docs/type-profile.md)
-and [open matters](https://github.com/libnumafly/dotReg/blob/4aca4adba1cdc4c523d3e07b91a64403de4f8f68/docs/open-issues.md)
+[type profile](https://github.com/libnumafly/dotReg/blob/2c76ec3d88224c30fad42608dd02a615bd8bfe5c/docs/type-profile.md)
+and [open matters](https://github.com/libnumafly/dotReg/blob/2c76ec3d88224c30fad42608dd02a615bd8bfe5c/docs/open-issues.md)
 when those distinctions affect the application.

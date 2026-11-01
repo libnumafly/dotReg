@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/libnumafly/dotReg",
-  "revision": "4aca4adba1cdc4c523d3e07b91a64403de4f8f68",
+  "revision": "2c76ec3d88224c30fad42608dd02a615bd8bfe5c",
   "format_version": "0.1",
   "note": "Bundled files are verbatim snapshots. References summarise this revision; the upstream specification remains authoritative. Hashes describe the listed source bytes.",
   "sources": [
     {
-      "sha256": "1803b8ce3725e4a53ca38074a1f622082e4430fe46a5bcc98847ceafc9b2a86b",
+      "sha256": "da560eba056c8000cdcec8a8e9d89e539df14c931edf86b26d2cea51e2f73c5e",
       "path": "docs/config-format.md"
     },
     {
@@ -13,25 +13,85 @@
       "path": "docs/type-profile.md"
     },
     {
-      "sha256": "1580db2e2be674c1eac144b863c30f59fd69e82eaabedfc1cd6af304de3fe661",
+      "sha256": "0c393f56a8b813262b2169c9531df40f8fc5b206305e35664983d906f8a091b5",
       "path": "docs/open-issues.md"
     },
     {
-      "sha256": "13c37d94fc2bc7e19e37d23f44ce394999ddb55a9bc759de839dc5acae6901a5",
+      "sha256": "674b7ae8a76c9407bdf8a1ecc890e582996e709c3a5dca940610541de1d63705",
       "path": "implementations/README.md"
     },
     {
-      "sha256": "3336abb6ac51f6fecf7a6473f79310a01d3b1fb60d31512135fe9b9b4ac40d06",
+      "sha256": "f2f74c0f27afb26f75a842d376409b582312c02621856e22b0651900d83bcc0f",
       "path": "implementations/go/README.md"
     },
     {
-      "sha256": "ccebcdc5e273b971d7627a6e71fb21e8542cc8b8785036cf6bf58d416d4d237a",
+      "sha256": "e2c7072913d38aff794a9b6d2a9a55569b137bfe3f64882d62e8b2a8b9c20574",
+      "path": "implementations/go/writer.go"
+    },
+    {
+      "sha256": "ecaacbc54f3c79a12dea9db4d43b1d54fae7288401244725f43ff097cf38566a",
       "path": "implementations/javascript/README.md"
     },
     {
       "bundled_path": "scripts/lib/dotreg.mjs",
-      "sha256": "c6e43827e451565c7e243dfc459c2cbb1bbdbfe8a0d84feeafb26f2d1816fedb",
+      "sha256": "e806d970ca6d4ffb82aa66eef908199b20c0525110f7a820b0dacaf33835d8da",
       "path": "implementations/javascript/dotreg.mjs"
+    },
+    {
+      "sha256": "e4eb87c0f35dbaa2695b015d7bf9c535f8995b0ea6a5bd6b29391d5eae7c1ef3",
+      "path": "implementations/javascript/dotreg.d.mts"
+    },
+    {
+      "sha256": "46976610add54bb1c38de071e7554660edc3e0d44817b190ffacfcf57751292a",
+      "path": "implementations/typescript/README.md"
+    },
+    {
+      "sha256": "6bc844d0655d6476574a75f9c0aae6f099bc3b561307b9e5e5c28bee84e86814",
+      "path": "implementations/typescript/dotreg.mts"
+    },
+    {
+      "sha256": "4fac5359f806aefd3f7a368ae9887590314a4a3b50f4fb67371f6897818c1713",
+      "path": "implementations/python/README.md"
+    },
+    {
+      "sha256": "4c84e291218ae8b0a078eea29aac016a659edc67add8254d08e428ac336c3df5",
+      "path": "implementations/python/dotreg.py"
+    },
+    {
+      "sha256": "6a3df3dd24a52425f4cdf1d3f72f633d02db6315c584fcbc499fd4821f8e83af",
+      "path": "implementations/java/README.md"
+    },
+    {
+      "sha256": "41f1aa38412117934337e3baa7b5ca5eb748df5b6a3c78ecb5bd44594836cdbe",
+      "path": "implementations/java/DotReg.java"
+    },
+    {
+      "sha256": "9fde6a2d7b3acc10f93b9eb402b975b2ab571eddf359aa3f6da63bfd808989b8",
+      "path": "implementations/csharp/README.md"
+    },
+    {
+      "sha256": "dc14e758b7e6c8636d59cd9c704bbf82b5412545c3902a5a7854656689247c2b",
+      "path": "implementations/csharp/Writer.cs"
+    },
+    {
+      "sha256": "82f2192c410202336eca34379c4a8fc73e468cbb22b4b8a3b691d210b502a9d6",
+      "path": "implementations/rust/README.md"
+    },
+    {
+      "sha256": "bf79bc70edb135c2d629802b80aa5546ea97072f33e3d482f5e8c197aeca4aee",
+      "path": "implementations/rust/src/lib.rs"
+    },
+    {
+      "sha256": "0722822a451128047dce5f2bf76c5b4147313a018702a5b98517dd38c8ea0e87",
+      "path": "implementations/rust/src/writer.rs"
+    },
+    {
+      "sha256": "d4fdd9dbf162373b712b9cdd0a634dc06baaed24998494695bfa8ece56acba64",
+      "path": "implementations/cpp/README.md"
+    },
+    {
+      "sha256": "d22836d81caede8b949b4fdda3d152a01c256e9ac92d8ef32a576a72a33148d9",
+      "path": "implementations/cpp/dotreg.hpp"
     },
     {
       "bundled_path": "assets/example.dotreg",
